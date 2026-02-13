@@ -10,23 +10,13 @@ LABEL \
 ENV \
     PATH="$PNPM_HOME:$PATH" \
     CRON_SECRET="test" \
-    RESEND_API_KEY="test" \
-    STRIPE_SECRET_KEY="test" \
     TINY_BIRD_API_KEY="test" \
-    TEAM_ID_VERCEL="test" \
-    PROJECT_ID_VERCEL="test" \
     SELF_HOST="true" \
     NODE_ENV="production" \
-    NEXT_PUBLIC_OPENPANEL_CLIENT_ID="test" \
-    OPENPANEL_CLIENT_SECRET="test" \
     NEXT_PUBLIC_URL="http://localhost:3002" \
     UNKEY_TOKEN="test" \
-    RANDOM_YOLO="YOLO" \
-    UPSTASH_REDIS_REST_TOKEN="test" \
     UNKEY_API_ID="test" \
     DATABASE_URL="http://libsql:8080" \
-    UPSTASH_REDIS_REST_URL="test" \
-    VERCEL_AUTH_BEARER_TOKEN="test" \
     PNPM_HOME="/pnpm" \
     DATABASE_AUTH_TOKEN="test"
 WORKDIR /app

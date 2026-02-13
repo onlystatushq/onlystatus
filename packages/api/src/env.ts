@@ -4,10 +4,10 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     TINY_BIRD_API_KEY: z.string(),
-    SMTP_HOST: z.string(),
-    SMTP_PORT: z.coerce.number(),
-    SMTP_USER: z.string(),
-    SMTP_PASS: z.string(),
+    SMTP_HOST: z.string().default("localhost"),
+    SMTP_PORT: z.coerce.number().default(587),
+    SMTP_USER: z.string().default(""),
+    SMTP_PASS: z.string().default(""),
     CRON_SECRET: z.string(),
     UNKEY_TOKEN: z.string(),
     UNKEY_API_ID: z.string(),
