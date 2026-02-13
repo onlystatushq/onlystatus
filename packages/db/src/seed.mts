@@ -16,8 +16,6 @@ import {
   statusReport,
   statusReportUpdate,
   statusReportsToPageComponents,
-  user,
-  usersToWorkspaces,
   workspace,
 } from "./schema";
 
@@ -31,7 +29,7 @@ async function main() {
     .values([
       {
         id: 1,
-        slug: "love-openstatus",
+        slug: "onlystatus",
         stripeId: "stripeId1",
         name: "test",
         subscriptionId: "subscriptionId",
@@ -72,9 +70,9 @@ async function main() {
         id: 1,
         workspaceId: 1,
         active: true,
-        url: "https://www.openstatus.dev",
-        name: "OpenStatus",
-        description: "OpenStatus website",
+        url: "https://www.onlystatus.com",
+        name: "OnlyStatus",
+        description: "OnlyStatus website",
         method: "POST",
         periodicity: "1m",
         regions: "ams",
@@ -95,9 +93,9 @@ async function main() {
         id: 3,
         workspaceId: 1,
         active: true,
-        url: "https://www.openstatus.dev",
-        name: "OpenStatus",
-        description: "OpenStatus website",
+        url: "https://www.onlystatus.com",
+        name: "OnlyStatus",
+        description: "OnlyStatus website",
         method: "GET",
         periodicity: "1m",
         regions: "ams",
@@ -121,7 +119,7 @@ async function main() {
         active: true,
         workspaceId: 3,
         periodicity: "10m",
-        url: "https://openstat.us",
+        url: "https://www.onlystatus.com",
         method: "GET",
         regions: "ams",
         public: true,
@@ -137,7 +135,7 @@ async function main() {
       workspaceId: 1,
       title: "Acme Inc.",
       description: "Get informed about our services.",
-      icon: "https://www.openstatus.dev/favicon.ico",
+      icon: "https://www.onlystatus.com/favicon.ico",
       slug: "status",
       customDomain: "",
       published: true,
@@ -145,23 +143,7 @@ async function main() {
     .onConflictDoNothing()
     .run();
 
-  await db
-    .insert(user)
-    .values({
-      id: 1,
-      tenantId: "1",
-      firstName: "Speed",
-      lastName: "Matters",
-      email: "ping@openstatus.dev",
-      photoUrl: "",
-    })
-    .onConflictDoNothing()
-    .run();
-  await db
-    .insert(usersToWorkspaces)
-    .values({ workspaceId: 1, userId: 1 })
-    .onConflictDoNothing()
-    .run();
+  // User created via first-time setup flow, not seeded
 
   // Page Components - representing monitors on the status page
   await db
@@ -173,7 +155,7 @@ async function main() {
         pageId: 1,
         type: "monitor",
         monitorId: 1,
-        name: "OpenStatus Monitor",
+        name: "OnlyStatus Monitor",
         description: "Main website monitoring",
         order: 0,
       },
@@ -197,7 +179,7 @@ async function main() {
       id: 1,
       provider: "email",
       name: "sample test notification",
-      data: '{"email":"ping@openstatus.dev"}',
+      data: '{"email":"ping@onlystatus.com"}',
       workspaceId: 1,
     })
     .onConflictDoNothing()
