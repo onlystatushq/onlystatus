@@ -12,7 +12,6 @@
     "lint:oxc": "oxlint .",
     "lint:oxc-type": "oxlint . --type-aware --fix --fix-suggestions",
     "format:oxc": "oxfmt --check",
-    "dev:web": "turbo run dev --filter='./apps/web' --filter='./packages/db'",
     "dev:status-page": "turbo run dev --filter='./apps/status-page' --filter='./packages/db'",
     "dev:dashboard": "turbo run dev --filter='./apps/dashboard' --filter='./packages/db'",
     "dx": "turbo run dx",

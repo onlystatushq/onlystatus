@@ -1,9 +1,6 @@
 # Files to exclude from Docker context
 ignore:
   - node_modules
-  - /apps/docs
-  - /apps/screenshot-service
-  - /apps/web
   - /apps/dashboard
   - /apps/status-page
   - /apps/workflows
