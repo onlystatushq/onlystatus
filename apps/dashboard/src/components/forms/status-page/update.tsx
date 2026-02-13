@@ -109,7 +109,6 @@ export function FormStatusPageUpdate() {
         }}
       />
       <FormCustomDomain
-        locked={workspace.limits["custom-domain"] === false}
         defaultValues={{
           domain: statusPage.customDomain ?? undefined,
         }}

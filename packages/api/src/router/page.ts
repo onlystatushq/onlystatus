@@ -16,40 +16,10 @@ import {
 } from "@openstatus/db/src/schema";
 
 import { Events } from "@openstatus/analytics";
-import { env } from "../env";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 if (process.env.NODE_ENV === "test") {
   require("../test/preload");
-}
-
-// Helper functions to reuse Vercel API logic
-async function addDomainToVercel(domain: string) {
-  const data = await fetch(
-    `https://api.vercel.com/v9/projects/${env.PROJECT_ID_VERCEL}/domains?teamId=${env.TEAM_ID_VERCEL}`,
-    {
-      body: JSON.stringify({ name: domain }),
-      headers: {
-        Authorization: `Bearer ${env.VERCEL_AUTH_BEARER_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    },
-  );
-  return data.json();
-}
-
-async function removeDomainFromVercel(domain: string) {
-  const data = await fetch(
-    `https://api.vercel.com/v9/projects/${env.PROJECT_ID_VERCEL}/domains/${domain}?teamId=${env.TEAM_ID_VERCEL}`,
-    {
-      headers: {
-        Authorization: `Bearer ${env.VERCEL_AUTH_BEARER_TOKEN}`,
-      },
-      method: "DELETE",
-    },
-  );
-  return data.json();
 }
 
 export const pageRouter = createTRPCRouter({
@@ -383,82 +353,13 @@ export const pageRouter = createTRPCRouter({
         eq(page.id, opts.input.id),
       ];
 
-      if (opts.input.customDomain.includes("openstatus")) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Domain cannot contain 'openstatus'",
-        });
-      }
-
-      // Get the current page to check the existing custom domain
-      const currentPage = await opts.ctx.db.query.page.findFirst({
-        where: and(...whereConditions),
-      });
-
-      if (!currentPage) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Page not found",
-        });
-      }
-
-      const oldDomain = currentPage.customDomain;
-      const newDomain = opts.input.customDomain;
-
-      try {
-        // Handle domain changes
-        if (newDomain && !oldDomain) {
-          // Adding a new domain
-          await opts.ctx.db
-            .update(page)
-            .set({ customDomain: newDomain, updatedAt: new Date() })
-            .where(and(...whereConditions))
-            .run();
-
-          // Add domain to Vercel using the domain router logic
-          await addDomainToVercel(newDomain);
-        } else if (oldDomain && newDomain !== oldDomain) {
-          // Changing domain - remove old and add new
-          await opts.ctx.db
-            .update(page)
-            .set({ customDomain: newDomain, updatedAt: new Date() })
-            .where(and(...whereConditions))
-            .run();
-
-          // Remove old domain from Vercel
-          await removeDomainFromVercel(oldDomain);
-
-          // Add new domain to Vercel
-          if (newDomain) {
-            await addDomainToVercel(newDomain);
-          }
-        } else if (oldDomain && newDomain === "") {
-          // Removing domain
-          await opts.ctx.db
-            .update(page)
-            .set({ customDomain: "", updatedAt: new Date() })
-            .where(and(...whereConditions))
-            .run();
-
-          // Remove domain from Vercel
-          await removeDomainFromVercel(oldDomain);
-        } else {
-          // No change needed, just update the database
-          await opts.ctx.db
-            .update(page)
-            .set({ customDomain: newDomain, updatedAt: new Date() })
-            .where(and(...whereConditions))
-            .run();
-        }
-      } catch (error) {
-        // If Vercel operations fail, we should rollback the database change
-        // For now, we'll just throw the error
-        console.error("Error updating custom domain:", error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to update custom domain",
-        });
-      }
+      // Store the custom domain value in DB.
+      // Actual domain provisioning requires manual reverse proxy configuration.
+      await opts.ctx.db
+        .update(page)
+        .set({ customDomain: opts.input.customDomain, updatedAt: new Date() })
+        .where(and(...whereConditions))
+        .run();
     }),
 
   updatePasswordProtection: protectedProcedure

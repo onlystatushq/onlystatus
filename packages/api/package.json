@@ -8,8 +8,7 @@
     "./src/trpc": "./src/trpc.ts",
     "./src/edge": "./src/edge.ts",
     "./src/lambda": "./src/lambda.ts",
-    "./src/root": "./src/root.ts",
-    "./src/router/domain": "./src/router/domain.ts"
+    "./src/root": "./src/root.ts"
   },
   "scripts": {
     "test": "bun test",

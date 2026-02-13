@@ -47,8 +47,8 @@ export const selectWorkspaceSchema = createSelectSchema(workspace)
     plan: z
       .enum(workspacePlans)
       .nullable()
-      .prefault("free")
-      .transform((val) => val ?? "free"),
+      .prefault("team")
+      .transform((val) => val ?? "team"),
     // REMINDER: workspace usage
     usage: z
       .object({
