@@ -210,6 +210,19 @@ const enforceUserIsAuthed = t.middleware(async (opts) => {
   const user = schema.selectUserSchema.parse(userProps);
   const workspace = schema.selectWorkspaceSchema.parse(activeWorkspace);
 
+  // Check if user account is disabled
+  if (user.disabled) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "Account disabled" });
+  }
+
+  // Force password change guard: block all routes except auth.changePassword
+  if (user.forcePasswordChange && opts.path !== "auth.changePassword") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "PASSWORD_CHANGE_REQUIRED",
+    });
+  }
+
   const result = await opts.next({ ctx: { ...ctx, user, workspace } });
 
   if (process.env.NODE_ENV === "test") {
@@ -275,3 +288,15 @@ export const formdataMiddleware = t.middleware(async (opts) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+/**
+ * Root procedure - only accessible to root users (is_root = 1)
+ */
+const enforceUserIsRoot = t.middleware(async (opts) => {
+  if (!opts.ctx.user?.isRoot) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Root access required" });
+  }
+  return opts.next({ ctx: opts.ctx });
+});
+
+export const rootProcedure = protectedProcedure.use(enforceUserIsRoot);

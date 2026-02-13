@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { and, eq, isNotNull } from "@openstatus/db";
 import {
-  invitation,
   maintenance,
   pageSubscriber,
   selectWorkspaceSchema,
@@ -139,31 +138,6 @@ export const emailRouter = createTRPCRouter({
         });
       }
     }),
-  sendTeamInvitation: protectedProcedure
-    .input(z.object({ id: z.number(), baseUrl: z.string().optional() }))
-    .mutation(async (opts) => {
-      const limits = opts.ctx.workspace.limits;
-
-      if (limits.members === "Unlimited" || limits.members > 1) {
-        const _invitation = await opts.ctx.db.query.invitation.findFirst({
-          where: and(
-            eq(invitation.id, opts.input.id),
-            eq(invitation.workspaceId, opts.ctx.workspace.id),
-          ),
-        });
-
-        if (!_invitation) return;
-
-        await emailClient.sendTeamInvitation({
-          to: _invitation.email,
-          token: _invitation.token,
-          invitedBy: `${opts.ctx.user.email}`,
-          workspaceName: opts.ctx.workspace.name || "OpenStatus",
-          baseUrl: opts.input.baseUrl,
-        });
-      }
-    }),
-
   sendPageSubscription: publicProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async (opts) => {
