@@ -29,7 +29,7 @@ const MonitorDeactivationEmail = ({
     <Html>
       <Head />
       <Preview>
-        Login to your OpenStatus account to keep your monitors active.
+        Login to your account to keep your monitors active.
       </Preview>
       <Body style={styles.main}>
         <Layout>
@@ -50,18 +50,12 @@ const MonitorDeactivationEmail = ({
             your account or upgrade to a paid plan.
           </Text>
           <Text style={{ textAlign: "center" }}>
-            <Button style={styles.button} href="https://www.openstatus.dev/app">
+            <Button style={styles.button} href="https://onlystatus.dev/app">
               Login
             </Button>
           </Text>
           <Text>If you have any questions, please reply to this email.</Text>
-          <Text>Thibault </Text>
-          <Text>
-            Check out our latest update{" "}
-            <a href="https://www.openstatus.dev/changelog?ref=paused-email">
-              here
-            </a>
-          </Text>
+          <Text>The OnlyStatus Team</Text>
         </Layout>
       </Body>
     </Html>

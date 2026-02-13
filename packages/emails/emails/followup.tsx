@@ -6,21 +6,18 @@ const FollowUpEmail = () => {
   return (
     <Html>
       <Head>
-        <title>How's it going with openstatus?</title>
+        <title>How's it going with OnlyStatus?</title>
       </Head>
-      <Preview>How's it going with openstatus?</Preview>
+      <Preview>How's it going with OnlyStatus?</Preview>
       <Body>
-        Hey
+        Hey,
         <br />
         <br />
-        How’s everything going with openstatus so far? Let me know if you run
-        into any issues, or have any feedback, good or bad!
+        How's everything going with OnlyStatus so far? Let us know if you run
+        into any issues or have any feedback.
         <br />
         <br />
-        Thank you,
-        <br />
-        <br />
-        Thibault Le Ouay Ducasse
+        The OnlyStatus Team
         <br />
       </Body>
     </Html>

@@ -48,8 +48,8 @@ const StatusPageMagicLinkEmail = ({ page, link }: StatusPageMagicLinkProps) => {
 };
 
 StatusPageMagicLinkEmail.PreviewProps = {
-  page: "OpenStatus",
-  link: "https://slug.openstatus.dev/verify/token-xyz",
+  page: "OnlyStatus",
+  link: "https://slug.onlystatus.dev/verify/token-xyz",
 } satisfies StatusPageMagicLinkProps;
 
 export default StatusPageMagicLinkEmail;

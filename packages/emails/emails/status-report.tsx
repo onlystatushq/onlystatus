@@ -134,7 +134,7 @@ function StatusReportEmail({
 }
 
 StatusReportEmail.PreviewProps = {
-  pageTitle: "OpenStatus Status",
+  pageTitle: "OnlyStatus Status",
   reportTitle: "API Unavaible",
   status: "investigating",
   date: new Date().toISOString(),
@@ -160,9 +160,9 @@ StatusReportEmail.PreviewProps = {
 
 We'll post another update by **19:00 UTC** today or sooner if critical developments occur. We apologize for the inconvenience and appreciate your patience as we restore full cache functionality.
   `,
-  pageComponents: ["OpenStatus API", "OpenStatus Webhook"],
+  pageComponents: ["API", "Webhook"],
   unsubscribeUrl:
-    "https://status.openstatus.dev/unsubscribe/550e8400-e29b-41d4-a716-446655440000",
+    "https://status.onlystatus.dev/unsubscribe/550e8400-e29b-41d4-a716-446655440000",
 };
 
 export default StatusReportEmail;

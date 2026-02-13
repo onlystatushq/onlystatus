@@ -27,16 +27,16 @@ const SubscribeEmail = ({ page, link }: SubscribeProps) => {
         <p>
           <a href={link}>Confirm subscription</a>
         </p>
-        <br />🚀 Powered by{" "}
-        <Link href="https://www.openstatus.dev">OpenStatus.dev</Link>
+        <br />Powered by{" "}
+        <Link href="https://onlystatus.dev">OnlyStatus</Link>
       </Body>
     </Html>
   );
 };
 
 SubscribeEmail.PreviewProps = {
-  page: "OpenStatus",
-  link: "https://slug.openstatus.dev/verify/token-xyz",
+  page: "OnlyStatus",
+  link: "https://slug.onlystatus.dev/verify/token-xyz",
 } satisfies SubscribeProps;
 
 export default SubscribeEmail;

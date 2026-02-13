@@ -15,9 +15,9 @@ interface LayoutProps {
 }
 
 const defaultImg = {
-  src: "https://openstatus.dev/assets/logos/OpenStatus.png",
-  alt: "OpenStatus",
-  href: "https://openstatus.dev",
+  src: "https://onlystatus.dev/assets/logos/onlystatus.png",
+  alt: "OnlyStatus",
+  href: "https://onlystatus.dev",
 };
 
 export function Layout({ children, img = defaultImg }: LayoutProps) {

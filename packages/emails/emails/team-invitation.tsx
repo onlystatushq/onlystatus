@@ -13,7 +13,7 @@ import { z } from "zod";
 import { Layout } from "./_components/layout";
 import { styles } from "./_components/styles";
 
-const BASE_URL = "https://app.openstatus.dev/invite";
+const BASE_URL = "https://onlystatus.dev/invite";
 
 export const TeamInvitationSchema = z.object({
   invitedBy: z.string(),
@@ -33,12 +33,12 @@ const TeamInvitationEmail = ({
   return (
     <Html>
       <Head />
-      <Preview>You have been invited to join OpenStatus.dev</Preview>
+      <Preview>You have been invited to join OnlyStatus</Preview>
       <Body style={styles.main}>
         <Layout>
           <Heading as="h3">
             You have been invited to join{" "}
-            {workspaceName ? `"${workspaceName}" workspace` : "OpenStatus.dev"}{" "}
+            {workspaceName ? `"${workspaceName}" workspace` : "OnlyStatus"}{" "}
             by {invitedBy}
           </Heading>
           <Text>
@@ -58,8 +58,8 @@ const TeamInvitationEmail = ({
 
 TeamInvitationEmail.PreviewProps = {
   token: "token",
-  workspaceName: "OpenStatus",
-  invitedBy: "max@openstatus.dev",
+  workspaceName: "OnlyStatus",
+  invitedBy: "user@onlystatus.dev",
 } satisfies TeamInvitationProps;
 
 export default TeamInvitationEmail;

@@ -7,16 +7,16 @@ export function Footer() {
   return (
     <Section style={{ textAlign: "center" }}>
       <Text>
-        <Link style={styles.link} href="https://openstatus.dev">
+        <Link style={styles.link} href="https://onlystatus.dev">
           Home Page
         </Link>{" "}
         ・{" "}
-        <Link style={styles.link} href="mailto:ping@openstatus.dev">
+        <Link style={styles.link} href="mailto:support@onlystatus.dev">
           Contact Support
         </Link>
       </Text>
 
-      <Text>OpenStatus ・ 122 Rue Amelot ・ 75011 Paris, France</Text>
+      <Text>OnlyStatus</Text>
     </Section>
   );
 }

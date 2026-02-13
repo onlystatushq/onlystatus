@@ -40,9 +40,8 @@ export class EmailClient {
     try {
       const html = await render(<FollowUpEmail />);
       const result = await this.client.emails.send({
-        from: "Thibault Le Ouay Ducasse <welcome@openstatus.dev>",
-        replyTo: "Thibault Le Ouay Ducasse <thibault@openstatus.dev>",
-        subject: "How's it going with OpenStatus?",
+        from: "OnlyStatus <notifications@onlystatus.dev>",
+        subject: "How's it going with OnlyStatus?",
         to: req.to,
         html,
       });
@@ -67,8 +66,8 @@ export class EmailClient {
     const html = await render(<FollowUpEmail />);
     const result = await this.client.batch.send(
       req.to.map((subscriber) => ({
-        from: "Thibault Le Ouay Ducasse <thibault@openstatus.dev>",
-        subject: "How's it going with OpenStatus?",
+        from: "OnlyStatus <notifications@onlystatus.dev>",
+        subject: "How's it going with OnlyStatus?",
         to: subscriber,
         html,
       })),
@@ -98,7 +97,7 @@ export class EmailClient {
   ) {
     const statusPageBaseUrl = req.customDomain
       ? `https://${req.customDomain}`
-      : `https://${req.pageSlug}.openstatus.dev`;
+      : `https://${req.pageSlug}.onlystatus.dev`;
 
     if (process.env.NODE_ENV === "development") {
       console.log(
@@ -116,7 +115,7 @@ export class EmailClient {
             recipients.map((subscriber) => {
               const unsubscribeUrl = `${statusPageBaseUrl}/unsubscribe/${subscriber.token}`;
               return {
-                from: `${req.pageTitle} <notifications@notifications.openstatus.dev>`,
+                from: `${req.pageTitle} <notifications@onlystatus.dev>`,
                 subject: req.reportTitle,
                 to: subscriber.email,
                 react: (
@@ -158,10 +157,10 @@ export class EmailClient {
       const html = await render(<TeamInvitationEmail {...req} />);
       const result = await this.client.emails.send({
         from: `${
-          req.workspaceName ?? "OpenStatus"
-        } <notifications@notifications.openstatus.dev>`,
+          req.workspaceName ?? "OnlyStatus"
+        } <notifications@onlystatus.dev>`,
         subject: `You've been invited to join ${
-          req.workspaceName ?? "OpenStatus"
+          req.workspaceName ?? "OnlyStatus"
         }`,
         to: req.to,
         html,
@@ -188,7 +187,7 @@ export class EmailClient {
       // const html = await render(<MonitorAlertEmail {...req} />);
       const html = monitorAlertEmail(req);
       const result = await this.client.emails.send({
-        from: "OpenStatus <notifications@notifications.openstatus.dev>",
+        from: "OnlyStatus <notifications@onlystatus.dev>",
         subject: `${req.name}: ${req.type.toUpperCase()}`,
         to: req.to,
         html,
@@ -217,7 +216,7 @@ export class EmailClient {
     try {
       const html = await render(<PageSubscriptionEmail {...req} />);
       const result = await this.client.emails.send({
-        from: "Status Page <notifications@notifications.openstatus.dev>",
+        from: "Status Page <notifications@onlystatus.dev>",
         subject: `Confirm your subscription to ${req.page}`,
         to: req.to,
         html,
@@ -246,7 +245,7 @@ export class EmailClient {
     try {
       const html = await render(<StatusPageMagicLinkEmail {...req} />);
       const result = await this.client.emails.send({
-        from: "Status Page <notifications@notifications.openstatus.dev>",
+        from: "Status Page <notifications@onlystatus.dev>",
         subject: `Authenticate to ${req.page}`,
         to: req.to,
         html,
@@ -276,7 +275,7 @@ export class EmailClient {
   }) {
     const statusPageBaseUrl = req.customDomain
       ? `https://${req.customDomain}`
-      : `https://${req.pageSlug}.openstatus.dev`;
+      : `https://${req.pageSlug}.onlystatus.dev`;
 
     if (process.env.NODE_ENV === "development") {
       console.log(
@@ -294,7 +293,7 @@ export class EmailClient {
             recipients.map((subscriber) => {
               const unsubscribeUrl = `${statusPageBaseUrl}/unsubscribe/${subscriber.token}`;
               return {
-                from: `${req.pageTitle} <notifications@notifications.openstatus.dev>`,
+                from: `${req.pageTitle} <notifications@onlystatus.dev>`,
                 subject: `Scheduled Maintenance: ${req.maintenanceTitle}`,
                 to: subscriber.email,
                 react: (

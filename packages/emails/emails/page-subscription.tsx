@@ -58,8 +58,8 @@ const PageSubscriptionEmail = ({ page, link, img }: PageSubscriptionProps) => {
 };
 
 PageSubscriptionEmail.PreviewProps = {
-  link: "https://slug.openstatus.dev/verify/token",
-  page: "OpenStatus",
+  link: "https://slug.onlystatus.dev/verify/token",
+  page: "OnlyStatus",
 } satisfies PageSubscriptionProps;
 
 export default PageSubscriptionEmail;

@@ -141,7 +141,7 @@ const MonitorAlertEmail = (props: MonitorAlertProps) => (
         <Row style={styles.row}>
           <Column>
             <Text style={{ textAlign: "center" }}>
-              <Link style={styles.link} href="https://openstatus.dev/app">
+              <Link style={styles.link} href="https://onlystatus.dev/app">
                 View details
               </Link>
             </Text>
@@ -155,7 +155,7 @@ const MonitorAlertEmail = (props: MonitorAlertProps) => (
 MonitorAlertEmail.PreviewProps = {
   type: "alert",
   name: "Ping Pong",
-  url: "https://openstatus.dev/ping",
+  url: "https://onlystatus.dev/ping",
   method: "GET",
   status: "200",
   latency: "300ms",
