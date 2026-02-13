@@ -14,7 +14,7 @@ import { EmailClient } from "@openstatus/emails";
 import type { maintenancesApi } from "./index";
 import { MaintenanceSchema } from "./schema";
 
-const emailClient = new EmailClient({ apiKey: env.RESEND_API_KEY });
+const emailClient = new EmailClient({ smtpHost: env.SMTP_HOST, smtpPort: env.SMTP_PORT, smtpUser: env.SMTP_USER, smtpPass: env.SMTP_PASS });
 
 const postRoute = createRoute({
   method: "post",

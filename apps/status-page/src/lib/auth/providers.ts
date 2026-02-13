@@ -10,7 +10,10 @@ export const ResendProvider = Resend({
     const email = params.identifier;
 
     const emailClient = new EmailClient({
-      apiKey: process.env.RESEND_API_KEY ?? "",
+      smtpHost: process.env.SMTP_HOST ?? "localhost",
+      smtpPort: Number(process.env.SMTP_PORT ?? "587"),
+      smtpUser: process.env.SMTP_USER,
+      smtpPass: process.env.SMTP_PASS,
     });
 
     const { prefix } = getValidCustomDomain(params.request);
