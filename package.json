@@ -32,10 +32,14 @@
   },
   "packageManager": "pnpm@10.26.0",
   "pnpm": {
-    "onlyBuiltDependencies": ["@sentry/cli", "@swc/core", "sharp"]
+    "onlyBuiltDependencies": ["@sentry/cli", "@swc/core", "sharp", "argon2"]
   },
   "name": "openstatus",
-  "workspaces": ["apps/*", "packages/**/*", "packages/config/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/**/*",
+    "packages/config/*"
+  ],
   "overrides": {
     "@react-email/preview-server": "npm:next@16.0.10"
   }

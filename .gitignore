@@ -76,3 +76,12 @@ packages/ui/public/r
 # For vibing
 research.md
 plan.md
+
+# Build artifacts
+*.tsbuildinfo
+
+# Local/dev files
+bun.lock
+data/
+docker-compose.traefik.yml
+.agents/
