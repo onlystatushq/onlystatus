@@ -1,0 +1,40 @@
+# Dev mode with hot reload (no build, mount source directly)
+# Usage: docker compose -f docker-compose.yaml -f docker-compose.dev.yml up
+#
+# Dashboard:    http://localhost:3002
+# Status Page:  http://localhost:3003
+
+services:
+  # Override dashboard: dev mode with hot reload
+  dashboard:
+    build: !reset null
+    image: node:25-slim
+    volumes:
+      - .:/app
+    working_dir: /app/apps/dashboard
+    command: ["npx", "next", "dev", "--turbopack", "--hostname", "0.0.0.0", "--port", "3000"]
+    ports:
+      - "3002:3000"
+    environment:
+      - DATABASE_URL=http://libsql:8080
+      - NODE_ENV=development
+      - HOSTNAME=0.0.0.0
+      - AUTH_TRUST_HOST=true
+    healthcheck: !reset null
+
+  # Override status-page: dev mode with hot reload
+  status-page:
+    build: !reset null
+    image: node:25-slim
+    volumes:
+      - .:/app
+    working_dir: /app/apps/status-page
+    command: ["npx", "next", "dev", "--turbopack", "--hostname", "0.0.0.0", "--port", "3000"]
+    ports:
+      - "3003:3000"
+    environment:
+      - DATABASE_URL=http://libsql:8080
+      - NODE_ENV=development
+      - HOSTNAME=0.0.0.0
+      - AUTH_TRUST_HOST=true
+    healthcheck: !reset null
