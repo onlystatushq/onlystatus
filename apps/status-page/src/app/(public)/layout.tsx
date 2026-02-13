@@ -10,7 +10,6 @@ import {
   SidebarProvider,
 } from "@openstatus/ui/components/ui/sidebar";
 import { Toaster } from "@openstatus/ui/components/ui/sonner";
-import PlausibleProvider from "next-plausible";
 import { Suspense } from "react";
 
 const SIDEBAR_WIDTH = "20rem";
@@ -22,7 +21,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   return (
-    <PlausibleProvider domain="themes.openstatus.dev">
+    <>
       <style
         id="theme-styles"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: <explanation>
@@ -53,6 +52,6 @@ export default async function Layout({
         </SidebarProvider>
         <Toaster richColors expand />
       </ThemeProvider>
-    </PlausibleProvider>
+    </>
   );
 }

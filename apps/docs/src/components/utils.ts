@@ -43,13 +43,6 @@ export const statusDictionary: Record<
   },
 } as const;
 
-export async function getStatus(slug: string): Promise<StatusResponse> {
-  const res = await fetch(`https://api.openstatus.dev/public/status/${slug}`);
-
-  if (res.ok) {
-    const data = (await res.json()) as StatusResponse;
-    return data;
-  }
-
-  return { status: "unknown" };
+export async function getStatus(_slug: string): Promise<StatusResponse> {
+  return { status: "operational" };
 }
