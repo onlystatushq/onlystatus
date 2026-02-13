@@ -29,6 +29,16 @@ export const user = sqliteTable("user", {
   updatedAt: integer("updated_at", { mode: "timestamp" }).default(
     sql`(strftime('%s', 'now'))`,
   ),
+
+  // Auth v2 fields
+  passwordHash: text("password_hash"),
+  isRoot: integer("is_root").default(0),
+  totpSecret: text("totp_secret"),
+  totpEnabled: integer("totp_enabled").default(0),
+  forcePasswordChange: integer("force_password_change").default(0),
+  disabled: integer("disabled").default(0),
+  tokenVersion: integer("token_version").default(0),
+  onboardingCompleted: integer("onboarding_completed").default(0),
 });
 
 export const userRelations = relations(user, ({ many }) => ({
