@@ -6,7 +6,6 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@google-cloud/tasks": "4.0.1",
     "@hono/sentry": "1.2.2",
     "@libsql/client": "0.15.15",
     "@logtape/logtape": "2.0.1",

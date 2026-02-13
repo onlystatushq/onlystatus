@@ -5,10 +5,7 @@ export const env = () =>
     .object({
       NODE_ENV: z.string().prefault("development"),
       PORT: z.coerce.number().prefault(3000),
-      GCP_PROJECT_ID: z.string().prefault(""),
-      GCP_CLIENT_EMAIL: z.string().prefault(""),
-      GCP_PRIVATE_KEY: z.string().prefault(""),
-      GCP_LOCATION: z.string().prefault("europe-west1"),
+      CHECKER_URL: z.string().prefault("http://checker:8080"),
       CRON_SECRET: z.string().prefault(""),
       SITE_URL: z.string().prefault("http://localhost:3000"),
       DATABASE_URL: z.string().prefault("http://localhost:8080"),

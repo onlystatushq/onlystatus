@@ -11,7 +11,7 @@ services:
             - UPSTASH_REDIS_REST_URL=test
             - UPSTASH_REDIS_REST_TOKEN=test
             - NODE_ENV=production
-            - GCP_PROJECT_ID=test
+            - CHECKER_URL=http://checker:8080
         extra_hosts:
           - "host.docker.internal:host-gateway"
 
