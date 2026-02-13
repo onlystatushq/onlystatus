@@ -1,12 +1,11 @@
-import { NextResponse } from "next/server";
-
-import { auth } from "@/lib/auth";
+import { type NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 import { db, eq } from "@openstatus/db";
 import { user, usersToWorkspaces, workspace } from "@openstatus/db/src/schema";
 import { getCurrency } from "@openstatus/db/src/schema/plan/utils";
 
-export default auth(async (req) => {
+export default async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const response = NextResponse.next();
 
@@ -21,7 +20,19 @@ export default auth(async (req) => {
     return response;
   }
 
-  if (!req.auth && url.pathname !== "/login") {
+  // Decode JWT directly - edge-compatible, no native deps needed
+  // Behind a TLS-terminating proxy (Traefik), the request arrives as HTTP
+  // but AUTH_TRUST_HOST makes NextAuth set __Secure- prefixed cookies.
+  // Try secure cookie first (HTTPS via proxy), fall back to plain (local dev).
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    secureCookie: req.headers.get("x-forwarded-proto") === "https",
+  });
+
+  const isAuthenticated = !!token?.userId;
+
+  if (!isAuthenticated && url.pathname !== "/login") {
     console.log("User not authenticated, redirecting to login");
     const newURL = new URL("/login", req.url);
     const encodedSearchParams = `${url.pathname}${url.search}`;
@@ -33,7 +44,7 @@ export default auth(async (req) => {
     return NextResponse.redirect(newURL);
   }
 
-  if (req.auth && url.pathname === "/login") {
+  if (isAuthenticated && url.pathname === "/login") {
     const redirectTo = url.searchParams.get("redirectTo");
     console.log("User authenticated, redirecting to", redirectTo);
     if (redirectTo) {
@@ -44,13 +55,13 @@ export default auth(async (req) => {
 
   const hasWorkspaceSlug = req.cookies.has("workspace-slug");
 
-  if (req.auth?.user?.id && !hasWorkspaceSlug) {
+  if (isAuthenticated && token.userId && !hasWorkspaceSlug) {
     const [query] = await db
       .select()
       .from(usersToWorkspaces)
       .innerJoin(user, eq(user.id, usersToWorkspaces.userId))
       .innerJoin(workspace, eq(workspace.id, usersToWorkspaces.workspaceId))
-      .where(eq(user.id, Number.parseInt(req.auth.user.id)))
+      .where(eq(user.id, Number.parseInt(token.userId as string)))
       .all();
 
     if (!query) {
@@ -60,12 +71,12 @@ export default auth(async (req) => {
     response.cookies.set("workspace-slug", query.workspace.slug);
   }
 
-  if (!req.auth && hasWorkspaceSlug) {
+  if (!isAuthenticated && hasWorkspaceSlug) {
     response.cookies.delete("workspace-slug");
   }
 
   return response;
-});
+}
 
 export const config = {
   matcher: [

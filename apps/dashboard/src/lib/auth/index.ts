@@ -1,124 +1,82 @@
 import type { DefaultSession } from "next-auth";
 import NextAuth from "next-auth";
 
-import { Events, setupAnalytics } from "@openstatus/analytics";
 import { db, eq } from "@openstatus/db";
 import { user } from "@openstatus/db/src/schema";
 
-import { WelcomeEmail, sendEmail } from "@openstatus/emails";
-import { headers } from "next/headers";
 import { adapter } from "./adapter";
-import { GitHubProvider, GoogleProvider, ResendProvider } from "./providers";
+import { CredentialsProvider } from "./providers";
 
 export type { DefaultSession };
 
+// Token version cache: userId -> { version, fetchedAt }
+const tokenVersionCache = new Map<
+  number,
+  { version: number; fetchedAt: number }
+>();
+const TOKEN_VERSION_CACHE_TTL = 30_000; // 30 seconds
+
+async function getCachedTokenVersion(userId: number): Promise<number> {
+  const cached = tokenVersionCache.get(userId);
+  if (cached && Date.now() - cached.fetchedAt < TOKEN_VERSION_CACHE_TTL) {
+    return cached.version;
+  }
+
+  const dbUser = await db
+    .select({ tokenVersion: user.tokenVersion })
+    .from(user)
+    .where(eq(user.id, userId))
+    .get();
+
+  const version = dbUser?.tokenVersion ?? 0;
+  tokenVersionCache.set(userId, { version, fetchedAt: Date.now() });
+  return version;
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  // debug: true,
   adapter,
-  providers:
-    process.env.NODE_ENV === "development" || process.env.SELF_HOST === "true"
-      ? [GitHubProvider, GoogleProvider, ResendProvider]
-      : [GitHubProvider, GoogleProvider],
-  callbacks: {
-    async signIn(params) {
-      // We keep updating the user info when we loggin in
-
-      if (params.account?.provider === "google") {
-        if (!params.profile) return true;
-        if (Number.isNaN(Number(params.user.id))) return true;
-
-        await db
-          .update(user)
-          .set({
-            firstName: params.profile.given_name,
-            lastName: params.profile.family_name || "",
-            photoUrl: params.profile.picture,
-            // keep the name in sync
-            name: `${params.profile.given_name} ${
-              params.profile.family_name || ""
-            }`.trim(),
-            updatedAt: new Date(),
-          })
-          .where(eq(user.id, Number(params.user.id)))
-          .run();
-      }
-      if (params.account?.provider === "github") {
-        if (!params.profile) return true;
-        if (Number.isNaN(Number(params.user.id))) return true;
-
-        await db
-          .update(user)
-          .set({
-            name: params.profile.name,
-            photoUrl: String(params.profile.avatar_url),
-            updatedAt: new Date(),
-          })
-          .where(eq(user.id, Number(params.user.id)))
-          .run();
-      }
-
-      // REMINDER: only used in dev mode
-      if (params.account?.provider === "resend") {
-        if (Number.isNaN(Number(params.user.id))) return true;
-        await db
-          .update(user)
-          .set({ updatedAt: new Date() })
-          .where(eq(user.id, Number(params.user.id)))
-          .run();
-      }
-
-      return true;
-    },
-    async session(params) {
-      return params.session;
-    },
+  providers: [CredentialsProvider],
+  session: {
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
-  events: {
-    // That should probably done in the callback method instead
-    async createUser(params) {
-      if (!params.user.id || !params.user.email) {
-        throw new Error("User id & email is required");
+  callbacks: {
+    async jwt({ token, user: authUser, trigger }) {
+      // On sign-in: stamp user data into token
+      if (trigger === "signIn" && authUser) {
+        token.userId = authUser.id;
+        token.email = authUser.email ?? undefined;
+        const dbUser = await db
+          .select({ tokenVersion: user.tokenVersion })
+          .from(user)
+          .where(eq(user.id, Number(authUser.id)))
+          .get();
+        token.tokenVersion = dbUser?.tokenVersion ?? 0;
       }
 
-      // this means the user has already been created with clerk
-      if (params.user.tenantId) return;
+      // On every request: verify tokenVersion (cached)
+      if (token.userId) {
+        const currentVersion = await getCachedTokenVersion(
+          Number(token.userId),
+        );
+        if (currentVersion !== token.tokenVersion) {
+          // Force logout: token version mismatch
+          return null as any;
+        }
+      }
 
-      await sendEmail({
-        from: "Thibault from OpenStatus <thibault@openstatus.dev>",
-        subject: "Welcome to OpenStatus.",
-        to: [params.user.email],
-        react: WelcomeEmail(),
-      });
-
-      const analytics = await setupAnalytics({
-        userId: `usr_${params.user.id}`,
-        email: params.user.email,
-        location: (await headers()).get("x-forwarded-for") ?? undefined,
-        userAgent: (await headers()).get("user-agent") ?? undefined,
-      });
-
-      await analytics.track(Events.CreateUser);
+      return token;
     },
-
-    async signIn(params) {
-      if (params.isNewUser) return;
-      if (!params.user.id || !params.user.email) return;
-
-      const analytics = await setupAnalytics({
-        userId: `usr_${params.user.id}`,
-        email: params.user.email,
-        location: (await headers()).get("x-forwarded-for") ?? undefined,
-        userAgent: (await headers()).get("user-agent") ?? undefined,
-      });
-
-      await analytics.track(Events.SignInUser);
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.userId as string;
+        session.user.email = token.email as string;
+      }
+      return session;
     },
   },
   pages: {
     signIn: "/login",
-    newUser: "/onboarding",
   },
-  // basePath: "/api/auth", // default is `/api/auth`
-  // secret: process.env.AUTH_SECRET, // default is `AUTH_SECRET`
   debug: process.env.NODE_ENV === "development",
 });
