@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Outfit, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -44,14 +44,9 @@ const commitMono = LocalFont({
   variable: "--font-commit-mono",
 });
 
-const inter = Inter({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: "--font-outfit",
 });
 
 const geistMono = Geist_Mono({
@@ -82,12 +77,11 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          geistSans.variable,
+          outfit.variable,
           geistMono.variable,
           cal.variable,
           commitMono.variable,
-          inter.variable,
-          "font-sans antialiased ",
+          "font-sans antialiased",
         )}
       >
         <SessionProvider session={session}>

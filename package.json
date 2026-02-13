@@ -34,7 +34,7 @@
   "pnpm": {
     "onlyBuiltDependencies": ["@sentry/cli", "@swc/core", "sharp", "argon2"]
   },
-  "name": "openstatus",
+  "name": "onlystatus",
   "workspaces": [
     "apps/*",
     "packages/**/*",

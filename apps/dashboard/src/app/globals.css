@@ -13,8 +13,7 @@
 @theme inline {
   --font-cal: var(--font-cal-sans);
   --font-commit-mono: var(--font-commit-mono);
-  --font-sans: var(--font-inter);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
 }
 

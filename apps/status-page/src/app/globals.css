@@ -11,7 +11,7 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-outfit);
   --font-mono: var(--font-commit-mono, var(--font-geist-mono));
   --radius-xs: calc(var(--radius) - 8px);
 }

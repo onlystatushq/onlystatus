@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-export const TITLE = "openstatus";
+export const TITLE = "onlystatus";
 export const DESCRIPTION =
-  "Open-source platform to monitor your services and keep your users informed.";
+  "Self-hosted synthetic monitoring platform to monitor your services and keep your users informed.";
 
-const OG_TITLE = "openstatus";
+const OG_TITLE = "onlystatus";
 const OG_DESCRIPTION = "Monitor your services and keep your users informed.";
-const FOOTER = "app.openstatus.dev";
+const FOOTER = "onlystatus.dev";
 const IMAGE = "assets/og/dashboard-v2.png";
 
 export const defaultMetadata: Metadata = {
@@ -15,7 +15,7 @@ export const defaultMetadata: Metadata = {
     default: TITLE,
   },
   description: DESCRIPTION,
-  metadataBase: new URL("https://www.openstatus.dev"),
+  metadataBase: new URL("https://onlystatus.dev"),
 };
 
 export const twitterMetadata: Metadata["twitter"] = {
