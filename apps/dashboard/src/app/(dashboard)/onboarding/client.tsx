@@ -127,6 +127,9 @@ export function Client() {
   const createFeedbackMutation = useMutation(
     trpc.feedback.submit.mutationOptions({}),
   );
+  const completeOnboardingMutation = useMutation(
+    trpc.auth.completeOnboarding.mutationOptions({}),
+  );
 
   useEffect(() => {
     if (!callbackUrl) return;
@@ -141,6 +144,14 @@ export function Client() {
       router.push(callbackUrl);
     }
   }, [callbackUrl, router]);
+
+  // Mark onboarding as completed when user reaches the final step
+  useEffect(() => {
+    if (step === "next") {
+      completeOnboardingMutation.mutate();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   return (
     <SectionGroup>

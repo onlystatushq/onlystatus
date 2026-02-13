@@ -15,12 +15,11 @@ import { FormWorkspace } from "@/components/forms/settings/form-workspace";
 import { useTRPC } from "@/lib/trpc/client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-const BASE_URL = "https://app.openstatus.dev/invite";
-
 export default function Page() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const { data: workspace } = useQuery(trpc.workspace.get.queryOptions());
+  const { data: currentUser } = useQuery(trpc.user.get.queryOptions());
   const updateWorkspaceNameMutation = useMutation(
     trpc.workspace.updateName.mutationOptions({
       onSuccess: () => {
@@ -33,21 +32,19 @@ export default function Page() {
       },
     }),
   );
-  const sendInvitationMutation = useMutation(
-    trpc.emailRouter.sendTeamInvitation.mutationOptions(),
-  );
-  const createInvitationMutation = useMutation(
-    trpc.invitation.create.mutationOptions({
-      onSuccess: (data) => {
-        sendInvitationMutation.mutate({ id: data.id, baseUrl: BASE_URL });
+  const createUserMutation = useMutation(
+    trpc.auth.createUser.mutationOptions({
+      onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: trpc.invitation.list.queryKey(),
+          queryKey: trpc.member.list.queryKey(),
         });
       },
     }),
   );
 
   if (!workspace) return null;
+
+  const isRoot = !!currentUser?.isRoot;
 
   return (
     <SectionGroup>
@@ -69,16 +66,17 @@ export default function Page() {
           />
           <FormSlug defaultValues={{ slug: workspace.slug }} />
           <FormMembers
+            isRoot={isRoot}
             onCreate={async (values) => {
-              await createInvitationMutation.mutateAsync({
-                email: values.email,
-              });
+              if ("password" in values && isRoot) {
+                await createUserMutation.mutateAsync({
+                  name: values.name,
+                  email: values.email,
+                  password: values.password,
+                  role: values.role as "admin" | "member",
+                });
+              }
             }}
-            locked={
-              (typeof workspace.limits.members === "number" &&
-                workspace.limits.members === 1) ||
-              workspace.limits.members !== "Unlimited"
-            }
           />
           <FormApiKey />
         </FormCardGroup>
