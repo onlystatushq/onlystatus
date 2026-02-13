@@ -148,16 +148,6 @@ export function FormStatusPageUpdate() {
         }}
       />
       <FormPageAccess
-        lockedMap={
-          new Map([
-            ["public", false],
-            ["password", workspace.limits["password-protection"] === false],
-            [
-              "email-domain",
-              workspace.limits["email-domain-protection"] === false,
-            ],
-          ])
-        }
         defaultValues={{
           accessType: statusPage.accessType,
           password: statusPage.password ?? undefined,

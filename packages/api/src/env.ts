@@ -3,7 +3,6 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
-    STRIPE_SECRET_KEY: z.string(),
     TINY_BIRD_API_KEY: z.string(),
     SMTP_HOST: z.string(),
     SMTP_PORT: z.coerce.number(),
@@ -16,7 +15,6 @@ export const env = createEnv({
   },
 
   runtimeEnv: {
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     TINY_BIRD_API_KEY: process.env.TINY_BIRD_API_KEY,
     SMTP_HOST: process.env.SMTP_HOST,
     SMTP_PORT: process.env.SMTP_PORT,

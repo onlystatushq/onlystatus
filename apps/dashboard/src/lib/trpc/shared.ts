@@ -11,7 +11,7 @@ const getBaseUrl = () => {
   return "http://localhost:3000"; // Local dev and Docker (internal calls)
 };
 
-const lambdas = ["auth", "stripeRouter", "emailRouter", "apiKeyRouter"];
+const lambdas = ["auth", "emailRouter", "apiKeyRouter"];
 
 export const endingLink = (opts?: {
   fetch?: typeof fetch;

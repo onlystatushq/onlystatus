@@ -28,14 +28,13 @@ import {
 } from "@openstatus/ui/components/ui/form";
 import { Slider } from "@openstatus/ui/components/ui/slider";
 import { cn } from "@openstatus/ui/lib/utils";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { IconCloudProviderTooltip } from "@/components/common/icon-cloud-provider";
 import { Note, NoteButton } from "@/components/common/note";
-import { UpgradeDialog } from "@/components/dialogs/upgrade";
 import { useTRPC } from "@/lib/trpc/client";
 import {
   formatRegionCode,
@@ -70,7 +69,6 @@ export function FormSchedulingRegions({
   privateLocations: { id: number; name: string }[];
 }) {
   const trpc = useTRPC();
-  const [openDialog, setOpenDialog] = useState(false);
   const { data: workspace } = useQuery(trpc.workspace.get.queryOptions());
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -175,10 +173,7 @@ export function FormSchedulingRegions({
             {!periodicity.includes(watchPeriodicity) ? (
               <Note color="error">
                 <CircleX />
-                The periodicity you are selecting is not allowed for your plan.
-                <NoteButton type="button" onClick={() => setOpenDialog(true)}>
-                  Upgrade your plan
-                </NoteButton>
+                The selected periodicity is not available.
               </Note>
             ) : null}
           </FormCardContent>
@@ -467,7 +462,6 @@ export function FormSchedulingRegions({
           </FormCardFooter>
         </FormCard>
       </form>
-      <UpgradeDialog open={openDialog} onOpenChange={setOpenDialog} />
     </Form>
   );
 }

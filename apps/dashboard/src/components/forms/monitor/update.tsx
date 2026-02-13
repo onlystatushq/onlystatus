@@ -222,7 +222,6 @@ export function FormMonitorUpdate() {
         }
       />
       <FormOtel
-        locked={workspace.limits.otel === false}
         defaultValues={{
           endpoint: monitor.otelEndpoint ?? "",
           headers: monitor.otelHeaders ?? [],
