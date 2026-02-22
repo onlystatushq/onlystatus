@@ -8,6 +8,7 @@ import {
   verifyRegistrationResponse,
 } from "@simplewebauthn/server";
 import type { RegistrationResponseJSON } from "@simplewebauthn/types";
+import { headers } from "next/headers";
 import {
   consumeChallenge,
   getWebAuthnConfig,
@@ -31,7 +32,8 @@ export async function getPasskeyRegistrationOptions() {
     .from(webauthnCredential)
     .where(eq(webauthnCredential.userId, userId));
 
-  const config = getWebAuthnConfig();
+  const h = await headers();
+  const config = getWebAuthnConfig(h.get("host") || undefined);
 
   const options = await generateRegistrationOptions({
     rpName: config.rpName,
@@ -62,7 +64,8 @@ export async function verifyPasskeyRegistration(
   if (!session?.user?.id) throw new Error("Not authenticated");
 
   const userId = Number(session.user.id);
-  const config = getWebAuthnConfig();
+  const h = await headers();
+  const config = getWebAuthnConfig(h.get("host") || undefined);
 
   const clientData = JSON.parse(
     Buffer.from(response.response.clientDataJSON, "base64url").toString(),

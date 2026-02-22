@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { AuthLayout } from "@/components/layout/auth-layout";
 import { auth } from "@/lib/auth";
+import { HydrateClient, prefetch, trpc } from "@/lib/trpc/server";
 
 export default async function Layout({
   children,
@@ -11,5 +12,12 @@ export default async function Layout({
   const session = await auth();
   if (session) redirect("/");
 
-  return <AuthLayout>{children}</AuthLayout>;
+  prefetch(trpc.auth.hasUsers.queryOptions());
+  prefetch(trpc.auth.hasPasskeys.queryOptions());
+
+  return (
+    <HydrateClient>
+      <AuthLayout>{children}</AuthLayout>
+    </HydrateClient>
+  );
 }

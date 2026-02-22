@@ -12,10 +12,7 @@ import {
   FormCardTitle,
 } from "@/components/forms/form-card";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type Region,
-  monitorPeriodicity,
-} from "@openstatus/db/src/schema/constants";
+import { monitorPeriodicity } from "@openstatus/db/src/schema/constants";
 import { Button } from "@openstatus/ui/components/ui/button";
 import { Checkbox } from "@openstatus/ui/components/ui/checkbox";
 import {
@@ -33,20 +30,14 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { IconCloudProviderTooltip } from "@/components/common/icon-cloud-provider";
 import { Note, NoteButton } from "@/components/common/note";
 import { useTRPC } from "@/lib/trpc/client";
-import {
-  formatRegionCode,
-  groupByContinent,
-  regionDict,
-} from "@openstatus/regions";
 import { useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import { CircleX, Globe, Info } from "lucide-react";
+import { CircleX, Globe, Server } from "lucide-react";
 
 const DEFAULT_PERIODICITY = "10m";
-const DEFAULT_REGIONS = ["ams", "fra", "iad", "syd", "jnb", "gru"];
+const DEFAULT_REGIONS = ["local"];
 const PERIODICITY = monitorPeriodicity.filter((p) => p !== "other");
 const DEFAULT_PRIVATE_LOCATIONS = [] satisfies { id: number; name: string }[];
 
@@ -80,7 +71,6 @@ export function FormSchedulingRegions({
   });
   const [isPending, startTransition] = useTransition();
   const watchPeriodicity = form.watch("periodicity");
-  const watchRegions = form.watch("regions");
   const watchPrivateLocations = form.watch("privateLocations");
 
   function submitAction(values: FormValues) {
@@ -109,22 +99,16 @@ export function FormSchedulingRegions({
 
   if (!workspace) return null;
 
-  const allowedRegions = workspace.limits.regions.filter(
-    (r) => !regionDict[r as keyof typeof regionDict].deprecated,
-  );
-  const maxRegions = workspace.limits["max-regions"];
   const periodicity = workspace.limits.periodicity;
-
-  const isMaxed = watchRegions.length >= maxRegions;
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submitAction)} {...props}>
         <FormCard>
           <FormCardHeader>
-            <FormCardTitle>Scheduling & Regions</FormCardTitle>
+            <FormCardTitle>Scheduling & Locations</FormCardTitle>
             <FormCardDescription>
-              Configure the scheduling and regions for your monitor.
+              Configure the check frequency and monitoring locations.
             </FormCardDescription>
           </FormCardHeader>
           <FormCardContent className="grid gap-4">
@@ -133,7 +117,7 @@ export function FormSchedulingRegions({
               name="periodicity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Periodicity</FormLabel>
+                  <FormLabel>Frequency</FormLabel>
                   <FormControl>
                     <div>
                       <Slider
@@ -173,174 +157,34 @@ export function FormSchedulingRegions({
             {!periodicity.includes(watchPeriodicity) ? (
               <Note color="error">
                 <CircleX />
-                The selected periodicity is not available.
+                The selected frequency is not available on your plan.
               </Note>
             ) : null}
           </FormCardContent>
           <FormCardSeparator />
           <FormCardContent className="grid gap-4">
-            <Note color="warning">
-              <Info />
-              To minimize false positives, we recommend monitoring your endpoint
-              in at least 3 regions.
-            </Note>
-            <FormField
-              control={form.control}
-              name="regions"
-              render={() => (
-                <FormItem>
-                  <FormControl>
-                    <div className="grid gap-4">
-                      {Object.entries(groupByContinent).map(
-                        ([continent, r]) => {
-                          const selected = r
-                            .filter((r) => allowedRegions.includes(r.code))
-                            .reduce((prev, curr) => {
-                              return (
-                                prev +
-                                (watchRegions.includes(curr.code) ? 1 : 0)
-                              );
-                            }, 0);
-                          const isAllSelected =
-                            selected ===
-                            r.filter((r) => allowedRegions.includes(r.code))
-                              .length;
-
-                          const disabled =
-                            r.length + watchRegions.length - selected >
-                            maxRegions;
-
-                          return (
-                            <div key={continent} className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <FormLabel>
-                                  {continent}{" "}
-                                  <span className="align-baseline font-mono font-normal text-muted-foreground/70 text-xs tabular-nums">
-                                    ({selected}/{r.length})
-                                  </span>
-                                </FormLabel>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  type="button"
-                                  className={cn(
-                                    isAllSelected && "text-muted-foreground",
-                                  )}
-                                  disabled={disabled}
-                                  onClick={() => {
-                                    if (!isAllSelected) {
-                                      // Add all regions from this continent
-                                      const newRegions = [...watchRegions];
-                                      r.filter((r) =>
-                                        allowedRegions.includes(r.code),
-                                      ).forEach((region) => {
-                                        if (!newRegions.includes(region.code)) {
-                                          newRegions.push(region.code);
-                                        }
-                                      });
-                                      form.setValue("regions", newRegions);
-                                    } else {
-                                      // Remove all regions from this continent
-                                      form.setValue(
-                                        "regions",
-                                        watchRegions?.filter(
-                                          (region) =>
-                                            !r
-                                              .map(({ code }) => code)
-                                              .includes(region as Region),
-                                        ),
-                                      );
-                                    }
-                                  }}
-                                >
-                                  Select all
-                                </Button>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                {r.map((region) => {
-                                  return (
-                                    <FormField
-                                      key={region.code}
-                                      control={form.control}
-                                      name="regions"
-                                      render={({ field }) => {
-                                        const checked = field.value?.includes(
-                                          region.code,
-                                        );
-                                        const disabled = checked
-                                          ? false
-                                          : !allowedRegions.includes(
-                                              region.code,
-                                            ) || isMaxed;
-                                        const deprecated = region.deprecated;
-                                        return (
-                                          <FormItem
-                                            key={region.code}
-                                            className="flex items-center"
-                                          >
-                                            <Checkbox
-                                              id={region.code}
-                                              checked={checked || false}
-                                              disabled={
-                                                disabled ||
-                                                (deprecated && !checked)
-                                              }
-                                              onCheckedChange={(checked) => {
-                                                if (checked) {
-                                                  field.onChange([
-                                                    ...field.value,
-                                                    region.code,
-                                                  ]);
-                                                } else {
-                                                  field.onChange(
-                                                    field.value?.filter(
-                                                      (r) => r !== region.code,
-                                                    ),
-                                                  );
-                                                }
-                                              }}
-                                            />
-                                            <FormLabel
-                                              htmlFor={region.code}
-                                              className="w-full truncate font-mono font-normal text-sm"
-                                            >
-                                              <span className="text-nowrap">
-                                                {formatRegionCode(region.code)}{" "}
-                                                {region.flag}
-                                              </span>
-                                              <span className="truncate font-normal text-muted-foreground text-xs leading-[inherit]">
-                                                {region.location}
-                                              </span>
-                                              <IconCloudProviderTooltip
-                                                provider={region.provider}
-                                                className="size-3"
-                                              />
-                                            </FormLabel>
-                                          </FormItem>
-                                        );
-                                      }}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        },
-                      )}
-                    </div>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </FormCardContent>
-          <FormCardSeparator />
-          <FormCardContent className="grid gap-4">
+            <FormLabel>Locations</FormLabel>
+            <div className="flex items-center gap-2 rounded-md border p-3">
+              <Server className="size-4 text-muted-foreground" />
+              <div className="flex flex-col">
+                <span className="font-medium text-sm">Local Checker</span>
+                <span className="text-muted-foreground text-xs">
+                  Built-in checker running alongside your instance
+                </span>
+              </div>
+              <Checkbox
+                checked={true}
+                disabled={true}
+                className="ml-auto"
+              />
+            </div>
             {privateLocations.length === 0 ? (
               <Note>
                 <Globe />
-                Monitor your endpoints from private locations.
+                Deploy checkers to additional locations for distributed
+                monitoring.
                 <NoteButton variant="outline" asChild>
-                  <Link href="/private-locations">Learn more</Link>
+                  <Link href="/private-locations">Set up locations</Link>
                 </NoteButton>
               </Note>
             ) : (
@@ -431,31 +275,7 @@ export function FormSchedulingRegions({
             )}
           </FormCardContent>
           <FormCardFooter>
-            <FormCardFooterInfo>
-              Your plan allows you to run{" "}
-              <span className="font-medium text-foreground">{maxRegions}</span>{" "}
-              out of{" "}
-              <span className="font-medium text-foreground">
-                {allowedRegions.length}
-              </span>{" "}
-              regions. Learn more about{" "}
-              <Link
-                href="https://docs.openstatus.dev/reference/http-monitor/#regions"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Regions
-              </Link>{" "}
-              and{" "}
-              <Link
-                href="https://docs.openstatus.dev/reference/http-monitor/#frequency"
-                rel="noreferrer"
-                target="_blank"
-              >
-                Periodicity
-              </Link>
-              .
-            </FormCardFooterInfo>
+            <FormCardFooterInfo />
             <Button type="submit" disabled={isPending}>
               {isPending ? "Submitting..." : "Submit"}
             </Button>

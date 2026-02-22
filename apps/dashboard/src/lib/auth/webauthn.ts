@@ -4,15 +4,18 @@ import { webauthnChallenge } from "@openstatus/db/src/schema";
 
 // --- RP Configuration ---
 
-export function getWebAuthnConfig(requestUrl?: string) {
-  const url = requestUrl
-    ? new URL(requestUrl)
-    : new URL(process.env.NEXTAUTH_URL || "http://localhost:3002");
+export function getWebAuthnConfig(requestHost?: string) {
+  const host =
+    requestHost ||
+    process.env.NEXTAUTH_URL?.replace(/^https?:\/\//, "").replace(/\/.*/, "") ||
+    "localhost";
+  const isLocalhost = host === "localhost" || host.startsWith("localhost:");
+  const origin = `${isLocalhost ? "http" : "https"}://${host}`;
 
   return {
-    rpName: "OpenStatus",
-    rpID: url.hostname,
-    origin: url.origin,
+    rpName: "OnlyStatus",
+    rpID: host.split(":")[0],
+    origin,
   };
 }
 

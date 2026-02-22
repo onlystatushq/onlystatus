@@ -176,30 +176,8 @@ function TwoFactorCard({ enabled }: { enabled: boolean }) {
             : "Add an extra layer of security to your account."}
         </FormCardDescription>
       </FormCardHeader>
+      {step !== "idle" && (
       <FormCardContent>
-        {step === "idle" && !enabled && (
-          <Button
-            size="sm"
-            onClick={() => setupMutation.mutate()}
-            disabled={setupMutation.isPending}
-          >
-            {setupMutation.isPending ? "Setting up..." : "Enable 2FA"}
-          </Button>
-        )}
-
-        {step === "idle" && enabled && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => {
-              setStep("disable");
-              setError(null);
-            }}
-          >
-            Disable 2FA
-          </Button>
-        )}
-
         {step === "qr" && (
           <div className="grid gap-4">
             <p className="text-sm text-muted-foreground">
@@ -334,10 +312,34 @@ function TwoFactorCard({ enabled }: { enabled: boolean }) {
           </div>
         )}
 
-        {error && step === "idle" && (
-          <p className="text-sm text-destructive mt-2">{error}</p>
-        )}
       </FormCardContent>
+      )}
+      <FormCardFooter>
+        {step === "idle" && !enabled && (
+          <Button
+            size="sm"
+            onClick={() => setupMutation.mutate()}
+            disabled={setupMutation.isPending}
+          >
+            {setupMutation.isPending ? "Setting up..." : "Enable 2FA"}
+          </Button>
+        )}
+        {step === "idle" && enabled && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              setStep("disable");
+              setError(null);
+            }}
+          >
+            Disable 2FA
+          </Button>
+        )}
+        {error && step === "idle" && (
+          <p className="text-sm text-destructive">{error}</p>
+        )}
+      </FormCardFooter>
     </FormCard>
   );
 }
@@ -424,9 +426,10 @@ function PasskeyCard() {
           password and two-factor authentication.
         </FormCardDescription>
       </FormCardHeader>
+      {((passkeys && passkeys.length > 0) || error) && (
       <FormCardContent>
         {passkeys && passkeys.length > 0 && (
-          <div className="grid gap-2 mb-4">
+          <div className="grid gap-2">
             {passkeys.map((pk) => (
               <div
                 key={pk.id}
@@ -559,8 +562,10 @@ function PasskeyCard() {
           </div>
         )}
 
-        {error && <p className="text-sm text-destructive mb-2">{error}</p>}
-
+        {error && <p className="text-sm text-destructive">{error}</p>}
+      </FormCardContent>
+      )}
+      <FormCardFooter>
         <Button
           size="sm"
           onClick={handleRegister}
@@ -568,7 +573,7 @@ function PasskeyCard() {
         >
           {registering ? "Registering..." : "Add passkey"}
         </Button>
-      </FormCardContent>
+      </FormCardFooter>
     </FormCard>
   );
 }

@@ -78,11 +78,26 @@ export function ChartBarUptime({
           cursor={false}
           content={<ChartTooltipContent indicator="dot" />}
         />
-        <Bar dataKey="ok" stackId="a" fill="var(--color-ok)" />
-        <Bar dataKey="error" stackId="a" fill="var(--color-error)" />
-        <Bar dataKey="degraded" stackId="a" fill="var(--color-degraded)" />
+        <Bar
+          dataKey="ok"
+          stackId="a"
+          fill="var(--color-ok)"
+          maxBarSize={40}
+        />
+        <Bar
+          dataKey="error"
+          stackId="a"
+          fill="var(--color-error)"
+          maxBarSize={40}
+        />
+        <Bar
+          dataKey="degraded"
+          stackId="a"
+          fill="var(--color-degraded)"
+          maxBarSize={40}
+        />
         <YAxis
-          domain={["dataMin", "dataMax"]}
+          domain={[0, "dataMax"]}
           tickLine={false}
           axisLine={false}
           tickMargin={8}

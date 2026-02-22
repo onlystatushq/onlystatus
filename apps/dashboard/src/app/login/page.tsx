@@ -6,7 +6,7 @@ import { Input } from "@openstatus/ui/components/ui/input";
 import { Label } from "@openstatus/ui/components/ui/label";
 import { useSearchParams } from "next/navigation";
 import { useTRPC } from "@/lib/trpc/client";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import {
   getPasskeyLoginOptions,
   signInWithCredentialsAction,
@@ -21,11 +21,11 @@ export default function Page() {
   const redirectTo = searchParams.get("redirectTo");
   const trpc = useTRPC();
 
-  const { data: hasUsersData, isLoading } = useQuery(
+  const { data: hasUsersData } = useSuspenseQuery(
     trpc.auth.hasUsers.queryOptions(),
   );
 
-  const { data: passkeyData } = useQuery(
+  const { data: passkeyData } = useSuspenseQuery(
     trpc.auth.hasPasskeys.queryOptions(),
   );
 
@@ -44,8 +44,7 @@ export default function Page() {
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const mode: Mode =
-    !isLoading && !hasUsersData?.hasUsers ? "first_time_setup" : "login";
+  const mode: Mode = !hasUsersData?.hasUsers ? "first_time_setup" : "login";
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -133,8 +132,6 @@ export default function Page() {
       setState("error");
     }
   }
-
-  if (isLoading) return null;
 
   if (mode === "first_time_setup") {
     return (

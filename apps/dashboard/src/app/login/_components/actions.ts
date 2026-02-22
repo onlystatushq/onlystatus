@@ -15,6 +15,7 @@ import {
 } from "@simplewebauthn/server";
 import type { AuthenticationResponseJSON } from "@simplewebauthn/types";
 import { AuthError } from "next-auth";
+import { headers } from "next/headers";
 
 export async function signInWithCredentialsAction(input: {
   email: string;
@@ -50,7 +51,8 @@ export async function signInWithCredentialsAction(input: {
 }
 
 export async function getPasskeyLoginOptions() {
-  const config = getWebAuthnConfig();
+  const h = await headers();
+  const config = getWebAuthnConfig(h.get("host") || undefined);
 
   const options = await generateAuthenticationOptions({
     rpID: config.rpID,
@@ -67,7 +69,8 @@ export async function signInWithPasskeyAction(
   response: AuthenticationResponseJSON,
   redirectTo?: string,
 ): Promise<{ error?: string } | undefined> {
-  const config = getWebAuthnConfig();
+  const h = await headers();
+  const config = getWebAuthnConfig(h.get("host") || undefined);
 
   const clientData = JSON.parse(
     Buffer.from(response.response.clientDataJSON, "base64url").toString(),

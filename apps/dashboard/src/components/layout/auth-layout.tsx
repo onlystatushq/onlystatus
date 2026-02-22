@@ -6,7 +6,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       <aside className="col-span-1 flex w-full flex-col gap-4 border border-border bg-sidebar p-4 backdrop-blur-[2px] md:p-8 xl:col-span-2">
         <a href="https://openstatus.dev" className="relative h-8 w-8">
           <Image
-            src="https://openstatus.dev/icon.png"
+            src="/icon.png"
             alt="OpenStatus"
             height={32}
             width={32}
