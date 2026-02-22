@@ -83,5 +83,6 @@ plan.md
 # Local/dev files
 bun.lock
 data/
+docker-compose.dev.yml
 docker-compose.traefik.yml
 .agents/
