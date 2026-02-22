@@ -52,7 +52,6 @@
     "@radix-ui/react-switch": "1.2.5",
     "@radix-ui/react-tabs": "1.1.12",
     "@radix-ui/react-tooltip": "1.2.7",
-    "@sentry/nextjs": "10.31.0",
     "@stripe/stripe-js": "2.1.6",
     "@tanstack/react-query": "5.81.5",
     "@tanstack/react-table": "8.21.3",
@@ -84,6 +83,8 @@
     "superjson": "2.2.2",
     "tailwind-merge": "3.3.1",
     "unified": "11.0.5",
+    "argon2": "^0.44.0",
+    "nodemailer": "8.0.1",
     "zod": "4.1.13"
   },
   "devDependencies": {

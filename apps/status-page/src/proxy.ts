@@ -7,12 +7,16 @@ import { page, selectPageSchema } from "@openstatus/db/src/schema";
 import { getValidSubdomain } from "./lib/domain";
 import { createProtectedCookieKey } from "./lib/protected";
 
+const STATUS_PAGE_DOMAIN =
+  process.env.STATUS_PAGE_DOMAIN ?? "localhost";
+
 export default auth(async (req) => {
   const url = req.nextUrl.clone();
   const response = NextResponse.next();
   const cookies = req.cookies;
   const headers = req.headers;
   const host = headers.get("x-forwarded-host");
+  const effectiveHost = host ?? url.host;
 
   let prefix = "";
   let type: "hostname" | "pathname";
@@ -20,7 +24,7 @@ export default auth(async (req) => {
   const hostnames = host?.split(/[.:]/) ?? url.host.split(/[.:]/);
   const pathnames = url.pathname.split("/");
 
-  const subdomain = getValidSubdomain(url.host);
+  const subdomain = getValidSubdomain(effectiveHost);
   console.log({
     hostnames,
     pathnames,
@@ -29,7 +33,11 @@ export default auth(async (req) => {
     subdomain,
   });
 
-  if (
+  if (subdomain !== null) {
+    // Subdomain detected (either a slug or a full custom domain)
+    prefix = subdomain.toLowerCase();
+    type = "hostname";
+  } else if (
     hostnames.length > 2 &&
     hostnames[0] !== "www" &&
     !url.host.endsWith(".vercel.app")
@@ -37,17 +45,21 @@ export default auth(async (req) => {
     prefix = hostnames[0].toLowerCase();
     type = "hostname";
   } else {
-    prefix = pathnames[1].toLowerCase();
+    prefix = pathnames[1]?.toLowerCase() ?? "";
     type = "pathname";
   }
 
-  if (subdomain !== null) {
-    prefix = subdomain.toLowerCase();
+  // When on the base STATUS_PAGE_DOMAIN with no subdomain, use the full host
+  // for custom_domain lookup (supports single-tenant self-hosted setups)
+  const hostWithoutPort = effectiveHost.replace(/:\d+$/, "");
+  if (subdomain === null && hostWithoutPort === STATUS_PAGE_DOMAIN) {
+    prefix = hostWithoutPort;
+    type = "hostname";
   }
 
   console.log({ pathname: url.pathname, type, prefix, subdomain });
 
-  if (url.pathname === "/" && type !== "hostname" && subdomain === null) {
+  if (url.pathname === "/" && type === "pathname" && !prefix) {
     return response;
   }
 
@@ -152,49 +164,24 @@ export default auth(async (req) => {
     return NextResponse.rewrite(rewriteUrl);
   }
 
-  console.log({
-    customDomain: _page.customDomain,
-    host,
-    expectedHost: `${_page.slug}.stpg.dev`,
-  });
-  if (_page.customDomain && host !== `${_page.slug}.stpg.dev`) {
-    if (pathnames.length > 2 && !subdomain) {
-      const pathname = pathnames.slice(2).join("/");
-      const rewriteUrl = new URL(`/${_page.slug}/${pathname}`, req.url);
-      rewriteUrl.search = url.search;
-      return NextResponse.rewrite(rewriteUrl);
-    }
-    if (_page.customDomain && subdomain) {
-      console.log({ url: req.url });
-      // const vercelURL = process.env.VERCEL_URL || "www.stpg.dev";
-      // console.log({newUrl: vercelURL})
-      if (pathnames.length > 2) {
-        const pathname = pathnames.slice(1).join("/");
+  // Rewrite to the correct internal path: /[slug]/[...rest]
+  const isSubdomainOfBase =
+    effectiveHost.replace(/:\d+$/, "").endsWith(`.${STATUS_PAGE_DOMAIN}`) ||
+    effectiveHost.replace(/:\d+$/, "") === STATUS_PAGE_DOMAIN;
 
-        const rewriteUrl = new URL(
-          `${pathname}`,
-          `https://${_page.slug}.stpg.dev`,
-        );
-        console.log({ rewriteUrl });
-        rewriteUrl.search = url.search;
-        return NextResponse.rewrite(rewriteUrl);
-      }
-      const rewriteUrl = new URL(
-        `${url.pathname}`,
-        `https://${_page.slug}.stpg.dev`,
-      );
-      console.log({ rewriteUrl });
-      rewriteUrl.search = url.search;
-      return NextResponse.rewrite(rewriteUrl);
-    }
-    const rewriteUrl = new URL(`/${_page.slug}`, req.url);
-    console.log({ rewriteUrl });
+  if (_page.customDomain || isSubdomainOfBase || subdomain) {
+    // hostname-based routing: rewrite to /{slug}{pathname}
+    const rewriteUrl = new URL(
+      `/${_page.slug}${url.pathname === "/" ? "" : url.pathname}`,
+      req.url,
+    );
     rewriteUrl.search = url.search;
+    console.log({ rewrite: rewriteUrl.pathname, slug: _page.slug });
     return NextResponse.rewrite(rewriteUrl);
   }
+
   if (host?.includes("openstatus.dev")) {
     const rewriteUrl = new URL(`/${prefix}${url.pathname}`, req.url);
-    // Preserve search params from original request
     rewriteUrl.search = url.search;
     return NextResponse.rewrite(rewriteUrl);
   }

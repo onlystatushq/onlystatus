@@ -1,5 +1,18 @@
 import type { NextRequest } from "next/server";
 
+const STATUS_PAGE_DOMAIN =
+  process.env.STATUS_PAGE_DOMAIN ?? "localhost";
+
+const isKnownDomain = (host: string) => {
+  return (
+    host.includes("stpg.dev") ||
+    host.includes("openstatus.dev") ||
+    host.endsWith(".vercel.app") ||
+    host === STATUS_PAGE_DOMAIN ||
+    host.endsWith(`.${STATUS_PAGE_DOMAIN}`)
+  );
+};
+
 export const getValidSubdomain = (host?: string | null) => {
   let subdomain: string | null = null;
   if (!host && typeof window !== "undefined") {
@@ -9,9 +22,7 @@ export const getValidSubdomain = (host?: string | null) => {
   }
 
   // Exclude localhost and IP addresses from being treated as subdomains
-  if (
-    host?.match(/^(localhost|127\\.0\\.0\\.1|::1|\\d+\\.\\d+\\.\\d+\\.\\d+)/)
-  ) {
+  if (host?.match(/^(localhost|127\.0\.0\.1|::1|\d+\.\d+\.\d+\.\d+)/)) {
     return null;
   }
 
@@ -21,24 +32,42 @@ export const getValidSubdomain = (host?: string | null) => {
     return match?.[1] || null;
   }
 
-  // we should improve here for custom vercel deploy page
+  // Strip port for domain matching
+  const hostWithoutPort = host?.replace(/:\d+$/, "") ?? "";
+
+  // If host is a subdomain of STATUS_PAGE_DOMAIN (e.g., myapp.status.example.com -> myapp)
+  if (hostWithoutPort.endsWith(`.${STATUS_PAGE_DOMAIN}`)) {
+    const sub = hostWithoutPort.slice(
+      0,
+      hostWithoutPort.length - STATUS_PAGE_DOMAIN.length - 1,
+    );
+    return sub || null;
+  }
+
+  // If host IS the STATUS_PAGE_DOMAIN exactly, no subdomain
+  if (hostWithoutPort === STATUS_PAGE_DOMAIN) {
+    return null;
+  }
+
+  // Known SaaS domains: extract subdomain
   if (host?.includes(".") && !host.includes(".vercel.app")) {
     const candidate = host.split(".")[0];
     if (candidate && !candidate.includes("www")) {
-      // Valid candidate
       subdomain = candidate;
     }
   }
 
-  // In case the host is a custom domain
   if (
     host &&
-    !(
-      host?.includes("stpg.dev") ||
-      host?.includes("openstatus.dev") ||
-      host?.endsWith(".vercel.app")
-    )
+    (host.includes("stpg.dev") ||
+      host.includes("openstatus.dev") ||
+      host.endsWith(".vercel.app"))
   ) {
+    return subdomain;
+  }
+
+  // Unknown domain = custom domain, return the full host for DB lookup
+  if (host) {
     subdomain = host;
   }
   return subdomain;
@@ -55,7 +84,7 @@ export const getValidCustomDomain = (req: NextRequest | Request) => {
   const hostnames = host?.split(/[.:]/) ?? url.host.split(/[.:]/);
   const pathnames = url.pathname.split("/");
 
-  const subdomain = getValidSubdomain(url.host);
+  const subdomain = getValidSubdomain(host ?? url.host);
   console.log({
     hostnames,
     pathnames,
