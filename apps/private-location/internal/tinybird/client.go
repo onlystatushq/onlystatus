@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,12 +19,46 @@ const (
 )
 
 func getBaseURL() string {
-	// Use local Tinybird container if available (Docker/self-hosted)
-	// https://www.tinybird.co/docs/api-reference
 	if tinybirdURL := os.Getenv("TINYBIRD_URL"); tinybirdURL != "" {
 		return tinybirdURL + "/v0/events"
 	}
-	return "https://api.tinybird.co/v0/events"
+	return "http://tinybird-local:7181/v0/events"
+}
+
+// resolveToken returns the provided apiKey if non-empty, otherwise
+// reads the admin token from the shared .tinyb auth file (set via
+// TINYBIRD_AUTH_FILE env var in Docker). No retries needed since
+// the dependency chain guarantees the file exists by startup.
+func resolveToken(apiKey string) string {
+	if apiKey != "" {
+		return apiKey
+	}
+
+	authFile := os.Getenv("TINYBIRD_AUTH_FILE")
+	if authFile == "" {
+		return ""
+	}
+
+	type tinybConfig struct {
+		Token string `json:"token"`
+	}
+
+	data, err := os.ReadFile(authFile)
+	if err != nil {
+		log.Printf("[tinybird] failed to read auth file %s: %v", authFile, err)
+		return ""
+	}
+
+	var cfg tinybConfig
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		log.Printf("[tinybird] failed to parse auth file: %v", err)
+		return ""
+	}
+
+	if cfg.Token != "" {
+		log.Println("[tinybird] resolved token from auth file")
+	}
+	return cfg.Token
 }
 
 type Client interface {
@@ -39,7 +74,7 @@ type client struct {
 func NewClient(httpClient *http.Client, apiKey string) Client {
 	return client{
 		httpClient: httpClient,
-		apiKey:     apiKey,
+		apiKey:     resolveToken(apiKey),
 		baseURL:    getBaseURL(),
 	}
 }

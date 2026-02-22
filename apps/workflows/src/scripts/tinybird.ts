@@ -61,7 +61,7 @@ async function deleteLogs(
   reverse = false,
 ) {
   const response = await fetch(
-    "https://api.tinybird.co/v0/datasources/ping_response__v8/delete",
+    `${process.env.TINYBIRD_URL || "http://tinybird-local:7181"}/v0/datasources/ping_response__v8/delete`,
     {
       method: "POST",
       headers: {

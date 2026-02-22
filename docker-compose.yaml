@@ -6,6 +6,10 @@ networks:
 volumes:
     libsql-data:
         name: onlystatus-libsql-data
+    tinybird-data:
+        name: onlystatus-tinybird-data
+    tinybird-auth:
+        name: onlystatus-tinybird-auth
 
 services:
     # External services
@@ -41,8 +45,16 @@ services:
             - onlystatus
         ports:
             - "7181:7181"
+        volumes:
+            - tinybird-data:/var/lib/tinybird
+            - tinybird-auth:/auth
         environment:
             - COMPATIBILITY_MODE=1
+        entrypoint: ["/bin/bash", "-c"]
+        command:
+            - |
+                (while [ ! -f /app/.tinyb ]; do sleep 1; done; cp /app/.tinyb /auth/.tinyb) &
+                exec /usr/bin/supervisord
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:7181/"]
             interval: 15s
@@ -50,6 +62,46 @@ services:
             retries: 5
             start_period: 20s
         restart: unless-stopped
+
+    tinybird-deploy:
+        container_name: onlystatus-tinybird-deploy
+        image: tinybirdco/tinybird-cli-docker:latest
+        platform: linux/amd64
+        networks:
+            - onlystatus
+        volumes:
+            - tinybird-auth:/auth:ro
+            - ./packages/tinybird:/mnt/data:ro
+            - ./scripts:/scripts:ro
+        environment:
+            - TINYBIRD_HOST=http://tinybird-local:7181
+            - AUTH_FILE=/auth/.tinyb
+        depends_on:
+            tinybird-local:
+                condition: service_healthy
+        entrypoint: ["sh", "/scripts/tinybird-deploy.sh"]
+        restart: "no"
+
+    db-migrate:
+        container_name: onlystatus-db-migrate
+        build:
+            context: .
+            dockerfile: apps/workflows/Dockerfile
+        image: onlystatus/workflows:latest
+        networks:
+            - onlystatus
+        working_dir: /app/packages/db
+        entrypoint: ["bun", "x", "drizzle-kit", "push", "--force"]
+        environment:
+            - DATABASE_URL=http://libsql:8080
+            - DATABASE_AUTH_TOKEN=dummy
+            - CLICKHOUSE_URL=
+            - CLICKHOUSE_USERNAME=
+            - CLICKHOUSE_PASSWORD=
+        depends_on:
+            libsql:
+                condition: service_healthy
+        restart: "no"
 
     # Internal Services
     workflows:
@@ -60,8 +112,6 @@ services:
         image: onlystatus/workflows:latest
         networks:
             - onlystatus
-        ports:
-            - "3000:3000"
         volumes:
             - ./data:/app/data
         env_file:
@@ -72,6 +122,8 @@ services:
         depends_on:
             libsql:
                 condition: service_healthy
+            db-migrate:
+                condition: service_completed_successfully
         healthcheck:
             test:
                 [
@@ -98,6 +150,7 @@ services:
             - .env.docker
         environment:
             - DATABASE_URL=http://libsql:8080
+            - CHECKER_URL=http://checker:8080
             - PORT=3000
         depends_on:
             workflows:
@@ -112,6 +165,39 @@ services:
             start_period: 30s
         restart: unless-stopped
 
+    checker:
+        container_name: onlystatus-checker
+        build:
+            context: apps/checker
+            dockerfile: Dockerfile
+        image: onlystatus/checker:latest
+        networks:
+            - onlystatus
+        ports:
+            - "8082:8080"
+        env_file:
+            - .env.docker
+        volumes:
+            - tinybird-auth:/auth:ro
+        environment:
+            - CLOUD_PROVIDER=docker
+            - REGION=local
+            - PORT=8080
+            - TINYBIRD_URL=http://tinybird-local:7181
+            - TINYBIRD_AUTH_FILE=/auth/.tinyb
+            - WORKFLOWS_URL=http://workflows:3000
+            - GIN_MODE=release
+        depends_on:
+            tinybird-deploy:
+                condition: service_completed_successfully
+        healthcheck:
+            test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/health || exit 1"]
+            interval: 15s
+            timeout: 10s
+            retries: 3
+            start_period: 15s
+        restart: unless-stopped
+
     private-location:
         container_name: onlystatus-private-location
         build:
@@ -124,9 +210,12 @@ services:
             - "8081:8080"
         env_file:
             - .env.docker
+        volumes:
+            - tinybird-auth:/auth:ro
         environment:
             - DB_URL=http://libsql:8080
             - TINYBIRD_URL=http://tinybird-local:7181
+            - TINYBIRD_AUTH_FILE=/auth/.tinyb
             - GIN_MODE=release
             - PORT=8080
         depends_on:
@@ -147,6 +236,31 @@ services:
             start_period: 30s
         restart: unless-stopped
 
+    cron:
+        container_name: onlystatus-cron
+        image: alpine:latest
+        networks:
+            - onlystatus
+        env_file:
+            - .env.docker
+        entrypoint: /bin/sh
+        command:
+            - -c
+            - |
+                apk add --no-cache curl > /dev/null 2>&1
+                CRON_URL="http://workflows:3000/cron/checker"
+                AUTH="$$CRON_SECRET"
+                echo "* * * * * curl -sf -H 'authorization: '$$AUTH $$CRON_URL/1m" > /etc/crontabs/root
+                echo "*/5 * * * * curl -sf -H 'authorization: '$$AUTH $$CRON_URL/5m" >> /etc/crontabs/root
+                echo "*/10 * * * * curl -sf -H 'authorization: '$$AUTH $$CRON_URL/10m" >> /etc/crontabs/root
+                echo "*/30 * * * * curl -sf -H 'authorization: '$$AUTH $$CRON_URL/30m" >> /etc/crontabs/root
+                echo "0 * * * * curl -sf -H 'authorization: '$$AUTH $$CRON_URL/1h" >> /etc/crontabs/root
+                crond -f -l 6
+        depends_on:
+            workflows:
+                condition: service_healthy
+        restart: unless-stopped
+
     dashboard:
         container_name: onlystatus-dashboard
         build:
@@ -159,11 +273,20 @@ services:
             - "${DASHBOARD_PORT:-3002}:3000"
         env_file:
             - .env.docker
+        volumes:
+            - tinybird-auth:/auth:ro
         environment:
             - DATABASE_URL=http://libsql:8080
+            - TINYBIRD_URL=http://tinybird-local:7181
+            - TINYBIRD_AUTH_FILE=/auth/.tinyb
             - PORT=3000
             - HOSTNAME=0.0.0.0
             - AUTH_TRUST_HOST=true
+        entrypoint: ["/bin/sh", "-c"]
+        command:
+            - |
+                export TINY_BIRD_API_KEY=$$(node -e 'try{process.stdout.write(JSON.parse(require("fs").readFileSync("/auth/.tinyb","utf-8")).token)}catch(e){}' 2>/dev/null)
+                exec node server.js
         depends_on:
             workflows:
                 condition: service_healthy
@@ -191,11 +314,20 @@ services:
             - "3003:3000"
         env_file:
             - .env.docker
+        volumes:
+            - tinybird-auth:/auth:ro
         environment:
             - DATABASE_URL=http://libsql:8080
+            - TINYBIRD_URL=http://tinybird-local:7181
+            - TINYBIRD_AUTH_FILE=/auth/.tinyb
             - PORT=3000
             - HOSTNAME=0.0.0.0
             - AUTH_TRUST_HOST=true
+        entrypoint: ["/bin/sh", "-c"]
+        command:
+            - |
+                export TINY_BIRD_API_KEY=$$(node -e 'try{process.stdout.write(JSON.parse(require("fs").readFileSync("/auth/.tinyb","utf-8")).token)}catch(e){}' 2>/dev/null)
+                exec node server.js
         depends_on:
             workflows:
                 condition: service_healthy

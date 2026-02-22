@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,12 +14,46 @@ import (
 )
 
 func getBaseURL() string {
-	// Use local Tinybird container if available (Docker/self-hosted)
-	// https://www.tinybird.co/docs/api-reference
 	if tinybirdURL := os.Getenv("TINYBIRD_URL"); tinybirdURL != "" {
 		return tinybirdURL + "/v0/events"
 	}
-	return "https://api.tinybird.co/v0/events"
+	return "http://tinybird-local:7181/v0/events"
+}
+
+// resolveToken returns the provided apiKey if non-empty, otherwise
+// reads the admin token from the shared .tinyb auth file (set via
+// TINYBIRD_AUTH_FILE env var in Docker). No retries needed since
+// the dependency chain guarantees the file exists by startup.
+func resolveToken(apiKey string) string {
+	if apiKey != "" {
+		return apiKey
+	}
+
+	authFile := os.Getenv("TINYBIRD_AUTH_FILE")
+	if authFile == "" {
+		return ""
+	}
+
+	type tinybConfig struct {
+		Token string `json:"token"`
+	}
+
+	data, err := os.ReadFile(authFile)
+	if err != nil {
+		log.Warn().Err(err).Str("path", authFile).Msg("failed to read tinybird auth file")
+		return ""
+	}
+
+	var cfg tinybConfig
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		log.Warn().Err(err).Msg("failed to parse tinybird auth file")
+		return ""
+	}
+
+	if cfg.Token != "" {
+		log.Info().Msg("resolved tinybird token from auth file")
+	}
+	return cfg.Token
 }
 
 type Client interface {
@@ -32,9 +67,14 @@ type client struct {
 }
 
 func NewClient(httpClient *http.Client, apiKey string) Client {
+	resolved := resolveToken(apiKey)
+	log.Info().
+		Int("keyLen", len(resolved)).
+		Str("baseURL", getBaseURL()).
+		Msg("tinybird client initialized")
 	return client{
 		httpClient: httpClient,
-		apiKey:     apiKey,
+		apiKey:     resolved,
 		baseURL:    getBaseURL(),
 	}
 }
@@ -71,7 +111,13 @@ func (c client) SendEvent(ctx context.Context, event any, dataSourceName string)
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusAccepted {
-		log.Ctx(ctx).Error().Str("status", resp.Status).Msg("unexpected status code")
+		body, _ := io.ReadAll(resp.Body)
+		log.Ctx(ctx).Error().
+			Str("status", resp.Status).
+			Str("url", requestURL.String()).
+			Str("body", string(body)).
+			Int("tokenLen", len(c.apiKey)).
+			Msg("unexpected status code")
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 

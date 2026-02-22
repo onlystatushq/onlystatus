@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/openstatushq/openstatus/apps/checker/pkg/tinybird"
+	"github.com/openstatushq/openstatus/apps/private-location/internal/tinybird"
 	"github.com/stretchr/testify/require"
 )
 
@@ -71,6 +71,6 @@ func TestSendEvent(t *testing.T) {
 
 		err := client.SendEvent(ctx, "event", "test")
 		require.NoError(t, err)
-		require.Equal(t, "https://api.tinybird.co/v0/events?name=test", url)
+		require.Equal(t, "http://tinybird-local:7181/v0/events?name=test", url)
 	})
 }

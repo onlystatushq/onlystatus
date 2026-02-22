@@ -12,23 +12,33 @@ const PUBLIC_CACHE = 300; // 5 * 60 = 300s = 5m
 const DEV_CACHE = 10 * 60; // 10m
 const REVALIDATE = process.env.NODE_ENV === "development" ? DEV_CACHE : 0;
 
+function resolveToken(token: string): string {
+  if (token) return token;
+  const authFile = process.env.TINYBIRD_AUTH_FILE;
+  if (!authFile) return "";
+  try {
+    // Dynamic require to avoid breaking Edge Runtime (node:fs unavailable there)
+    const fs = require("node:fs");
+    const data = JSON.parse(fs.readFileSync(authFile, "utf-8"));
+    return data.token || "";
+  } catch {
+    return "";
+  }
+}
+
 export class OSTinybird {
   private readonly tb: Client;
 
   constructor(token: string) {
-    if (
-      process.env.NODE_ENV === "development" ||
-      process.env.NODE_ENV === "test"
-    ) {
-      this.tb = new NoopTinybird();
-    } else {
-      // Use local Tinybird container if available (Docker/self-hosted)
-      // https://www.tinybird.co/docs/api-reference
-      const tinybirdUrl = process.env.TINYBIRD_URL || "https://api.tinybird.co";
+    const tinybirdUrl = process.env.TINYBIRD_URL;
+    const resolved = resolveToken(token);
+    if (tinybirdUrl || resolved) {
       this.tb = new Client({
-        token,
-        baseUrl: tinybirdUrl,
+        token: resolved,
+        baseUrl: tinybirdUrl || "http://tinybird-local:7181",
       });
+    } else {
+      this.tb = new NoopTinybird();
     }
   }
 
