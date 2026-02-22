@@ -5,15 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
-	"strings"
 
 	"github.com/rs/zerolog/log"
-	"google.golang.org/api/option"
-
-	"cloud.google.com/go/auth"
-	cloudtasks "cloud.google.com/go/cloudtasks/apiv2"
-	taskspb "cloud.google.com/go/cloudtasks/apiv2/cloudtaskspb"
 )
 
 type UpdateData struct {
@@ -26,67 +21,41 @@ type UpdateData struct {
 	Latency       int64  `json:"latency,omitempty"`
 }
 
+func getWorkflowsURL() string {
+	if url := os.Getenv("WORKFLOWS_URL"); url != "" {
+		return url + "/updateStatus"
+	}
+	return "http://workflows:4030/updateStatus"
+}
+
 func UpdateStatus(ctx context.Context, updateData UpdateData) error {
+	url := getWorkflowsURL()
+	secret := os.Getenv("CRON_SECRET")
 
-	url := "https://openstatus-workflows.fly.dev/updateStatus"
-	basic := "Basic " + os.Getenv("CRON_SECRET")
 	payloadBuf := new(bytes.Buffer)
-	c := os.Getenv("GCP_PRIVATE_KEY")
-	c = strings.ReplaceAll(c, "\\n", "\n")
-	opts := &auth.Options2LO{
-		Email:        os.Getenv("GCP_CLIENT_EMAIL"),
-		PrivateKey:   []byte(c),
-		PrivateKeyID: os.Getenv("GCP_PRIVATE_KEY_ID"),
-		Scopes: []string{
-			"https://www.googleapis.com/auth/cloud-platform",
-		},
-		TokenURL: "https://oauth2.googleapis.com/token",
-	}
-
-	tp, err := auth.New2LOTokenProvider(opts)
-	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while creating token provider")
-		return err
-	}
-
-	creds := auth.NewCredentials(&auth.CredentialsOptions{
-		TokenProvider: tp,
-	})
-
-	client, err := cloudtasks.NewClient(ctx, option.WithAuthCredentials(creds))
-	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while creating cloud tasks client")
-
-	}
-	defer client.Close()
-
 	if err := json.NewEncoder(payloadBuf).Encode(updateData); err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while updating status")
-		return err
-	}
-	projectID := os.Getenv("GCP_PROJECT_ID")
-	queuePath := fmt.Sprintf("projects/%s/locations/europe-west1/queues/alerting", projectID)
-	req := &taskspb.CreateTaskRequest{
-		Parent: queuePath,
-		Task: &taskspb.Task{
-			// https://godoc.org/google.golang.org/genproto/googleapis/cloud/tasks/v2#HttpRequest
-			MessageType: &taskspb.Task_HttpRequest{
-				HttpRequest: &taskspb.HttpRequest{
-					HttpMethod: taskspb.HttpMethod_POST,
-					Url:        url,
-					Headers:    map[string]string{"Authorization": basic, "Content-Type": "application/json"},
-				},
-			},
-		},
+		log.Ctx(ctx).Error().Err(err).Msg("error while encoding update status payload")
+		return fmt.Errorf("json.Encode: %w", err)
 	}
 
-	// Add a payload message if one is present.
-	req.Task.GetHttpRequest().Body = payloadBuf.Bytes()
-
-	_, err = client.CreateTask(ctx, req)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, payloadBuf)
 	if err != nil {
-		log.Ctx(ctx).Error().Err(err).Msg("error while creating the cloud task")
-		return fmt.Errorf("cloudtasks.CreateTask: %w", err)
+		log.Ctx(ctx).Error().Err(err).Msg("error while creating update status request")
+		return fmt.Errorf("http.NewRequest: %w", err)
+	}
+	req.Header.Set("Authorization", "Basic "+secret)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Ctx(ctx).Error().Err(err).Msg("error while sending update status request")
+		return fmt.Errorf("http.Do: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		log.Ctx(ctx).Error().Int("statusCode", resp.StatusCode).Msg("update status returned error")
+		return fmt.Errorf("updateStatus returned status %d", resp.StatusCode)
 	}
 
 	return nil

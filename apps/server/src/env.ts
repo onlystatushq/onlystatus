@@ -21,6 +21,7 @@ export const env = createEnv({
     SMTP_PASS: z.string().prefault(""),
     AXIOM_TOKEN: z.string(),
     AXIOM_DATASET: z.string(),
+    CHECKER_URL: z.string().prefault("http://checker:8080"),
   },
 
   /**

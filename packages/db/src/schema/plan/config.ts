@@ -1,4 +1,4 @@
-import { AVAILABLE_REGIONS, FREE_FLY_REGIONS } from "@openstatus/regions";
+import { SELF_HOSTED_REGIONS } from "@openstatus/regions";
 import type { WorkspacePlan } from "../workspaces/validation";
 import type { Addons, PlanLimits, Price } from "./schema";
 
@@ -59,7 +59,7 @@ export const allPlans: Record<WorkspacePlan, PlanConfig> = {
       "notification-channels": 1,
       members: 1,
       "audit-log": false,
-      regions: [...FREE_FLY_REGIONS],
+      regions: [...SELF_HOSTED_REGIONS],
       "private-locations": false,
     },
   },
@@ -133,7 +133,7 @@ export const allPlans: Record<WorkspacePlan, PlanConfig> = {
       "notification-channels": 10,
       members: "Unlimited",
       "audit-log": false,
-      regions: [...AVAILABLE_REGIONS],
+      regions: [...SELF_HOSTED_REGIONS],
       "private-locations": false,
     },
   },
@@ -183,7 +183,7 @@ export const allPlans: Record<WorkspacePlan, PlanConfig> = {
       "synthetic-checks": 300,
       periodicity: ["30s", "1m", "5m", "10m", "30m", "1h"],
       "multi-region": true,
-      "max-regions": AVAILABLE_REGIONS.length,
+      "max-regions": SELF_HOSTED_REGIONS.length,
       "data-retention": "12 months",
       "status-pages": 5,
       "page-components": 50,
@@ -207,7 +207,7 @@ export const allPlans: Record<WorkspacePlan, PlanConfig> = {
       "notification-channels": 20,
       members: "Unlimited",
       "audit-log": true,
-      regions: [...AVAILABLE_REGIONS],
+      regions: [...SELF_HOSTED_REGIONS],
       "private-locations": true,
     },
   },

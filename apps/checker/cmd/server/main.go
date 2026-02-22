@@ -170,7 +170,7 @@ func main() {
 	// environment variables.
 	var region string
 	cronSecret := env("CRON_SECRET", "")
-	tinyBirdToken := env("TINYBIRD_TOKEN", "")
+	tinyBirdToken := env("TINYBIRD_TOKEN", env("TINY_BIRD_API_KEY", ""))
 	logLevel := env("LOG_LEVEL", "info")
 	cloudProvider := env("CLOUD_PROVIDER", "fly")
 	axiomToken := env("AXIOM_TOKEN", "")
@@ -184,6 +184,8 @@ func main() {
 
 	case "railway":
 		region = fmt.Sprintf("railway_%s", env("RAILWAY_REPLICA_REGION", env("REGION", "local")))
+	case "docker":
+		region = env("REGION", "local")
 	default:
 		log.Fatal().Msgf("unsupported cloud provider: %s", cloudProvider)
 	}
@@ -199,28 +201,28 @@ func main() {
 		attribute.String("cloud.region", region),
 	)
 
-	// Set up OTLP log exporter for Axiom
-	exporter, err := otlploghttp.New(ctx,
-		otlploghttp.WithEndpointURL("https://eu-central-1.aws.edge.axiom.co/v1/logs"),
-		otlploghttp.WithHeaders(map[string]string{
-			"Authorization":   "Bearer " + axiomToken,
-			"X-Axiom-Dataset": axiomDataset,
-		}),
-	)
-	if err != nil {
-		log.Fatal().Err(err).Msg("failed to create OTLP exporter")
+	// Set up OTLP log exporter (only if Axiom token is configured)
+	if axiomToken != "" {
+		exporter, err := otlploghttp.New(ctx,
+			otlploghttp.WithEndpointURL("https://eu-central-1.aws.edge.axiom.co/v1/logs"),
+			otlploghttp.WithHeaders(map[string]string{
+				"Authorization":   "Bearer " + axiomToken,
+				"X-Axiom-Dataset": axiomDataset,
+			}),
+		)
+		if err != nil {
+			log.Fatal().Err(err).Msg("failed to create OTLP exporter")
+		}
+
+		logProvider := sdklog.NewLoggerProvider(
+			sdklog.WithResource(res),
+			sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)),
+		)
+		defer logProvider.Shutdown(ctx)
+
+		global.SetLoggerProvider(logProvider)
+		slog.SetDefault(otelslog.NewLogger("openstatus-checker"))
 	}
-
-	// Create log provider with resource and batch processor
-	logProvider := sdklog.NewLoggerProvider(
-		sdklog.WithResource(res),
-		sdklog.WithProcessor(sdklog.NewBatchProcessor(exporter)),
-
-	)
-	defer logProvider.Shutdown(ctx)
-
-	global.SetLoggerProvider(logProvider)
-	slog.SetDefault(otelslog.NewLogger("openstatus-checker"))
 	httpClient := &http.Client{
 		Timeout: 45 * time.Second,
 	}

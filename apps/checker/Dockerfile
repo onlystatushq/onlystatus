@@ -18,23 +18,17 @@ COPY go.* .
 RUN go mod download
 
 COPY . .
-RUN go build -trimpath -ldflags "-s -w" -o checker ./cmd/server/main.go
+RUN go build -trimpath -ldflags "-s -w" -o checker-server ./cmd/server/main.go
 
-FROM scratch
+FROM alpine:3.21
+
+RUN apk add --no-cache ca-certificates tzdata wget
 
 WORKDIR /opt/bin
 
-COPY --from=builder /usr/local/share/ca-certificates/ca-bundle.crt /etc/ssl/certs/ca-bundle.crt
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-
-
-
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-
-COPY --from=builder /go/src/app/checker/main /opt/bin/checker
+COPY --from=builder /go/src/app/checker-server /opt/bin/checker-server
 
 ENV TZ=UTC
-ENV USER=1000
 ENV GIN_MODE=release
 
-CMD [ "/opt/bin/checker" ]
+CMD [ "/opt/bin/checker-server" ]

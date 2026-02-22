@@ -42,7 +42,7 @@ const httpTestInput = z.object({
     .prefault("GET"),
   headers: z.array(z.object({ key: z.string(), value: z.string() })).optional(),
   body: z.string().optional(),
-  region: monitorRegionSchema.optional().prefault("ams"),
+  region: monitorRegionSchema.optional().prefault("local"),
   assertions: z
     .array(
       z.discriminatedUnion("type", [
@@ -58,12 +58,12 @@ const httpTestInput = z.object({
 
 const tcpTestInput = z.object({
   url: z.string(),
-  region: monitorRegionSchema.optional().prefault("ams"),
+  region: monitorRegionSchema.optional().prefault("local"),
 });
 
 const dnsTestInput = z.object({
   url: z.string(),
-  region: monitorRegionSchema.optional().prefault("ams"),
+  region: monitorRegionSchema.optional().prefault("local"),
   assertions: z
     .array(
       z.discriminatedUnion("type", [
@@ -149,23 +149,14 @@ export const dnsOutput = z
   );
 
 export async function testHttp(input: z.infer<typeof httpTestInput>) {
-  // Reject requests to our own domain to avoid loops
-  if (input.url.includes("openstatus.dev")) {
-    throw new TRPCError({
-      code: "BAD_REQUEST",
-      message: "Self-requests are not allowed",
-    });
-  }
-
   try {
     const res = await fetch(
-      `https://openstatus-checker.fly.dev/ping/${input.region}`,
+      `${env.CHECKER_URL}/ping/${input.region}`,
       {
         method: "POST",
         headers: {
           Authorization: `Basic ${env.CRON_SECRET}`,
           "Content-Type": "application/json",
-          "fly-prefer-region": input.region,
         },
         body: JSON.stringify({
           url: input.url,
@@ -251,13 +242,12 @@ export async function testHttp(input: z.infer<typeof httpTestInput>) {
 export async function testTcp(input: z.infer<typeof tcpTestInput>) {
   try {
     const res = await fetch(
-      `https://openstatus-checker.fly.dev/tcp/${input.region}`,
+      `${env.CHECKER_URL}/tcp/${input.region}`,
       {
         method: "POST",
         headers: {
           Authorization: `Basic ${env.CRON_SECRET}`,
           "Content-Type": "application/json",
-          "fly-prefer-region": input.region,
         },
         body: JSON.stringify({ uri: input.url }),
         signal: AbortSignal.timeout(ABORT_TIMEOUT),
@@ -302,13 +292,12 @@ export async function testTcp(input: z.infer<typeof tcpTestInput>) {
 export async function testDns(input: z.infer<typeof dnsTestInput>) {
   try {
     const res = await fetch(
-      `https://openstatus-checker.fly.dev/dns/${input.region}`,
+      `${env.CHECKER_URL}/dns/${input.region}`,
       {
         method: "POST",
         headers: {
           Authorization: `Basic ${env.CRON_SECRET}`,
           "Content-Type": "application/json",
-          "fly-prefer-region": input.region,
         },
         body: JSON.stringify({
           uri: input.url,
@@ -457,7 +446,6 @@ export async function triggerChecker(
       headers: {
         Authorization: `Basic ${env.CRON_SECRET}`,
         "Content-Type": "application/json",
-        "fly-prefer-region": region,
       },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(ABORT_TIMEOUT),
@@ -471,11 +459,11 @@ export async function triggerChecker(
 function generateUrl({ row }: { row: z.infer<typeof selectMonitorSchema> }) {
   switch (row.jobType) {
     case "http":
-      return `https://openstatus-checker.fly.dev/checker/http?monitor_id=${row.id}`;
+      return `${env.CHECKER_URL}/checker/http?monitor_id=${row.id}`;
     case "tcp":
-      return `https://openstatus-checker.fly.dev/checker/tcp?monitor_id=${row.id}`;
+      return `${env.CHECKER_URL}/checker/tcp?monitor_id=${row.id}`;
     case "dns":
-      return `https://openstatus-checker.fly.dev/checker/dns?monitor_id=${row.id}`;
+      return `${env.CHECKER_URL}/checker/dns?monitor_id=${row.id}`;
     default:
       throw new Error("Invalid jobType");
   }

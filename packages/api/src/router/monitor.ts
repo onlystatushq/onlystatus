@@ -36,12 +36,7 @@ import {
 } from "@openstatus/db/src/schema";
 
 import { Events } from "@openstatus/analytics";
-import {
-  freeFlyRegions,
-  monitorPeriodicity,
-  monitorRegions,
-} from "@openstatus/db/src/schema/constants";
-import { regionDict } from "@openstatus/regions";
+import { monitorPeriodicity } from "@openstatus/db/src/schema/constants";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { testDns, testHttp, testTcp } from "./checker";
 
@@ -733,20 +728,6 @@ export const monitorRouter = createTRPCRouter({
         }
       }
 
-      const selectableRegions =
-        ctx.workspace.plan === "free" ? freeFlyRegions : monitorRegions;
-      const randomRegions = ctx.workspace.plan === "free" ? 4 : 6;
-
-      const regions = [...selectableRegions]
-        // NOTE: make sure we don't use deprecated regions
-        .filter((r) => {
-          const deprecated = regionDict[r].deprecated;
-          if (!deprecated) return true;
-          return false;
-        })
-        .sort(() => 0.5 - Math.random())
-        .slice(0, randomRegions);
-
       const newMonitor = await ctx.db
         .insert(monitor)
         .values({
@@ -759,7 +740,7 @@ export const monitorRouter = createTRPCRouter({
           active: input.active,
           workspaceId: ctx.workspace.id,
           periodicity: ctx.workspace.plan === "free" ? "30m" : "1m",
-          regions: regions.join(","),
+          regions: "local",
           assertions: serialize(assertions),
           updatedAt: new Date(),
         })

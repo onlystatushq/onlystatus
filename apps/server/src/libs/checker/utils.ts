@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { OpenStatusApiError } from "@/libs/errors";
 import type { z } from "@hono/zod-openapi";
 import type { selectMonitorSchema } from "@openstatus/db/src/schema";
@@ -74,9 +75,9 @@ export function getCheckerUrl(
 ): string {
   switch (monitor.jobType) {
     case "http":
-      return `https://openstatus-checker.fly.dev/checker/http?monitor_id=${monitor.id}&trigger=${opts.trigger}&data=${opts.data}`;
+      return `${env.CHECKER_URL}/checker/http?monitor_id=${monitor.id}&trigger=${opts.trigger}&data=${opts.data}`;
     case "tcp":
-      return `https://openstatus-checker.fly.dev/checker/tcp?monitor_id=${monitor.id}&trigger=${opts.trigger}&data=${opts.data}`;
+      return `${env.CHECKER_URL}/checker/tcp?monitor_id=${monitor.id}&trigger=${opts.trigger}&data=${opts.data}`;
     default:
       throw new OpenStatusApiError({
         code: "BAD_REQUEST",

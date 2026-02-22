@@ -67,7 +67,7 @@ func getEnv(key, fallback string) string {
 }
 
 func getClient(apiKey string) v1.PrivateLocationServiceClient {
-	ingestUrl := getEnv("OPENSTATUS_INGEST_URL", "https://openstatus-private-location.fly.dev")
+	ingestUrl := getEnv("OPENSTATUS_INGEST_URL", "http://server:3000")
 
 	client := v1.NewPrivateLocationServiceClient(
 		http.DefaultClient,

@@ -61,10 +61,13 @@ export const FREE_FLY_REGIONS = [
   "jnb",
 ] as const satisfies (typeof FLY_REGIONS)[number][];
 
+export const SELF_HOSTED_REGIONS = ["local"] as const;
+
 export const ALL_REGIONS = [
   ...FLY_REGIONS,
   ...KOYEB_REGIONS,
   ...RAILWAY_REGIONS,
+  ...SELF_HOSTED_REGIONS,
 ] as const;
 
 export type Region = (typeof ALL_REGIONS)[number];
@@ -457,6 +460,14 @@ export const regionDict: Record<Region, RegionInfo> = {
     continent: "Asia",
     deprecated: false,
     provider: "railway",
+  },
+  local: {
+    code: "local",
+    location: "Local",
+    flag: "",
+    continent: "Europe",
+    deprecated: false,
+    provider: "private",
   },
 } as const;
 
