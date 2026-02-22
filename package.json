@@ -31,7 +31,7 @@
   },
   "packageManager": "pnpm@10.26.0",
   "pnpm": {
-    "onlyBuiltDependencies": ["@sentry/cli", "@swc/core", "sharp", "argon2"]
+    "onlyBuiltDependencies": ["@swc/core", "sharp", "argon2"]
   },
   "name": "onlystatus",
   "workspaces": [

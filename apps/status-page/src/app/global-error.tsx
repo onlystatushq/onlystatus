@@ -2,7 +2,6 @@
 
 import { Link } from "@/components/common/link";
 import { Button } from "@openstatus/ui/components/ui/button";
-import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 export default function GlobalError({
@@ -13,7 +12,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    console.error("Global error:", error);
   }, [error]);
 
   return (
@@ -28,10 +27,8 @@ export default function GlobalError({
                     Application Error
                   </h2>
                   <p className="text-muted-foreground text-sm sm:text-base">
-                    An unexpected error occurred. This has been reported and
-                    we&apos;re working on it.{" "}
-                    <Link href="mailto:ping@openstatus.dev">Contact us</Link> if
-                    it persists.
+                    An unexpected error occurred. Please try again or contact
+                    support if it persists.
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
