@@ -85,19 +85,19 @@ log "Authenticating with tb CLI..."
 cd /tmp
 tb auth --host "$TINYBIRD_HOST" --token "$TOKEN"
 
-# Set up work directory with schema files
+# Set up work directory with schema files (copy, not symlink, so we can patch)
 mkdir -p /tmp/tb-work
 cp /tmp/.tinyb /tmp/tb-work/.tinyb
 for dir in datasources pipes endpoints; do
-  [ -d "/mnt/data/$dir" ] && ln -sf "/mnt/data/$dir" "/tmp/tb-work/$dir"
+  [ -d "/mnt/data/$dir" ] && cp -r "/mnt/data/$dir" "/tmp/tb-work/$dir"
 done
 cd /tmp/tb-work
 
 log "Deploying schemas..."
-# Drop legacy datasources that block migration (column change limits)
-for ds in tcp_response__v0; do
-  tb datasource rm "$ds" --yes 2>/dev/null || true
-done
+# tcp_response.datasource (VERSION 0) and tcp_response__v0.datasource conflict on
+# fresh deploys (column change limit). The __v0 file has the current schema with
+# requestStatus/id columns that pipes depend on. Remove the outdated versioned file.
+rm -f /tmp/tb-work/datasources/tcp_response.datasource
 printf 'y\n%.0s' $(seq 1 50) | tb push --force 2>&1 || true
 
 # Verify critical schema exists

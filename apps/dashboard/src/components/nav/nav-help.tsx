@@ -37,7 +37,6 @@ export function NavHelp() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
-                  className="font-commit-mono tracking-tight"
                   tooltip="Get Help"
                 >
                   <HelpCircle />

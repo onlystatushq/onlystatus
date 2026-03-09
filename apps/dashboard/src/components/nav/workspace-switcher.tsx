@@ -55,7 +55,7 @@ export function WorkspaceSwitcher() {
                   {workspace.name || "Untitled Workspace"}
                 </div>
                 <div className="truncate text-xs">
-                  <span className="font-commit-mono tracking-tight">
+                  <span>
                     {workspace.slug}
                   </span>{" "}
                   <span className="text-muted-foreground">
@@ -96,7 +96,7 @@ export function WorkspaceSwitcher() {
             <DropdownMenuItem className="gap-2 p-2" asChild>
               <Link href="/settings/general">
                 <Plus />
-                <div className="font-commit-mono text-muted-foreground tracking-tight">
+                <div className="text-muted-foreground">
                   Add team member
                 </div>
               </Link>

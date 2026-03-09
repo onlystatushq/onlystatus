@@ -76,7 +76,6 @@ export function NavBreadcrumb({ items }: NavBreadcrumbProps) {
                 >
                   <Link
                     href={item.href}
-                    className="font-commit-mono tracking-tight"
                   >
                     {item.icon && (
                       <item.icon
@@ -90,7 +89,7 @@ export function NavBreadcrumb({ items }: NavBreadcrumbProps) {
                 </BreadcrumbLink>
               ) : null}
               {item.type === "page" ? (
-                <BreadcrumbPage className=" hidden max-w-[120px] truncate font-commit-mono tracking-tight md:block lg:max-w-[200px] ">
+                <BreadcrumbPage className="hidden max-w-[120px] truncate md:block lg:max-w-[200px]">
                   <span className="flex items-center gap-1.5">
                     {item.icon && (
                       <item.icon
@@ -113,7 +112,7 @@ export function NavBreadcrumb({ items }: NavBreadcrumbProps) {
                 >
                   <SelectTrigger
                     id="select-option"
-                    className="font-commit-mono text-foreground tracking-tight [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 [&>span_svg]:text-muted-foreground/80"
+                    className="text-foreground [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0 [&>span_svg]:text-muted-foreground/80"
                     aria-label="Select option"
                   >
                     <SelectValue placeholder="Select option" />
@@ -123,7 +122,6 @@ export function NavBreadcrumb({ items }: NavBreadcrumbProps) {
                       <SelectItem
                         key={i}
                         value={item.value}
-                        className="font-commit-mono tracking-tight"
                       >
                         <item.icon
                           size={16}

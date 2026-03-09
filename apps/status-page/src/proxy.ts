@@ -91,7 +91,7 @@ export default auth(async (req) => {
       const { pathname, origin } = req.nextUrl;
 
       // custom domain redirect
-      if (_page.customDomain && host !== `${_page.slug}.stpg.dev`) {
+      if (_page.customDomain && type === "hostname" && effectiveHost.replace(/:\d+$/, "") === _page.customDomain) {
         const redirect = pathname.replace(`/${_page.customDomain}`, "");
         const url = new URL(
           `https://${_page.customDomain}/login?redirect=${encodeURIComponent(
@@ -110,10 +110,14 @@ export default auth(async (req) => {
       return NextResponse.redirect(url);
     }
     if (password === _page.password && url.pathname.endsWith("/login")) {
-      const redirect = url.searchParams.get("redirect");
+      const rawRedirect = url.searchParams.get("redirect");
+      const redirect =
+        rawRedirect?.startsWith("/") && !rawRedirect.startsWith("//")
+          ? rawRedirect
+          : null;
 
       // custom domain redirect
-      if (_page.customDomain && host !== `${_page.slug}.stpg.dev`) {
+      if (_page.customDomain && type === "hostname" && effectiveHost.replace(/:\d+$/, "") === _page.customDomain) {
         const url = new URL(`https://${_page.customDomain}${redirect ?? "/"}`);
         console.log("redirect to /", url.toString());
         return NextResponse.redirect(url);
@@ -122,7 +126,7 @@ export default auth(async (req) => {
       return NextResponse.redirect(
         new URL(
           `${req.nextUrl.origin}${
-            redirect ?? type === "pathname" ? `/${prefix}` : "/"
+            redirect ?? (type === "pathname" ? `/${prefix}` : "/")
           }`,
         ),
       );
@@ -154,37 +158,17 @@ export default auth(async (req) => {
     }
   }
 
-  const proxy = req.headers.get("x-proxy");
-  console.log({ proxy });
-
-  if (proxy) {
-    const rewriteUrl = new URL(`/${prefix}${url.pathname}`, req.url);
-    // Preserve search params from original request
-    rewriteUrl.search = url.search;
-    return NextResponse.rewrite(rewriteUrl);
-  }
-
-  // Rewrite to the correct internal path: /[slug]/[...rest]
-  const isSubdomainOfBase =
-    effectiveHost.replace(/:\d+$/, "").endsWith(`.${STATUS_PAGE_DOMAIN}`) ||
-    effectiveHost.replace(/:\d+$/, "") === STATUS_PAGE_DOMAIN;
-
-  if (_page.customDomain || isSubdomainOfBase || subdomain) {
-    // hostname-based routing: rewrite to /{slug}{pathname}
+  // Hostname-based routing (subdomain or custom domain): prepend slug to path
+  // Path-based routing: slug is already in the URL, no rewrite needed
+  if (type === "hostname") {
     const rewriteUrl = new URL(
       `/${_page.slug}${url.pathname === "/" ? "" : url.pathname}`,
       req.url,
     );
     rewriteUrl.search = url.search;
-    console.log({ rewrite: rewriteUrl.pathname, slug: _page.slug });
     return NextResponse.rewrite(rewriteUrl);
   }
 
-  if (host?.includes("openstatus.dev")) {
-    const rewriteUrl = new URL(`/${prefix}${url.pathname}`, req.url);
-    rewriteUrl.search = url.search;
-    return NextResponse.rewrite(rewriteUrl);
-  }
   return response;
 });
 

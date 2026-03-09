@@ -72,7 +72,7 @@ export function NavUser() {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{userName}</span>
-                <span className="truncate font-commit-mono text-xs tracking-tight">
+                <span className="truncate text-xs">
                   {user?.email}
                 </span>
               </div>
@@ -98,14 +98,14 @@ export function NavUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{userName}</span>
-                  <span className="truncate font-commit-mono text-xs tracking-tight">
+                  <span className="truncate text-xs">
                     {user?.email}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup className="font-commit-mono tracking-tight">
+            <DropdownMenuGroup>
               <DropdownMenuItem asChild>
                 <Link
                   href="/settings/account"
@@ -127,7 +127,7 @@ export function NavUser() {
                   Theme
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
-                  <DropdownMenuSubContent className="font-commit-mono tracking-tight">
+                  <DropdownMenuSubContent>
                     <DropdownMenuItem onClick={() => setTheme("light")}>
                       <Sun /> Light
                     </DropdownMenuItem>
@@ -144,7 +144,6 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => signOut()}
-              className="font-commit-mono tracking-tight"
             >
               <LogOut />
               Log out

@@ -3,16 +3,6 @@ import type { NextRequest } from "next/server";
 const STATUS_PAGE_DOMAIN =
   process.env.STATUS_PAGE_DOMAIN ?? "localhost";
 
-const isKnownDomain = (host: string) => {
-  return (
-    host.includes("stpg.dev") ||
-    host.includes("openstatus.dev") ||
-    host.endsWith(".vercel.app") ||
-    host === STATUS_PAGE_DOMAIN ||
-    host.endsWith(`.${STATUS_PAGE_DOMAIN}`)
-  );
-};
-
 export const getValidSubdomain = (host?: string | null) => {
   let subdomain: string | null = null;
   if (!host && typeof window !== "undefined") {
@@ -68,7 +58,7 @@ export const getValidSubdomain = (host?: string | null) => {
 
   // Unknown domain = custom domain, return the full host for DB lookup
   if (host) {
-    subdomain = host;
+    subdomain = host.replace(/:\d+$/, "");
   }
   return subdomain;
 };
@@ -85,13 +75,6 @@ export const getValidCustomDomain = (req: NextRequest | Request) => {
   const pathnames = url.pathname.split("/");
 
   const subdomain = getValidSubdomain(host ?? url.host);
-  console.log({
-    hostnames,
-    pathnames,
-    host,
-    urlHost: url.host,
-    subdomain,
-  });
 
   if (
     hostnames.length > 2 &&
@@ -101,15 +84,13 @@ export const getValidCustomDomain = (req: NextRequest | Request) => {
     prefix = hostnames[0].toLowerCase();
     type = "hostname";
   } else {
-    prefix = pathnames[1].toLowerCase();
+    prefix = pathnames[1]?.toLowerCase() ?? "";
     type = "pathname";
   }
 
   if (subdomain !== null) {
     prefix = subdomain.toLowerCase();
   }
-
-  console.log({ type, prefix });
 
   return { type, prefix };
 };

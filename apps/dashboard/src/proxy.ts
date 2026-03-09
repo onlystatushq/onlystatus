@@ -66,6 +66,7 @@ export default async function middleware(req: NextRequest) {
 
     if (!query) {
       console.error(">> Should not happen, no workspace found for user");
+      return response;
     }
 
     response.cookies.set("workspace-slug", query.workspace.slug);
