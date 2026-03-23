@@ -1,177 +1,199 @@
-<p align="center" style="margin-top: 120px">
-
-  <h3 align="center">OpenStatus</h3>
-
+<p align="center">
+  <img src="apps/dashboard/public/icon.png" alt="OnlyStatus" width="64" height="64" />
+  <h3 align="center">OnlyStatus</h3>
+  <p align="center">Self-hosted synthetic monitoring. No cloud dependencies. No restrictions.</p>
   <p align="center">
-  <a href="https://status.openstatus.dev">
-    <img src='https://status.openstatus.dev/badge/v2?variant=outline'>
-  </a>
-  </p>
-
-  <p align="center">The Open-Source synthetic monitoring platform.
-    <br />
-    <a href="https://www.openstatus.dev"><strong>Learn more »</strong></a>
-    <br />
-    <br />
-    <a href="https://www.openstatus.dev/discord">Discord</a>
+    <a href="https://onlystatus.dev">Website</a>
     ·
-    <a href="https://www.openstatus.dev">Website</a>
+    <a href="#getting-started">Getting Started</a>
     ·
-    <a href="https://github.com/openstatushq/openstatus/issues">Issues</a>
+    <a href="https://github.com/neoyubi/onlystatus/issues">Issues</a>
   </p>
 </p>
 
-## About OpenStatus 🏓
+## Overview
 
-OpenStatus is open-source synthetic monitoring platform.
+OnlyStatus is a fully self-hosted synthetic monitoring platform. Monitor your websites and APIs with HTTP, TCP, and DNS checks, get alerts when things break, and give your users a clean status page.
 
-- **Synthetic monitoring**: Monitor your website and APIs globally and receive
-  notifications when they are down or slow.
+It's a fork of [OpenStatus](https://github.com/openstatusHQ/openstatus).
 
-## Recognitions 🏆
+## Why fork OpenStatus?
 
-<a href="https://trendshift.io/repositories/1780" target="_blank"><img src="https://trendshift.io/api/badge/repositories/1780" alt="openstatusHQ%2Fopenstatus | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+OpenStatus is a great project with an active team and solid engineering. Its architecture integrates with specific cloud services: Vercel Blob, GCP Cloud Tasks, Resend, Fly.io, and Stripe. That's a reasonable design for a managed product.
 
-<a href="https://news.ycombinator.com/item?id=37740870">
-  <img
-    alt="Featured on Hacker News"
-    src="https://hackerbadge.now.sh/api?id=37740870"
-    style="width: 250px; height: 55px;" width="250" height="55"
-  />
-</a>
+I wanted something different. A clean, isolated stack where every component is self-contained and nothing requires an external account. Not because the integrations are broken, but because I think a monitoring tool should be able to run on its own, with no vendor dependencies. That's the idea behind the name: OnlyStatus. Only what you need, nothing else.
 
-<a href="https://www.producthunt.com/posts/openstatus-2?utm_source=badge-top-post-badge&utm_medium=badge" target="_blank">
-  <img
-    alt="OpenStatus - #2 Product of the Day on Product Hunt"
-    src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=openstatus-2&theme=light&period=daily"
-    style="width: 250px; height: 55px;" width="250" height="55"
-  />
-</a>
+- **Cloud services replaced.** Vercel Blob, GCP Cloud Tasks, Resend, Fly.io regions, Stripe billing. Each swapped for a local alternative that runs inside the same compose stack.
+- **Feature gates removed.** The self-hosted version inherited plan restrictions from the hosted product (periodicity limits, monitor caps, private locations gated behind tiers). All features are now unlocked.
+- **Standalone auth.** Magic-link authentication depended on a Resend API key. Replaced with credentials, TOTP 2FA, and WebAuthn passkeys.
 
-## Contact us 💌
+## What changed
 
-If you are interested in our enterprise plan or need special features, please
-email us at [ping@openstatus.dev](mailto:ping@openstatus.dev) or book a
-call<br/><br/>
-<a href="https://cal.com/team/openstatus/30min"><img alt="Book us with Cal.com" src="https://cal.com/book-with-cal-dark.svg" /></a>
+Here's what was replaced to make the stack fully self-contained:
 
-## Contributing 🤝
+| Before (OpenStatus) | After (OnlyStatus) |
+|----------------------|---------------------|
+| Vercel Blob (file uploads) | Local filesystem with content-hashed storage |
+| GCP Cloud Tasks (job dispatch) | Direct HTTP to local services |
+| Resend (email) | SMTP via nodemailer |
+| Stripe (billing) | Removed entirely, all features unlocked |
+| Fly.io regions | Local checker + private locations |
+| Magic-link auth | Credentials + TOTP 2FA + WebAuthn passkeys |
+| OpenPanel/Plausible analytics | Removed |
+| Sentry | Removed |
+| Plan-based feature gating | All workspaces default to full access |
 
-If you want to help us building the best status page and alerting system, you
-can check our
-[contributing guidelines](https://github.com/openstatusHQ/openstatus/blob/main/CONTRIBUTING.MD)
+See the [full commit history](https://github.com/neoyubi/onlystatus/commits/main) for details.
 
-### Top Contributors
+## Features
 
-<a href="https://github.com/openstatushq/openstatus/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=openstatushq/openstatus" />
-</a>
+- **Multi-protocol monitoring** - HTTP, TCP, and DNS checks
+- **Status pages** - Public status pages with custom domains and themes
+- **Alerts** - Email, Slack, Discord, PagerDuty, OpsGenie, and more
+- **Private locations** - Deploy lightweight checkers anywhere for distributed monitoring
+- **Proper auth** - Password login, TOTP two-factor, WebAuthn/passkey support
+- **Incidents and maintenance** - Track and communicate downtime
+- **Full API** - REST and RPC endpoints for automation
+- **Single compose file** - Everything runs in Docker, fully self-contained
 
-Made with [Contrib.rocks](https://contrib.rocks)
+## Architecture
 
-### Stats
+```
+┌─────────────────────────────────────────────────────┐
+│  Frontend                                           │
+│  ┌──────────────┐          ┌──────────────┐         │
+│  │  Dashboard   │          │ Status Page  │         │
+│  │  (Next.js)   │          │  (Next.js)   │         │
+│  └──────┬───────┘          └──────┬───────┘         │
+├─────────┼─────────────────────────┼─────────────────┤
+│  Backend│                         │                 │
+│  ┌──────┴───────┐  ┌───────────┐  │                 │
+│  │  API Server  │  │ Workflows │  │                 │
+│  │   (Hono)     │  │  (Hono)   │  │                 │
+│  └──────┬───────┘  └─────┬─────┘  │                 │
+│         │                │        │                 │
+│         │          ┌─────┴─────┐  │                 │
+│         │          │  Checker  │  │                 │
+│         │          │   (Go)    │  │                 │
+├─────────┼──────────┼──────┬────┼──┼─────────────────┤
+│  Data   │          │      │    │  │                 │
+│  ┌──────┴───────┐  │  ┌───┴────┴──┴──┐              │
+│  │   libSQL     │  │  │   Tinybird   │              │
+│  │  (Database)  │  │  │  (Analytics) │              │
+│  └──────────────┘  │  └──────────────┘              │
+│                    │                                │
+│  ┌─────────────────┴──┐                             │
+│  │  Private Location  │◄── Remote Checkers (Go)     │
+│  │       (Go)         │    deployed anywhere        │
+│  └────────────────────┘                             │
+└─────────────────────────────────────────────────────┘
+```
 
-![Alt](https://repobeats.axiom.co/api/embed/180eee159c0128f683a30f15f51ac35bdbd9fa44.svg "Repobeats analytics image")
+## Getting Started
 
-## Tech stack 🥞
+### Requirements
 
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [tinybird](https://tinybird.co/?ref=openstatus.dev)
-- [turso](https://turso.tech/)
-- [drizzle](https://orm.drizzle.team/)
-- [Resend](https://resend.com/)
+- Docker and Docker Compose
 
-[![Built with Depot](https://depot.dev/badges/built-with-depot.svg)](https://depot.dev/?utm_source=Opource=OpenStatus)
-
-## Getting Started 🚀
-
-### With Docker (Recommended)
-
-The fastest way to get started for both development and self-hosting:
+### Quick Start
 
 ```sh
-# 1. Copy environment file
+# Clone the repo
+git clone https://github.com/neoyubi/onlystatus.git
+cd onlystatus
+
+# Configure environment
 cp .env.docker.example .env.docker
 
-# 2. Start all services
+# Start everything
 docker compose up -d
-
-# 3. Access the application
-open http://localhost:3002  # Dashboard
-open http://localhost:3003  # Status Pages
 ```
 
-📖 **Full guide**: [DOCKER.md](DOCKER.md)
+Once running:
+- **Dashboard**: http://localhost:3002
+- **Status Pages**: http://localhost:3003
 
-### With Devbox
+Register an account at the dashboard login page. First user gets a workspace automatically.
 
-You can use [Devbox](https://www.jetify.com/devbox/) and get started with the following commands:
+For production, put the stack behind a reverse proxy (Traefik, nginx, Caddy) with TLS.
 
-1. Install Devbox
-    ```sh
-    curl -fsSL https://get.jetify.com/devbox | bash
-    ```
-2. Install project dependencies, build and start services
-    ```sh
-    devbox services up
-    ```
+### Configuration
 
-### Manual Setup
+Edit `.env.docker` before starting. The essentials:
 
-#### Requirements
+```bash
+# Auth (generate a random string)
+AUTH_SECRET=your-secret-here
 
-- [Node.js](https://nodejs.org/en/) >= 20.0.0
-- [pnpm](https://pnpm.io/) >= 8.6.2
-- [Bun](https://bun.sh/)
-- [Turso CLI](https://docs.turso.tech/quickstart)
-
-#### Setup
-
-1. Clone the repository
-
-```sh
-git clone https://github.com/openstatushq/openstatus.git
+# Email (for notifications, optional)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=user
+SMTP_PASS=pass
+SMTP_FROM=alerts@example.com
 ```
 
-2. Install dependencies
+See [.env.docker.example](.env.docker.example) for all available options.
+
+### Creating Monitors
+
+1. Log into the dashboard
+2. Create a monitor with a URL and check frequency
+3. Set region to "Local Checker" (built-in) or add private locations for distributed checks
+4. Configure notifications (email, Slack, Discord, etc.)
+
+### Private Locations
+
+Deploy lightweight checkers to additional locations for distributed monitoring:
+
+1. Go to **Private Locations** in the dashboard
+2. Create a location and copy the token
+3. Deploy the checker container wherever you want:
 
 ```sh
+docker run -d \
+  -e OPENSTATUS_KEY=<your-token> \
+  -e OPENSTATUS_INGEST_URL=https://your-instance.com \
+  neoyubi/onlystatus-checker:latest
+```
+
+The checker only needs outbound access to your OnlyStatus instance. No inbound ports required.
+
+> **Note:** The `neoyubi/onlystatus-checker` image is not yet published. For now, build from source: `docker build -t neoyubi/onlystatus-checker apps/checker -f apps/checker/Dockerfile.private`
+
+## Tech Stack
+
+- **Frontend**: Next.js, React, Tailwind CSS, shadcn/ui, tRPC
+- **API**: Hono (Node.js)
+- **Checker**: Go
+- **Database**: libSQL (Turso)
+- **Analytics**: Tinybird (local)
+- **Auth**: NextAuth.js with credentials, TOTP, WebAuthn
+- **ORM**: Drizzle
+
+## Development
+
+```sh
+# Install dependencies
 pnpm install
-```
 
-3. Initialize the development environment
+# Run database locally
+turso dev --db-file dev.db
 
-Launch the database in one terminal:
-
-```sh
-turso dev --db-file openstatus-dev.db
-```
-
-In another terminal, run the following command:
-
-```sh
-pnpm dx
-```
-
-4. Launch whatever app you wish to:
-
-```sh
-pnpm dev:web
-pnpm dev:status-page
+# Start dev servers
 pnpm dev:dashboard
+pnpm dev:status-page
+pnpm dev:web          # Landing page
 ```
 
-The above commands whill automatically run the libSQL client on `8080` so you might wanna kill the turso command from step 3.
+## Contributing
 
-5. See the results:
+Contributions welcome. Check the [open issues](https://github.com/neoyubi/onlystatus/issues) or submit a PR.
 
-- open [http://localhost:3000](http://localhost:3000) (default port)
+## Credits
 
-### Videos
+OnlyStatus is a fork of [OpenStatus](https://github.com/openstatusHQ/openstatus), built by Thibault Le Ouay Ducroquet, Maximilian Kaske, and contributors. The original project is excellent software and active development continues there. This fork diverges to provide a fully self-hosted experience without cloud dependencies or usage-tier restrictions. If a hosted solution works for you, consider [OpenStatus Cloud](https://www.openstatus.dev/) directly.
 
-Videos to better understand the OpenStatus codebase:
+## License
 
-- [The code behind OpenStatus and how it uses Turbopack](https://youtube.com/watch?v=PYfSJATE8v8).
-- [Drop Betterstack and go open source](https://www.youtube.com/watch?v=PKag0USy3eQ)
+AGPL-3.0 - see [LICENSE](LICENSE) for details.
