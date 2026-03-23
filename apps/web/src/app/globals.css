@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@import "@openstatus/ui/globals";
+
+@theme inline {
+  --font-cal: var(--font-cal-sans);
+  --font-commit-mono: var(--font-commit-mono);
+  --font-sans: var(--font-outfit);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

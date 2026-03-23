@@ -1,0 +1,31 @@
+{
+  "name": "@openstatus/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "tsc": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openstatus/ui": "workspace:*",
+    "@radix-ui/react-slot": "1.2.3",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "0.525.0",
+    "next": "16.0.10",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "3.3.1"
+  },
+  "devDependencies": {
+    "@openstatus/tsconfig": "workspace:*",
+    "@tailwindcss/postcss": "4.1.11",
+    "@types/node": "24.0.8",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "tailwindcss": "4.1.11",
+    "typescript": "5.9.3"
+  }
+}

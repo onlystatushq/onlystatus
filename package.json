@@ -14,6 +14,7 @@
     "format:oxc": "oxfmt --check",
     "dev:status-page": "turbo run dev --filter='./apps/status-page' --filter='./packages/db'",
     "dev:dashboard": "turbo run dev --filter='./apps/dashboard' --filter='./packages/db'",
+    "dev:web": "turbo run dev --filter='./apps/web'",
     "dx": "turbo run dx",
     "tsc": "tsc",
     "test": "turbo run test"

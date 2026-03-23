@@ -268,7 +268,7 @@ importers:
         version: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next-auth:
         specifier: 5.0.0-beta.29
-        version: 5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3)
+        version: 5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3)
       next-themes:
         specifier: 0.4.6
         version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -684,7 +684,7 @@ importers:
         version: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next-auth:
         specifier: 5.0.0-beta.29
-        version: 5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3)
+        version: 5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3)
       next-themes:
         specifier: 0.4.6
         version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -771,6 +771,58 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
+  apps/web:
+    dependencies:
+      '@openstatus/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@radix-ui/react-slot':
+        specifier: 1.2.3
+        version: 1.2.3(@types/react@19.2.2)(react@19.2.3)
+      class-variance-authority:
+        specifier: 0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: 0.525.0
+        version: 0.525.0(react@19.2.3)
+      next:
+        specifier: 16.0.10
+        version: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: 19.2.3
+        version: 19.2.3(react@19.2.3)
+      tailwind-merge:
+        specifier: 3.3.1
+        version: 3.3.1
+    devDependencies:
+      '@openstatus/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@tailwindcss/postcss':
+        specifier: 4.1.11
+        version: 4.1.11
+      '@types/node':
+        specifier: 24.0.8
+        version: 24.0.8
+      '@types/react':
+        specifier: 19.2.2
+        version: 19.2.2
+      '@types/react-dom':
+        specifier: 19.2.2
+        version: 19.2.2(@types/react@19.2.2)
+      tailwindcss:
+        specifier: 4.1.11
+        version: 4.1.11
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   apps/workflows:
     dependencies:
       '@hono/sentry':
@@ -847,7 +899,7 @@ importers:
         version: 1.38.0
       drizzle-orm:
         specifier: 0.44.4
-        version: 0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.9)
+        version: 0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.11)
       effect:
         specifier: 3.19.12
         version: 3.19.12
@@ -863,7 +915,7 @@ importers:
         version: link:../../packages/tsconfig
       '@types/bun':
         specifier: latest
-        version: 1.3.9
+        version: 1.3.11
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -1024,10 +1076,10 @@ importers:
         version: 3.0.3
       drizzle-orm:
         specifier: 0.44.4
-        version: 0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.9)
+        version: 0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.11)
       drizzle-zod:
         specifier: 0.8.3
-        version: 0.8.3(drizzle-orm@0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.9))(zod@4.1.13)
+        version: 0.8.3(drizzle-orm@0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.11))(zod@4.1.13)
       zod:
         specifier: 4.1.13
         version: 4.1.13
@@ -1046,7 +1098,7 @@ importers:
         version: 0.31.4
       next-auth:
         specifier: 5.0.0-beta.29
-        version: 5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3)
+        version: 5.0.0-beta.29(next@16.0.10(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -5453,8 +5505,8 @@ packages:
     resolution: {integrity: sha512-WRZOuCuaz8UcZZE4R5HXTco2goQSI2XxjGY3hbM/xDvwmqFWd4ivooImsMx65OKM6CtNKbnZ5YL+YwAwK7c1dg==}
     deprecated: This is a stub types definition. bcryptjs provides its own type definitions, so you do not need this installed.
 
-  '@types/bun@1.3.9':
-    resolution: {integrity: sha512-KQ571yULOdWJiMH+RIWIOZ7B2RXQGpL1YQrBtLIV3FqDcCu6FsbFUBwhdKUlCKUpS3PJDsHlJ1QKlpxoVR+xtw==}
+  '@types/bun@1.3.11':
+    resolution: {integrity: sha512-5vPne5QvtpjGpsGYXiFyycfpDF2ECyPcTSsFBMa0fraoxiQyMJ3SmuQIGhzPg2WJuWxVBoxWJ2kClYTcw/4fAg==}
 
   '@types/cors@2.8.19':
     resolution: {integrity: sha512-mFNylyeyqN93lfe/9CSxOGREz8cpzAhH+E93xJ4xWQf62V8sQ/24reV2nyzUWM6H6Xji+GGHpkbLe7pVoUEskg==}
@@ -5779,8 +5831,8 @@ packages:
     peerDependencies:
       '@types/react': ^19
 
-  bun-types@1.3.9:
-    resolution: {integrity: sha512-+UBWWOakIP4Tswh0Bt0QD0alpTY8cb5hvgiYeWCMet9YukHbzuruIEeXC2D7nMJPB12kbh8C7XJykSexEqGKJg==}
+  bun-types@1.3.11:
+    resolution: {integrity: sha512-1KGPpoxQWl9f6wcZh57LvrPIInQMn2TQ7jsgxqpRzg+l0QPOFvJVH7HmvHo/AiPgwXy+/Thf6Ov3EdVn1vOabg==}
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -12503,9 +12555,9 @@ snapshots:
     dependencies:
       bcryptjs: 3.0.3
 
-  '@types/bun@1.3.9':
+  '@types/bun@1.3.11':
     dependencies:
-      bun-types: 1.3.9
+      bun-types: 1.3.11
 
   '@types/cors@2.8.19':
     dependencies:
@@ -12847,7 +12899,7 @@ snapshots:
       '@types/node': 24.0.8
       '@types/react': 19.2.2
 
-  bun-types@1.3.9:
+  bun-types@1.3.11:
     dependencies:
       '@types/node': 24.0.8
 
@@ -13282,16 +13334,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.9):
+  drizzle-orm@0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.11):
     optionalDependencies:
       '@libsql/client': 0.15.15
       '@opentelemetry/api': 1.9.0
       '@types/pg': 8.15.6
-      bun-types: 1.3.9
+      bun-types: 1.3.11
 
-  drizzle-zod@0.8.3(drizzle-orm@0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.9))(zod@4.1.13):
+  drizzle-zod@0.8.3(drizzle-orm@0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.11))(zod@4.1.13):
     dependencies:
-      drizzle-orm: 0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.9)
+      drizzle-orm: 0.44.4(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@types/pg@8.15.6)(bun-types@1.3.11)
       zod: 4.1.13
 
   dunder-proto@1.0.1:
@@ -14710,7 +14762,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  next-auth@5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3):
+  next-auth@5.0.0-beta.29(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(next@16.0.10(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(nodemailer@8.0.1)(react@19.2.3):
     dependencies:
       '@auth/core': 0.40.0(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(nodemailer@8.0.1)
       next: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -14719,6 +14771,12 @@ snapshots:
       '@simplewebauthn/browser': 13.2.2
       '@simplewebauthn/server': 13.2.2
       nodemailer: 8.0.1
+
+  next-auth@5.0.0-beta.29(next@16.0.10(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3):
+    dependencies:
+      '@auth/core': 0.40.0(@simplewebauthn/browser@13.2.2)(@simplewebauthn/server@13.2.2)(nodemailer@8.0.1)
+      next: 16.0.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      react: 19.2.3
 
   next-themes@0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
