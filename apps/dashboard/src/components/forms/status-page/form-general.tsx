@@ -29,7 +29,6 @@ import { Textarea } from "@openstatus/ui/components/ui/textarea";
 import { useDebounce } from "@openstatus/ui/hooks/use-debounce";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { isTRPCClientError } from "@trpc/client";
-import Image from "next/image";
 import { useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -207,7 +206,7 @@ export function FormGeneral({
                       {watchIcon ? (
                         <>
                           <div className="size-[36px] overflow-hidden rounded-md border bg-muted">
-                            <Image
+                            <img
                               src={watchIcon}
                               width={36}
                               height={36}

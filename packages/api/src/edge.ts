@@ -1,4 +1,3 @@
-import { blobRouter } from "./router/blob";
 import { checkerRouter } from "./router/checker";
 import { feedbackRouter } from "./router/feedback";
 import { incidentRouter } from "./router/incident";
@@ -38,7 +37,6 @@ export const edgeRouter = createTRPCRouter({
   maintenance: maintenanceRouter,
   member: memberRouter,
   checker: checkerRouter,
-  blob: blobRouter,
   feedback: feedbackRouter,
   statusPage: statusPageRouter,
   privateLocation: privateLocationRouter,

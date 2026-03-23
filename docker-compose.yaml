@@ -10,6 +10,8 @@ volumes:
         name: onlystatus-tinybird-data
     tinybird-auth:
         name: onlystatus-tinybird-auth
+    uploads:
+        name: onlystatus-uploads
 
 services:
     # External services
@@ -275,6 +277,7 @@ services:
             - .env.docker
         volumes:
             - tinybird-auth:/auth:ro
+            - uploads:/app/uploads
         environment:
             - DATABASE_URL=http://libsql:8080
             - TINYBIRD_URL=http://tinybird-local:7181
