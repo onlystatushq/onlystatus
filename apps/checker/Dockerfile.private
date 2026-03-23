@@ -1,0 +1,33 @@
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /go/src/app
+COPY ca/ca-bundle.crt /usr/local/share/ca-certificates/ca-bundle.crt
+
+RUN apk update \
+&& apk upgrade --available \
+&& update-ca-certificates
+
+RUN apk add --no-cache tzdata
+ENV TZ=UTC
+
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+ENV GOARCH=amd64
+
+COPY go.* .
+RUN go mod download
+
+COPY . .
+RUN go build -trimpath -ldflags "-s -w" -o checker-private ./cmd/private/main.go
+
+FROM alpine:3.21
+
+RUN apk add --no-cache ca-certificates tzdata
+
+WORKDIR /opt/bin
+
+COPY --from=builder /go/src/app/checker-private /opt/bin/checker-private
+
+ENV TZ=UTC
+
+CMD [ "/opt/bin/checker-private" ]

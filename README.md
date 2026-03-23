@@ -159,7 +159,6 @@ docker run -d \
 
 The checker only needs outbound access to your OnlyStatus instance. No inbound ports required.
 
-> **Note:** The `neoyubi/onlystatus-checker` image is not yet published. For now, build from source: `docker build -t neoyubi/onlystatus-checker apps/checker -f apps/checker/Dockerfile.private`
 
 ## Tech Stack
 
