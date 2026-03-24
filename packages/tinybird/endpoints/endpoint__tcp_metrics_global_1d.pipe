@@ -17,8 +17,9 @@ SQL >
         max(cronTimestamp) as lastTimestamp,
         count() as count,
         monitorId
-    FROM mv__tcp_1d__v0
+    FROM mv__tcp_1d__v1
     WHERE monitorId IN {{ Array(monitorIds, 'String', '4433') }}
+        AND time >= toDateTime64(now() - INTERVAL 1 DAY, 3)
     GROUP BY monitorId
 
 

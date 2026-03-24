@@ -53,8 +53,8 @@ export function ChartAreaLatency({
   const fromDate = periodToFromDate[period];
   const toDate = endOfDay(new Date());
 
-  const { data: latency } = useQuery(
-    trpc.tinybird.metricsLatency.queryOptions({
+  const { data: latency } = useQuery({
+    ...trpc.tinybird.metricsLatency.queryOptions({
       monitorId,
       period,
       type,
@@ -62,7 +62,8 @@ export function ChartAreaLatency({
       fromDate: fromDate.toISOString(),
       toDate: toDate.toISOString(),
     }),
-  );
+    refetchInterval: 30_000,
+  });
 
   const refinedLatency = latency ? mapLatency(latency, percentile) : [];
 

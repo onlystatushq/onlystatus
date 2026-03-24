@@ -70,6 +70,7 @@ export function Client() {
       toDate: toDate.toISOString(),
     }),
     enabled: !!monitor,
+    refetchInterval: 30_000,
   } as const;
 
   const { data: regionTimeline, isLoading } = useQuery(regionTimelineQuery);

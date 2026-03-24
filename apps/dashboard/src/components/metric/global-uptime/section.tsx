@@ -43,14 +43,15 @@ export function GlobalUptimeSection({
 }) {
   const trpc = useTRPC();
 
-  const { data: metrics, isLoading } = useQuery(
-    trpc.tinybird.metrics.queryOptions({
+  const { data: metrics, isLoading } = useQuery({
+    ...trpc.tinybird.metrics.queryOptions({
       monitorId,
       period,
       type: jobType,
       regions,
     }),
-  );
+    refetchInterval: 30_000,
+  });
 
   // Helper to transform the data the same way it used to be in the page
   function defineMetrics() {
@@ -90,13 +91,28 @@ export function GlobalUptimeSection({
               trend !== Number.POSITIVE_INFINITY &&
               k !== "total" &&
               k !== "lastTimestamp";
-            acc[k] = {
-              label: metricsCards[k].label,
-              variant: metricsCards[k].variant,
-              value: v ?? "0",
-              trend: hasTrend ? trend : null,
-              raw: value ?? 0,
-            } as (typeof acc)[typeof k & keyof typeof acc];
+            if (k === "lastTimestamp") {
+              // Keep the most recent non-null lastTimestamp across both periods
+              const prevRaw = acc[k]?.raw ?? 0;
+              const currRaw = (value as number) ?? 0;
+              if (currRaw > prevRaw) {
+                acc[k] = {
+                  label: metricsCards[k].label,
+                  variant: metricsCards[k].variant,
+                  value: v ?? "0",
+                  trend: null,
+                  raw: currRaw,
+                } as (typeof acc)[typeof k & keyof typeof acc];
+              }
+            } else {
+              acc[k] = {
+                label: metricsCards[k].label,
+                variant: metricsCards[k].variant,
+                value: v ?? "0",
+                trend: hasTrend ? trend : null,
+                raw: value ?? 0,
+              } as (typeof acc)[typeof k & keyof typeof acc];
+            }
           } else {
             acc[k] = {
               label: metricsCards[k].label,

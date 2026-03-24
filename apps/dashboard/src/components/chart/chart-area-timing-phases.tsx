@@ -74,15 +74,16 @@ export function ChartAreaTimingPhases({
 }) {
   const trpc = useTRPC();
 
-  const { data: timingPhases } = useQuery(
-    trpc.tinybird.metricsTimingPhases.queryOptions({
+  const { data: timingPhases } = useQuery({
+    ...trpc.tinybird.metricsTimingPhases.queryOptions({
       monitorId,
       period,
       type,
       interval,
       regions,
     }),
-  );
+    refetchInterval: 30_000,
+  });
 
   const refinedTimingPhases = timingPhases
     ? mapTimingPhases(timingPhases, percentile)

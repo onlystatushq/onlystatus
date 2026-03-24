@@ -19,6 +19,7 @@ SQL >
         monitorId
     FROM mv__http_1d__v1
     WHERE monitorId IN {{ Array(monitorIds, 'String', '1') }}
+        AND time >= toDateTime64(now() - INTERVAL 1 DAY, 3)
     GROUP BY monitorId
 
 
