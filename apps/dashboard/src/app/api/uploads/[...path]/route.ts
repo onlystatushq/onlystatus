@@ -49,7 +49,7 @@ export async function GET(
   try {
     const data = await readFile(filePath);
 
-    return new NextResponse(data, {
+    return new NextResponse(new Uint8Array(data), {
       headers: {
         "Content-Type": MIME_TYPES[ext],
         "Cache-Control": "public, max-age=31536000, immutable",

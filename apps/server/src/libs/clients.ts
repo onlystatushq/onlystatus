@@ -1,6 +1,5 @@
 import { env } from "@/env";
 import { OSTinybird } from "@openstatus/tinybird";
-import { Redis } from "@openstatus/upstash";
 
 /**
  * Shared singleton instances for external services.
@@ -11,5 +10,16 @@ import { Redis } from "@openstatus/upstash";
 // Tinybird client singleton
 export const tb = new OSTinybird(env.TINY_BIRD_API_KEY);
 
-// Redis client singleton
-export const redis = Redis.fromEnv();
+// Redis client singleton (optional for self-hosted)
+function createRedis() {
+  if (
+    !process.env.UPSTASH_REDIS_REST_URL ||
+    !process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return null;
+  }
+  const { Redis } = require("@upstash/redis") as typeof import("@upstash/redis");
+  return Redis.fromEnv();
+}
+
+export const redis = createRedis();

@@ -99,9 +99,12 @@ export async function sendCheckerTasks(
       continue;
     }
 
-    // Self-hosted: only dispatch to local checker if "local" is in the monitor's regions
+    // Self-hosted: use "local" region if available, otherwise fall back to first configured region
     const region = row.regions.includes("local") ? "local" : row.regions[0];
-    if (!region) continue; // No local regions, private locations handle their own dispatch
+    if (!region) {
+      logger.warn("Monitor has no regions configured, skipping", { monitor_id: row.id });
+      continue;
+    }
 
     const status =
       monitorStatus.data.find((m) => region === m.region)?.status || "active";

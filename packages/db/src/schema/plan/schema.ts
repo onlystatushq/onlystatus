@@ -18,7 +18,7 @@ export const limitsSchema = z.object({
   "data-retention": z
     .enum(["14 days", "3 months", "12 months", "24 months"])
     .prefault("14 days"),
-  regions: monitorRegionSchema.array().prefault(SELF_HOSTED_REGIONS),
+  regions: monitorRegionSchema.array().prefault([...SELF_HOSTED_REGIONS]),
   "private-locations": z.boolean().prefault(false),
   screenshots: z.boolean().prefault(false),
   "response-logs": z.boolean().prefault(false),

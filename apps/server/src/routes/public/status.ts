@@ -18,7 +18,7 @@ status.get("/:slug", async (c) => {
   try {
     const { slug } = c.req.param();
 
-    const cache = await redis.get(slug);
+    const cache = await redis?.get(slug);
 
     if (cache) {
       setMetric(c, "OpenStatus-Cache", "HIT");
@@ -88,7 +88,7 @@ status.get("/:slug", async (c) => {
     });
 
     const status = tracker.currentStatus;
-    await redis.set(slug, status, { ex: 60 }); // 1m cache
+    await redis?.set(slug, status, { ex: 60 }); // 1m cache
 
     return c.json({ status });
   } catch (e) {

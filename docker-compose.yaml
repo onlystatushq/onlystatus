@@ -21,8 +21,8 @@ services:
         networks:
             - onlystatus
         ports:
-            - "8080:8080"
-            - "5001:5001"
+            - "${LIBSQL_HTTP_PORT:-8080}:8080"
+            - "${LIBSQL_GRPC_PORT:-5001}:5001"
         volumes:
             - libsql-data:/var/lib/sqld
         environment:
@@ -46,7 +46,7 @@ services:
         networks:
             - onlystatus
         ports:
-            - "7181:7181"
+            - "${TINYBIRD_PORT:-7181}:7181"
         volumes:
             - tinybird-data:/var/lib/tinybird
             - tinybird-auth:/auth
@@ -89,11 +89,11 @@ services:
         build:
             context: .
             dockerfile: apps/workflows/Dockerfile
-        image: onlystatus/workflows:latest
+            target: build
         networks:
             - onlystatus
         working_dir: /app/packages/db
-        entrypoint: ["bun", "x", "drizzle-kit", "push", "--force"]
+        entrypoint: ["/bin/sh", "-c", "bun x drizzle-kit push --force; exit 0"]
         environment:
             - DATABASE_URL=http://libsql:8080
             - DATABASE_AUTH_TOKEN=dummy
@@ -111,7 +111,6 @@ services:
         build:
             context: .
             dockerfile: apps/workflows/Dockerfile
-        image: onlystatus/workflows:latest
         networks:
             - onlystatus
         volumes:
@@ -143,7 +142,6 @@ services:
         build:
             context: .
             dockerfile: apps/server/Dockerfile
-        image: onlystatus/server:latest
         networks:
             - onlystatus
         ports:
@@ -172,11 +170,10 @@ services:
         build:
             context: apps/checker
             dockerfile: Dockerfile
-        image: onlystatus/checker:latest
         networks:
             - onlystatus
         ports:
-            - "8082:8080"
+            - "${CHECKER_PORT:-8082}:8080"
         env_file:
             - .env.docker
         volumes:
@@ -193,7 +190,7 @@ services:
             tinybird-deploy:
                 condition: service_completed_successfully
         healthcheck:
-            test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/health || exit 1"]
+            test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/health || exit 1"]
             interval: 15s
             timeout: 10s
             retries: 3
@@ -205,11 +202,10 @@ services:
         build:
             context: apps/private-location
             dockerfile: Dockerfile
-        image: onlystatus/private-location:latest
         networks:
             - onlystatus
         ports:
-            - "8081:8080"
+            - "${PRIVATE_LOCATION_PORT:-8081}:8080"
         env_file:
             - .env.docker
         volumes:
@@ -224,14 +220,7 @@ services:
             server:
                 condition: service_healthy
         healthcheck:
-            test:
-                [
-                    "CMD",
-                    "wget",
-                    "--spider",
-                    "-q",
-                    "http://localhost:8080/health",
-                ]
+            test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/health || exit 1"]
             interval: 15s
             timeout: 10s
             retries: 3
@@ -268,7 +257,6 @@ services:
         build:
             context: .
             dockerfile: apps/dashboard/Dockerfile
-        image: onlystatus/dashboard:latest
         networks:
             - onlystatus
         ports:
@@ -310,11 +298,10 @@ services:
         build:
             context: .
             dockerfile: apps/status-page/Dockerfile
-        image: onlystatus/status-page:latest
         networks:
             - onlystatus
         ports:
-            - "3003:3000"
+            - "${STATUS_PAGE_PORT:-3003}:3000"
         env_file:
             - .env.docker
         volumes:

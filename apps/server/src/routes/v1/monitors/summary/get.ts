@@ -62,20 +62,18 @@ export function registerGetMonitorSummary(api: typeof monitorsApi) {
       });
     }
 
-    const cache = await redis.get<SummarySchema[]>(`${id}-daily-stats`);
+    const cache = await redis?.get<SummarySchema[]>(`${id}-daily-stats`);
 
     if (cache) {
-      // c.get("event").cache_hit = true;
       return c.json({ data: cache }, 200);
     }
 
-    // c.get("event").cache_hit = false;
     const res =
       _monitor.jobType === "http"
         ? await tb.legacy_httpStatus45d({ monitorId: id })
         : await tb.legacy_tcpStatus45d({ monitorId: id });
 
-    await redis.set(`${id}-daily-stats`, res.data, { ex: 600 });
+    await redis?.set(`${id}-daily-stats`, res.data, { ex: 600 });
 
     return c.json({ data: res.data }, 200);
   });
