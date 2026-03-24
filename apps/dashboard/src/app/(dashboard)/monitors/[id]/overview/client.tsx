@@ -27,7 +27,6 @@ import { mapRegionMetrics } from "@/data/metrics.client";
 import { periodToFromDate } from "@/data/metrics.client";
 import type { RegionMetric } from "@/data/region-metrics";
 import { useTRPC } from "@/lib/trpc/client";
-import { monitorRegions } from "@openstatus/db/src/schema/constants";
 import {
   Tabs,
   TabsContent,
@@ -51,7 +50,11 @@ export function Client() {
   const { data: monitor } = useQuery(
     trpc.monitor.get.queryOptions({ id: Number.parseInt(id) }),
   );
-  const selectedRegions = regions ?? undefined;
+  // Default to monitor's configured regions + private locations when no explicit filter
+  const selectedRegions = regions ?? (monitor ? [
+    ...monitor.regions,
+    ...(monitor.privateLocations?.map((l) => l.id.toString()) ?? []),
+  ] : undefined);
   const fromDate = periodToFromDate[period];
   const toDate = endOfDay(new Date());
 
@@ -71,22 +74,20 @@ export function Client() {
 
   const { data: regionTimeline, isLoading } = useQuery(regionTimelineQuery);
 
+  const activeRegions = useMemo(() => [
+    ...(monitor?.regions ?? []),
+    ...(monitor?.privateLocations?.map((location) =>
+      location.id.toString(),
+    ) ?? []),
+  ], [monitor?.regions, monitor?.privateLocations]);
+
   const regionMetrics: RegionMetric[] = React.useMemo(() => {
     return mapRegionMetrics(
       regionTimeline,
-      // NOTE: while loading, we show the selected regions with empty data,
-      // once the data is loaded, we show all the regions that we get from TB
-      isLoading
-        ? monitor?.regions ?? []
-        : [
-            ...monitorRegions,
-            ...(monitor?.privateLocations?.map((location) =>
-              location.id.toString(),
-            ) ?? []),
-          ],
+      activeRegions,
       percentile,
     );
-  }, [regionTimeline, monitor, percentile, isLoading]);
+  }, [regionTimeline, activeRegions, percentile]);
 
   const regionColumns = useMemo(
     () => getRegionColumns(monitor?.privateLocations ?? []),

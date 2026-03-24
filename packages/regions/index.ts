@@ -78,7 +78,8 @@ export type Continent =
   | "South America"
   | "Asia"
   | "Africa"
-  | "Oceania";
+  | "Oceania"
+  | "Private";
 
 export type RegionInfo = {
   code: Region;
@@ -463,9 +464,9 @@ export const regionDict: Record<Region, RegionInfo> = {
   },
   local: {
     code: "local",
-    location: "Local",
-    flag: "",
-    continent: "Europe",
+    location: "Local Checker",
+    flag: "🏠",
+    continent: "Private",
     deprecated: false,
     provider: "private",
   },
@@ -524,5 +525,6 @@ export const groupByContinent = Object.entries(regionDict).reduce<
     Oceania: [],
     Asia: [],
     Africa: [],
+    Private: [],
   },
 );

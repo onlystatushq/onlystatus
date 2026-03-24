@@ -43,7 +43,9 @@ export function getColumns(
                 <TooltipTrigger className="flex h-[50px] items-center gap-1">
                   {region.flag}{" "}
                   <span className="max-w-[90px] truncate">
-                    {formatRegionCode(region.code)}
+                    {region.continent === "Private"
+                      ? region.location
+                      : formatRegionCode(region.code)}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="left">

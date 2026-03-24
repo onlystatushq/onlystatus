@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { Events } from "@openstatus/analytics";
@@ -75,5 +76,39 @@ export const workspaceRouter = createTRPCRouter({
         .update(workspace)
         .set({ name: opts.input.name, updatedAt: new Date() })
         .where(and(...whereConditions));
+    }),
+
+  updateSlug: protectedProcedure
+    .meta({ track: Events.UpdateWorkspace })
+    .input(
+      z.object({
+        slug: z
+          .string()
+          .min(1, "Slug is required")
+          .max(64, "Slug must be at most 64 characters")
+          .regex(
+            /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+            "Slug must be lowercase alphanumeric with hyphens",
+          ),
+      }),
+    )
+    .mutation(async (opts) => {
+      try {
+        await opts.ctx.db
+          .update(workspace)
+          .set({ slug: opts.input.slug, updatedAt: new Date() })
+          .where(eq(workspace.id, opts.ctx.workspace.id));
+      } catch (e) {
+        if (
+          e instanceof Error &&
+          e.message.includes("UNIQUE constraint failed")
+        ) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "This slug is already taken",
+          });
+        }
+        throw e;
+      }
     }),
 });

@@ -41,11 +41,16 @@ const DEFAULT_REGIONS = ["local"];
 const PERIODICITY = monitorPeriodicity.filter((p) => p !== "other");
 const DEFAULT_PRIVATE_LOCATIONS = [] satisfies { id: number; name: string }[];
 
-const schema = z.object({
-  regions: z.array(z.string()),
-  periodicity: z.enum(monitorPeriodicity),
-  privateLocations: z.array(z.number()),
-});
+const schema = z
+  .object({
+    regions: z.array(z.string()),
+    periodicity: z.enum(monitorPeriodicity),
+    privateLocations: z.array(z.number()),
+  })
+  .refine((data) => data.regions.length > 0 || data.privateLocations.length > 0, {
+    message: "Select at least one check location",
+    path: ["regions"],
+  });
 
 type FormValues = z.infer<typeof schema>;
 
@@ -164,20 +169,35 @@ export function FormSchedulingRegions({
           <FormCardSeparator />
           <FormCardContent className="grid gap-4">
             <FormLabel>Locations</FormLabel>
-            <div className="flex items-center gap-2 rounded-md border p-3">
-              <Server className="size-4 text-muted-foreground" />
-              <div className="flex flex-col">
-                <span className="font-medium text-sm">Local Checker</span>
-                <span className="text-muted-foreground text-xs">
-                  Built-in checker running alongside your instance
-                </span>
-              </div>
-              <Checkbox
-                checked={true}
-                disabled={true}
-                className="ml-auto"
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="regions"
+              render={({ field }) => {
+                const hasLocal = field.value.includes("local");
+                return (
+                  <div className="flex items-center gap-2 rounded-md border p-3">
+                    <Server className="size-4 text-muted-foreground" />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm">Local Checker</span>
+                      <span className="text-muted-foreground text-xs">
+                        Built-in checker running alongside your instance
+                      </span>
+                    </div>
+                    <Checkbox
+                      checked={hasLocal}
+                      onCheckedChange={(checked) => {
+                        field.onChange(
+                          checked
+                            ? [...field.value, "local"]
+                            : field.value.filter((r: string) => r !== "local"),
+                        );
+                      }}
+                      className="ml-auto"
+                    />
+                  </div>
+                );
+              }}
+            />
             {privateLocations.length === 0 ? (
               <Note>
                 <Globe />

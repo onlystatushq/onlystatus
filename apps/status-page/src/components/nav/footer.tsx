@@ -33,11 +33,11 @@ export function Footer(props: React.ComponentProps<"footer">) {
             <p className="font-mono text-muted-foreground text-xs leading-none sm:text-sm">
               powered by{" "}
               <Link
-                href="https://openstatus.dev"
+                href="https://onlystatus.dev"
                 target="_blank"
                 rel="noreferrer"
               >
-                openstatus.dev
+                onlystatus.dev
               </Link>
             </p>
           ) : null}

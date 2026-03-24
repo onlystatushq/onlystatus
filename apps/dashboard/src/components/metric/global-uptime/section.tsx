@@ -59,7 +59,7 @@ export function GlobalUptimeSection({
 
     if (_metrics.length !== 2) return null;
 
-    return _metrics.reverse().reduce(
+    return _metrics.reduce(
       (acc, metric) => {
         Object.entries(metric).forEach(([key, value]) => {
           const k = key as keyof typeof acc;
@@ -82,8 +82,8 @@ export function GlobalUptimeSection({
           if (k in acc) {
             const trend = acc[k]?.raw
               ? k === "uptime"
-                ? acc[k]?.raw / (value ?? 0)
-                : (value ?? 0) / acc[k]?.raw
+                ? (value ?? 0) / acc[k]?.raw
+                : acc[k]?.raw / (value ?? 0)
               : 1;
             const hasTrend =
               !Number.isNaN(trend) &&
