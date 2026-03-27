@@ -36,7 +36,7 @@ docker compose version  # v2.x
 Three commands to get running:
 
 ```sh
-git clone https://github.com/openstatusHQ/openstatus.git onlystatus
+git clone https://github.com/neoyubi/onlystatus.git onlystatus
 cd onlystatus
 cp .env.docker.example .env.docker
 ```

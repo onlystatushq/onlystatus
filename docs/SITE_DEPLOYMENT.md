@@ -7,7 +7,7 @@ Self-hosted synthetic monitoring. No cloud dependencies. No feature gates. Just 
 ### 1. Clone
 
 ```sh
-git clone https://github.com/openstatusHQ/openstatus.git onlystatus
+git clone https://github.com/neoyubi/onlystatus.git onlystatus
 cd onlystatus
 ```
 
