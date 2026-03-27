@@ -1,3 +1,4 @@
+import { getStatusPageUrl } from "@openstatus/utils";
 import { defaultMetadata, ogMetadata, twitterMetadata } from "@/app/metadata";
 import { PasswordWrapper } from "@/components/password-wrapper";
 import {
@@ -108,9 +109,7 @@ export async function generateMetadata({
     description: page?.description,
     icons: page?.icon,
     alternates: {
-      canonical: page?.customDomain
-        ? `https://${page.customDomain}`
-        : `https://${page.slug}.openstatus.dev`,
+      canonical: getStatusPageUrl(page.slug, page?.customDomain),
     },
     twitter: {
       ...twitterMetadata,

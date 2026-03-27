@@ -7,6 +7,7 @@ import { getNextStatus } from "@/data/status-report-updates.client";
 import { getActions } from "@/data/status-reports.client";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@openstatus/api";
+import { getStatusPageUrl } from "@openstatus/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Row } from "@tanstack/react-table";
 import { useRef } from "react";
@@ -30,10 +31,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
     "view-report": () => {
       if (typeof window !== "undefined") {
         window.open(
-          `https://${
-            row.original.page.customDomain ||
-            `${row.original.page.slug}.openstatus.dev`
-          }/events/report/${row.original.id}`,
+          `${getStatusPageUrl(row.original.page.slug, row.original.page.customDomain)}/events/report/${row.original.id}`,
           "_blank",
         );
       }

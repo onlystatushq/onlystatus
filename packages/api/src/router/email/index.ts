@@ -8,6 +8,7 @@ import {
   statusReportUpdate,
 } from "@openstatus/db/src/schema";
 import { EmailClient } from "@openstatus/emails";
+import { getStatusPageUrl } from "@openstatus/utils";
 import { TRPCError } from "@trpc/server";
 import { env } from "../../env";
 import {
@@ -176,9 +177,7 @@ export const emailRouter = createTRPCRouter({
         });
       }
 
-      const link = _pageSubscriber.page.customDomain
-        ? `https://${_pageSubscriber.page.customDomain}/verify/${_pageSubscriber.token}`
-        : `https://${_pageSubscriber.page.slug}.openstatus.dev/verify/${_pageSubscriber.token}`;
+      const link = `${getStatusPageUrl(_pageSubscriber.page.slug, _pageSubscriber.page.customDomain)}/verify/${_pageSubscriber.token}`;
 
       await emailClient.sendPageSubscription({
         to: _pageSubscriber.email,

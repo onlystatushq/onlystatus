@@ -75,7 +75,7 @@ export async function GET(
       },
       copyright: `Copyright ${new Date()
         .getFullYear()
-        .toString()} openstatus.dev`,
+        .toString()} ${page.title || "OnlyStatus"}`,
       language: "en-US",
       updated: new Date(),
       ttl: 60,

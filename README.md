@@ -11,6 +11,14 @@
   </p>
 </p>
 
+## Heads Up
+
+This is a community fork, not a commercially supported product. It is maintained in my spare time and may contain bugs, including ones that could affect reliability. It is provided as-is, without warranty or liability of any kind.
+
+If you need rock-solid uptime monitoring with dedicated support, go with the [OpenStatus](https://www.openstatus.dev/) team directly. They are excellent, their paid plans will take care of you, and they actively maintain the upstream project.
+
+If you are the "I'll run it myself" type and you love self-hosting, this is the repo for you.
+
 ## Overview
 
 OnlyStatus is a fully self-hosted synthetic monitoring platform. Monitor your websites and APIs with HTTP, TCP, and DNS checks, get alerts when things break, and give your users a clean status page.

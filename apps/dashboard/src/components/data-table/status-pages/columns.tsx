@@ -3,6 +3,7 @@
 import { Link } from "@/components/common/link";
 import { TableCellLink } from "@/components/data-table/table-cell-link";
 import type { RouterOutputs } from "@openstatus/api";
+import { getStatusPageUrl } from "@openstatus/utils";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTableRowActions } from "./data-table-row-actions";
 
@@ -52,7 +53,7 @@ export const columns: ColumnDef<StatusPage>[] = [
       const slug = row.getValue("slug");
       return (
         <TableCellLink
-          href={domain ? `https://${domain}` : `https://${slug}.openstatus.dev`}
+          href={getStatusPageUrl(slug as string, domain as string | null)}
           value={slug}
         />
       );

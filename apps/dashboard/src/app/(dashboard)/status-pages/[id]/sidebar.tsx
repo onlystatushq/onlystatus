@@ -4,6 +4,7 @@ import { Link } from "@/components/common/link";
 import { TableCellLink } from "@/components/data-table/table-cell-link";
 import { SidebarRight } from "@/components/nav/sidebar-right";
 import { useTRPC } from "@/lib/trpc/client";
+import { getStatusPageUrl } from "@openstatus/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -25,7 +26,8 @@ export function Sidebar() {
 
   if (!statusPage) return null;
 
-  const BADGE_URL = `https://${statusPage.slug}.openstatus.dev/badge/v2`;
+  const pageUrl = getStatusPageUrl(statusPage.slug, statusPage.customDomain);
+  const BADGE_URL = `${pageUrl}/badge/v2`;
 
   return (
     <SidebarRight
@@ -37,13 +39,7 @@ export function Sidebar() {
             {
               label: "Slug",
               value: (
-                <Link
-                  href={`https://${
-                    statusPage.customDomain ||
-                    `${statusPage.slug}.openstatus.dev`
-                  }`}
-                  target="_blank"
-                >
+                <Link href={pageUrl} target="_blank">
                   {statusPage.slug}
                 </Link>
               ),
@@ -133,13 +129,7 @@ export function Sidebar() {
       ]}
       footerButton={{
         onClick: () =>
-          typeof window !== "undefined" &&
-          window.open(
-            `https://${
-              statusPage.customDomain || `${statusPage.slug}.openstatus.dev`
-            }`,
-            "_blank",
-          ),
+          typeof window !== "undefined" && window.open(pageUrl, "_blank"),
         children: (
           <>
             <ExternalLink />

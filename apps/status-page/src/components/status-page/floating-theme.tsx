@@ -33,14 +33,7 @@ export function FloatingTheme({ className }: { className?: string }) {
 
   useEffect(() => {
     const enabled = sessionStorage.getItem("community-theme") === "true";
-    const host = window.location.host;
-    if (
-      (host.includes("localhost") ||
-        host.includes("stpg.dev") ||
-        host.includes("openstatus.dev") ||
-        host.includes("vercel.app")) &&
-      enabled
-    ) {
+    if (enabled) {
       setDisplay(true);
       setOpen(true);
     }

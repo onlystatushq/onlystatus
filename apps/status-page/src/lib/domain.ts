@@ -39,24 +39,7 @@ export const getValidSubdomain = (host?: string | null) => {
     return null;
   }
 
-  // Known SaaS domains: extract subdomain
-  if (host?.includes(".") && !host.includes(".vercel.app")) {
-    const candidate = host.split(".")[0];
-    if (candidate && !candidate.includes("www")) {
-      subdomain = candidate;
-    }
-  }
-
-  if (
-    host &&
-    (host.includes("stpg.dev") ||
-      host.includes("openstatus.dev") ||
-      host.endsWith(".vercel.app"))
-  ) {
-    return subdomain;
-  }
-
-  // Unknown domain = custom domain, return the full host for DB lookup
+  // Any other domain is treated as a custom domain — return the full host for DB lookup
   if (host) {
     subdomain = host.replace(/:\d+$/, "");
   }
@@ -76,11 +59,7 @@ export const getValidCustomDomain = (req: NextRequest | Request) => {
 
   const subdomain = getValidSubdomain(host ?? url.host);
 
-  if (
-    hostnames.length > 2 &&
-    hostnames[0] !== "www" &&
-    !url.host.endsWith(".vercel.app")
-  ) {
+  if (hostnames.length > 2 && hostnames[0] !== "www") {
     prefix = hostnames[0].toLowerCase();
     type = "hostname";
   } else {

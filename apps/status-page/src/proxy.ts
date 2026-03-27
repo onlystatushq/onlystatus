@@ -37,11 +37,7 @@ export default auth(async (req) => {
     // Subdomain detected (either a slug or a full custom domain)
     prefix = subdomain.toLowerCase();
     type = "hostname";
-  } else if (
-    hostnames.length > 2 &&
-    hostnames[0] !== "www" &&
-    !url.host.endsWith(".vercel.app")
-  ) {
+  } else if (hostnames.length > 2 && hostnames[0] !== "www") {
     prefix = hostnames[0].toLowerCase();
     type = "hostname";
   } else {

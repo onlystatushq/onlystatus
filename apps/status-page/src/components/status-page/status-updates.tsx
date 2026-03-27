@@ -148,7 +148,7 @@ export function StatusUpdates({
               <CopyInputButton
                 className="w-full"
                 id="ssh"
-                value={`ssh ${page?.slug}@ssh.openstatus.dev`}
+                value="SSH access is not available in self-hosted deployments"
               />
             </div>
           </TabsContent>

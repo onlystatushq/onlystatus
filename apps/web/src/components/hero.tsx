@@ -1,9 +1,10 @@
 import { ChevronDown, Github } from "lucide-react";
+import Link from "next/link";
 import { CommandBlock } from "./command-block";
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-6 py-24">
+    <section className="relative flex min-h-screen flex-col items-center justify-center px-6 py-24">
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 text-center">
         <span className="rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
           self-hosted / open source
@@ -32,22 +33,20 @@ export function Hero() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/docs"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-medium text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Get Started
+          </Link>
           <a
             href="https://github.com/neoyubi/onlystatus"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 font-medium text-sm text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 font-medium text-sm text-foreground transition-colors hover:bg-accent"
           >
             <Github className="size-4" />
             GitHub
-          </a>
-          <a
-            href="https://github.com/neoyubi/onlystatus#getting-started"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 font-medium text-sm text-foreground transition-colors hover:bg-accent"
-          >
-            Get Started
           </a>
         </div>
       </div>

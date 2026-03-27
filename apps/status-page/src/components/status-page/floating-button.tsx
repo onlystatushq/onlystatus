@@ -150,14 +150,7 @@ export function FloatingButton({
     const enabled =
       localStorage.getItem("configuration-token") === token ||
       configToken === token;
-    const host = window.location.host;
-    if (
-      (host.includes("localhost") ||
-        host.includes("stpg.dev") ||
-        host.includes("openstatus.dev") ||
-        host.includes("vercel.app")) &&
-      enabled
-    ) {
+    if (enabled) {
       setDisplay(true);
       localStorage.setItem("configuration-token", token);
     } else if (IS_DEV) {
@@ -325,8 +318,8 @@ export function FloatingButton({
               <a
                 href={
                   pageId
-                    ? `https://app.openstatus.dev/status-pages/${pageId}/edit?type=${barType}&value=${cardType}&uptime=${showUptime}&theme=${communityTheme}`
-                    : "https://app.openstatus.dev/status-pages"
+                    ? `${process.env.NEXT_PUBLIC_URL || "http://localhost:3002"}/status-pages/${pageId}/edit?type=${barType}&value=${cardType}&uptime=${showUptime}&theme=${communityTheme}`
+                    : `${process.env.NEXT_PUBLIC_URL || "http://localhost:3002"}/status-pages`
                 }
                 target="_blank"
                 rel="noreferrer"

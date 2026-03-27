@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit, Geist_Mono } from "next/font/google";
 import LocalFont from "next/font/local";
 import { cn } from "@openstatus/ui/lib/utils";
+import { Nav } from "@/components/nav";
 import "./globals.css";
 
 const cal = LocalFont({
@@ -81,6 +82,7 @@ export default function RootLayout({
           "font-sans antialiased",
         )}
       >
+        <Nav />
         {children}
       </body>
     </html>

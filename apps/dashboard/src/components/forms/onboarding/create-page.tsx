@@ -3,6 +3,7 @@
 // FIXME: use input-group instead
 import { InputWithAddons } from "@/components/common/input-with-addons";
 import { useTRPC } from "@/lib/trpc/client";
+import { getStatusPageHost } from "@openstatus/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -103,7 +104,7 @@ export function CreatePageForm({
               <FormControl>
                 <InputWithAddons
                   placeholder="status"
-                  trailing=".openstatus.dev"
+                  leading={`${getStatusPageHost()}/`}
                   {...field}
                 />
               </FormControl>

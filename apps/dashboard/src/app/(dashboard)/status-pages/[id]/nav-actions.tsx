@@ -4,6 +4,7 @@ import { QuickActions } from "@/components/dropdowns/quick-actions";
 import { NavFeedback } from "@/components/nav/nav-feedback";
 import { getActions } from "@/data/status-pages.client";
 import { useTRPC } from "@/lib/trpc/client";
+import { getStatusPageUrl } from "@openstatus/utils";
 import { Button } from "@openstatus/ui/components/ui/button";
 import {
   Tooltip,
@@ -58,9 +59,7 @@ export function NavActions() {
           <TooltipTrigger asChild>
             <Button variant="ghost" size="sm" className="group h-7 w-7" asChild>
               <a
-                href={`https://${
-                  statusPage.customDomain || `${statusPage.slug}.openstatus.dev`
-                }`}
+                href={getStatusPageUrl(statusPage.slug, statusPage.customDomain)}
                 target="_blank"
                 rel="noreferrer"
               >

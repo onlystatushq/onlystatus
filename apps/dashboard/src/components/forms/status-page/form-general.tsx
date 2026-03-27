@@ -2,6 +2,7 @@
 
 // FIXME: use input-group instead
 import { InputWithAddons } from "@/components/common/input-with-addons";
+import { getStatusPageHost } from "@openstatus/utils";
 import {
   FormControl,
   FormDescription,
@@ -183,7 +184,7 @@ export function FormGeneral({
                   <FormControl>
                     <InputWithAddons
                       placeholder="status"
-                      trailing=".openstatus.dev"
+                      leading={`${getStatusPageHost()}/`}
                       {...field}
                     />
                   </FormControl>

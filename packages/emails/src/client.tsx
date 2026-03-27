@@ -3,6 +3,17 @@
 import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
+
+const STATUS_PAGE_BASE_URL =
+  process.env.NEXT_PUBLIC_STATUS_PAGE_BASE_URL || "http://localhost:3003";
+
+function statusPageUrl(
+  slug: string,
+  customDomain?: string | null,
+): string {
+  if (customDomain) return `https://${customDomain}`;
+  return `${STATUS_PAGE_BASE_URL}/${slug}`;
+}
 import FollowUpEmail from "../emails/followup";
 import type { MonitorAlertProps } from "../emails/monitor-alert";
 import PageSubscriptionEmail from "../emails/page-subscription";
@@ -122,9 +133,7 @@ export class EmailClient {
       customDomain?: string | null;
     },
   ) {
-    const statusPageBaseUrl = req.customDomain
-      ? `https://${req.customDomain}`
-      : `https://${req.pageSlug}.onlystatus.dev`;
+    const statusPageBaseUrl = statusPageUrl(req.pageSlug, req.customDomain);
 
     if (process.env.NODE_ENV === "development") {
       console.log(
@@ -277,9 +286,7 @@ export class EmailClient {
     to: string;
     pageComponents: string[];
   }) {
-    const statusPageBaseUrl = req.customDomain
-      ? `https://${req.customDomain}`
-      : `https://${req.pageSlug}.onlystatus.dev`;
+    const statusPageBaseUrl = statusPageUrl(req.pageSlug, req.customDomain);
 
     if (process.env.NODE_ENV === "development") {
       console.log(
