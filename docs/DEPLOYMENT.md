@@ -45,13 +45,13 @@ Generate the required secrets and write them to `.env.docker`:
 
 ```sh
 # Generate AUTH_SECRET
-sed -i "s/^AUTH_SECRET=$/AUTH_SECRET=$(openssl rand -base64 32)/" .env.docker
+sed -i "s|^AUTH_SECRET=$|AUTH_SECRET=$(openssl rand -base64 32)|" .env.docker
 
 # Generate TOTP_ENCRYPTION_KEY
-sed -i "s/^TOTP_ENCRYPTION_KEY=$/TOTP_ENCRYPTION_KEY=$(openssl rand -hex 32)/" .env.docker
+sed -i "s|^TOTP_ENCRYPTION_KEY=$|TOTP_ENCRYPTION_KEY=$(openssl rand -hex 32)|" .env.docker
 
 # Generate CRON_SECRET
-sed -i "s/^CRON_SECRET=change-me-to-a-random-string$/CRON_SECRET=$(openssl rand -base64 32)/" .env.docker
+sed -i "s|^CRON_SECRET=change-me-to-a-random-string$|CRON_SECRET=$(openssl rand -base64 32)|" .env.docker
 ```
 
 Start the stack:
@@ -129,7 +129,7 @@ These connect services within the Docker network. Change only if you've modified
 |----------|-------------|---------|
 | `NEXT_PUBLIC_URL` | Dashboard's public URL (what users see in their browser) | `http://localhost:3002` |
 | `NEXT_PUBLIC_STATUS_PAGE_BASE_URL` | Status page base URL | `http://localhost:3003` |
-| `STATUS_PAGE_DOMAIN` | Domain used for subdomain-based status page routing (e.g., `pages.example.com` enables `mypage.pages.example.com`). Must match the hostname in `NEXT_PUBLIC_STATUS_PAGE_BASE_URL`. | `localhost` |
+| `STATUS_PAGE_DOMAIN` | Optional. Enables subdomain-based status page routing (e.g., `pages.example.com` enables `mypage.pages.example.com`). Requires wildcard DNS and TLS. | `localhost` |
 
 ### Email (Optional)
 
@@ -171,10 +171,11 @@ Update `.env.docker` with your production URLs:
 NEXT_PUBLIC_URL=https://status.example.com
 NEXT_PUBLIC_STATUS_PAGE_BASE_URL=https://pages.example.com
 NEXTAUTH_URL=https://status.example.com
-STATUS_PAGE_DOMAIN=pages.example.com
 ```
 
-The `STATUS_PAGE_DOMAIN` must match the hostname in `NEXT_PUBLIC_STATUS_PAGE_BASE_URL`. This tells the status-page service how to extract subdomains from incoming requests (e.g., `mypage.pages.example.com` resolves to the status page with slug `mypage`).
+Status pages are accessed by path (`pages.example.com/myapp`) or by custom domain (configured per page in the dashboard). No additional env vars are needed for this.
+
+If you want subdomain-based routing (`myapp.pages.example.com`), also set `STATUS_PAGE_DOMAIN=pages.example.com` and configure wildcard DNS + TLS for that domain. This is optional.
 
 Apply the production overlay for resource limits and logging:
 

@@ -45,17 +45,10 @@ export default auth(async (req) => {
     type = "pathname";
   }
 
-  // When on the base STATUS_PAGE_DOMAIN with no subdomain, use the full host
-  // for custom_domain lookup (supports single-tenant self-hosted setups)
-  const hostWithoutPort = effectiveHost.replace(/:\d+$/, "");
-  if (subdomain === null && hostWithoutPort === STATUS_PAGE_DOMAIN) {
-    prefix = hostWithoutPort;
-    type = "hostname";
-  }
-
   console.log({ pathname: url.pathname, type, prefix, subdomain });
 
-  if (url.pathname === "/" && type === "pathname" && !prefix) {
+  // No slug resolved (root URL with no subdomain/path) — pass through
+  if (!prefix) {
     return response;
   }
 

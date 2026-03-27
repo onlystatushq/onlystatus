@@ -53,7 +53,7 @@ const configVars: {
   },
   {
     name: "STATUS_PAGE_DOMAIN",
-    desc: "Domain for subdomain-based status page routing",
+    desc: "Optional. Enables subdomain routing (e.g., mypage.pages.example.com). Requires wildcard DNS + TLS.",
     default: "localhost",
     group: "Public URLs",
   },
@@ -308,17 +308,17 @@ export default function DocsPage() {
               commands={[
                 "NEXT_PUBLIC_URL=https://status.example.com",
                 "NEXT_PUBLIC_STATUS_PAGE_BASE_URL=https://pages.example.com",
-                "STATUS_PAGE_DOMAIN=pages.example.com",
                 "NEXTAUTH_URL=https://status.example.com",
               ]}
             />
           </div>
           <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
-            <Code>STATUS_PAGE_DOMAIN</Code> must match the hostname in{" "}
-            <Code>NEXT_PUBLIC_STATUS_PAGE_BASE_URL</Code>. It tells the
-            status-page service how to extract subdomains (e.g.,{" "}
-            <Code>mypage.pages.example.com</Code> resolves to the status page
-            with slug <Code>mypage</Code>).
+            Status pages are accessed by path (
+            <Code>pages.example.com/myapp</Code>) or by custom domain
+            (configured per page in the dashboard). No extra env vars needed.
+            For subdomain routing (<Code>myapp.pages.example.com</Code>),
+            optionally set <Code>STATUS_PAGE_DOMAIN=pages.example.com</Code>{" "}
+            and configure wildcard DNS + TLS.
           </p>
           <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
             Apply the production overlay for resource limits and log rotation:
