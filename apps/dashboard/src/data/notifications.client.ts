@@ -6,16 +6,13 @@ import { FormNtfy } from "@/components/forms/notifications/form-ntfy";
 import { FormOpsGenie } from "@/components/forms/notifications/form-opsgenie";
 import { FormPagerDuty } from "@/components/forms/notifications/form-pagerduty";
 import { FormSlack } from "@/components/forms/notifications/form-slack";
-import { FormSms } from "@/components/forms/notifications/form-sms";
 import { FormTelegram } from "@/components/forms/notifications/form-telegram";
 import { FormWebhook } from "@/components/forms/notifications/form-webhook";
-import { FormWhatsApp } from "@/components/forms/notifications/form-whatsapp";
 import {
   DiscordIcon,
   GoogleIcon,
   GrafanaIcon,
   TelegramIcon,
-  WhatsappIcon,
 } from "@openstatus/icons";
 import { OpsGenieIcon } from "@openstatus/icons";
 import { PagerDutyIcon } from "@openstatus/icons";
@@ -27,13 +24,11 @@ import { sendTest as sendTestOpsGenie } from "@openstatus/notification-opsgenie"
 import { sendTest as sendTestPagerDuty } from "@openstatus/notification-pagerduty";
 import { sendTestSlackMessage as sendTestSlack } from "@openstatus/notification-slack";
 import { sendTest as sendTestTelegram } from "@openstatus/notification-telegram";
-import { sendTest as sendWhatsAppTest } from "@openstatus/notification-twillio-whatsapp";
 import { sendTest as sendTestWebhook } from "@openstatus/notification-webhook";
 import {
   BellIcon,
   Cog,
   Mail,
-  MessageCircle,
   Trash2,
   Webhook,
 } from "lucide-react";
@@ -86,13 +81,6 @@ export const config = {
     // TODO: add sendTest
     sendTest: undefined,
   },
-  sms: {
-    icon: MessageCircle,
-    label: "SMS",
-    form: FormSms,
-    // TODO: add sendTest
-    sendTest: undefined,
-  },
   webhook: {
     icon: Webhook,
     label: "Webhook",
@@ -134,12 +122,6 @@ export const config = {
     label: "Telegram",
     form: FormTelegram,
     sendTest: sendTestTelegram,
-  },
-  whatsapp: {
-    icon: WhatsappIcon,
-    label: "WhatsApp",
-    form: FormWhatsApp,
-    sendTest: sendWhatsAppTest,
   },
 };
 

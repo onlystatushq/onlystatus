@@ -17,15 +17,13 @@ import {
 import { useFormSheetDirty } from "@/components/forms/form-sheet";
 import { config } from "@/data/notifications.client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PagerDutySchema } from "@openstatus/notification-pagerduty";
 import { Button } from "@openstatus/ui/components/ui/button";
 import { Form } from "@openstatus/ui/components/ui/form";
 import { Input } from "@openstatus/ui/components/ui/input";
 import { Label } from "@openstatus/ui/components/ui/label";
 import { cn } from "@openstatus/ui/lib/utils";
 import { isTRPCClientError } from "@trpc/client";
-import { parseAsString, useQueryState } from "nuqs";
-import React, { useEffect, useTransition } from "react";
+import React, { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -39,6 +37,29 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+function buildPagerDutyData(integrationKey: string): string {
+  return JSON.stringify({
+    integration_keys: [
+      {
+        integration_key: integrationKey,
+        name: "default",
+        id: "default",
+        type: "events_api_v2",
+      },
+    ],
+    account: { subdomain: "self-hosted", name: "Self-hosted" },
+  });
+}
+
+function extractIntegrationKey(data: string): string {
+  try {
+    const parsed = JSON.parse(data);
+    return parsed?.integration_keys?.[0]?.integration_key ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export function FormPagerDuty({
   monitors,
   defaultValues,
@@ -50,8 +71,12 @@ export function FormPagerDuty({
   onSubmit: (values: FormValues) => Promise<void>;
   monitors: { id: number; name: string }[];
 }) {
-  const [searchConfig] = useQueryState("config", parseAsString);
-  console.log(searchConfig);
+  const existingKey = defaultValues?.data
+    ? extractIntegrationKey(defaultValues.data)
+    : "";
+
+  const [integrationKey, setIntegrationKey] = React.useState(existingKey);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues ?? {
@@ -66,19 +91,19 @@ export function FormPagerDuty({
 
   const formIsDirty = form.formState.isDirty;
   React.useEffect(() => {
-    setIsDirty(formIsDirty);
-  }, [formIsDirty, setIsDirty]);
+    setIsDirty(formIsDirty || integrationKey !== existingKey);
+  }, [formIsDirty, integrationKey, existingKey, setIsDirty]);
 
-  useEffect(() => {
-    if (searchConfig) {
-      const data = PagerDutySchema.safeParse(JSON.parse(searchConfig));
-      if (data.success) {
-        form.setValue("data", JSON.stringify(data.data));
-      } else {
-        toast.error("Invalid PagerDuty configuration");
-      }
+  function handleKeyChange(value: string) {
+    setIntegrationKey(value);
+    if (value.trim()) {
+      form.setValue("data", buildPagerDutyData(value.trim()), {
+        shouldDirty: true,
+      });
+    } else {
+      form.setValue("data", "", { shouldDirty: true });
     }
-  }, [searchConfig, form]);
+  }
 
   function submitAction(values: FormValues) {
     if (isPending) return;
@@ -108,19 +133,12 @@ export function FormPagerDuty({
 
     startTransition(async () => {
       try {
-        const provider = form.getValues("provider");
-        const data = form.getValues("data");
-        if (!data) {
-          toast.error("No PagerDuty configuration found");
+        if (!integrationKey.trim()) {
+          toast.error("Enter an integration key first");
           return;
         }
-        const validation = PagerDutySchema.safeParse(JSON.parse(data));
-        if (!validation.success) {
-          toast.error("Invalid PagerDuty configuration");
-          return;
-        }
-        const promise = config[provider].sendTest({
-          integrationKey: validation.data.integration_keys[0].integration_key,
+        const promise = config.pagerduty.sendTest({
+          integrationKey: integrationKey.trim(),
         });
         toast.promise(promise, {
           loading: "Sending test...",
@@ -163,22 +181,20 @@ export function FormPagerDuty({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="data"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Config</FormLabel>
-                <FormControl>
-                  <Input placeholder="..." disabled {...field} />
-                </FormControl>
-                <FormMessage />
-                <FormDescription>
-                  The PagerDuty configuration that is being used.
-                </FormDescription>
-              </FormItem>
-            )}
-          />
+          <FormItem>
+            <FormLabel>Integration Key</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="your-events-api-v2-integration-key"
+                value={integrationKey}
+                onChange={(e) => handleKeyChange(e.target.value)}
+              />
+            </FormControl>
+            <FormDescription>
+              Create an Events API v2 integration in your PagerDuty service,
+              then paste the integration key here.
+            </FormDescription>
+          </FormItem>
           <div>
             <Button
               variant="outline"

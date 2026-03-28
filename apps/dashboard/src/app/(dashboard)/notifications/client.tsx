@@ -1,6 +1,5 @@
 "use client";
 
-import { Link } from "@/components/common/link";
 import {
   ActionCard,
   ActionCardDescription,
@@ -24,15 +23,11 @@ import { FormSheetNotifier } from "@/components/forms/notifications/sheet";
 import { DataTable } from "@/components/ui/data-table/data-table";
 import { config } from "@/data/notifications.client";
 import { useTRPC } from "@/lib/trpc/client";
+import { Alert, AlertDescription } from "@openstatus/ui/components/ui/alert";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { InfoIcon } from "lucide-react";
 import { useQueryStates } from "nuqs";
 import { searchParamsParsers } from "./search-params";
-
-// FIXME: WARNING we are using the `web` api url here
-const BASE_URL =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : "https://www.openstatus.dev";
 
 export function Client() {
   const trpc = useTRPC();
@@ -40,7 +35,6 @@ export function Client() {
     trpc.notification.list.queryOptions(),
   );
   const [searchParams] = useQueryStates(searchParamsParsers);
-  const { data: workspace } = useQuery(trpc.workspace.get.queryOptions());
   const { data: monitors } = useQuery(trpc.monitor.list.queryOptions());
   const createNotifierMutation = useMutation(
     trpc.notification.new.mutationOptions({
@@ -48,10 +42,7 @@ export function Client() {
     }),
   );
 
-  if (!notifications || !monitors || !workspace) return null;
-
-  const limitReached =
-    notifications.length >= workspace.limits["notification-channels"];
+  if (!notifications || !monitors) return null;
 
   return (
     <SectionGroup>
@@ -74,59 +65,21 @@ export function Client() {
         <SectionHeader>
           <SectionTitle>Create a new notifier</SectionTitle>
           <SectionDescription>
-            Define your notifications to receive alerts when downtime occurs.{" "}
-            <Link
-              href="https://docs.openstatus.dev/reference/notification/"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Learn more
-            </Link>
-            .
+            Define your notifications to receive alerts when downtime occurs.
           </SectionDescription>
         </SectionHeader>
+        <Alert variant="default" className="mb-4">
+          <InfoIcon className="size-4" />
+          <AlertDescription>
+            Webhook, Slack, Discord, and Email work out of the box. Other
+            providers (PagerDuty, OpsGenie, Grafana OnCall, Telegram) require
+            accounts with those services.
+          </AlertDescription>
+        </Alert>
         <ActionCardGroup className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {Object.keys(config).map((notifier) => {
             const key = notifier as keyof typeof config;
             const Icon = config[key].icon;
-            let enabled = true;
-
-            if (key in workspace.limits) {
-              enabled =
-                workspace.limits[
-                  key as "opsgenie" | "sms" | "opsgenie" | "whatsapp"
-                ];
-            }
-
-            if (limitReached) {
-              enabled = false;
-            }
-
-            if (!searchParams.channel && key === "pagerduty") {
-              const PAGERDUTY_URL = `https://app.pagerduty.com/install/integration?app_id=${process.env.NEXT_PUBLIC_PAGERDUTY_APP_ID}&redirect_url=${BASE_URL}/api/callback/pagerduty?workspace=${workspace.slug}&version=2`;
-              return (
-                <a
-                  key={key}
-                  href={PAGERDUTY_URL}
-                  data-disabled={!enabled}
-                  className="data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
-                >
-                  <ActionCard className="h-full w-full">
-                    <ActionCardHeader>
-                      <div className="flex items-center gap-2">
-                        <div className="flex size-6 items-center justify-center rounded-md border border-border bg-muted">
-                          <Icon className="size-3" />
-                        </div>
-                        <ActionCardTitle>{config[key].label}</ActionCardTitle>
-                      </div>
-                      <ActionCardDescription>
-                        Send notifications to {config[key].label}
-                      </ActionCardDescription>
-                    </ActionCardHeader>
-                  </ActionCard>
-                </a>
-              );
-            }
 
             return (
               <FormSheetNotifier
@@ -142,7 +95,6 @@ export function Client() {
                     monitors: values.monitors,
                   });
                 }}
-                disabled={!enabled}
               >
                 <ActionCard className="h-full w-full">
                   <ActionCardHeader>
@@ -160,20 +112,6 @@ export function Client() {
               </FormSheetNotifier>
             );
           })}
-          <ActionCard className="border-dashed">
-            <ActionCardHeader>
-              <div className="flex items-center gap-2">
-                <div className="flex size-6 items-center justify-center rounded-md border border-border bg-muted" />
-                <ActionCardTitle className="text-muted-foreground">
-                  Your Notifier
-                </ActionCardTitle>
-              </div>
-              <ActionCardDescription>
-                Missing a channel?{" "}
-                <Link href="mailto:ping@openstatus.dev">Contact us</Link>
-              </ActionCardDescription>
-            </ActionCardHeader>
-          </ActionCard>
         </ActionCardGroup>
       </Section>
     </SectionGroup>
