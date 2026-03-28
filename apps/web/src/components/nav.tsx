@@ -32,7 +32,7 @@ export function Nav() {
         <Link href="/" className="flex items-center gap-2">
           <img
             src="/icon.png"
-            alt=""
+            alt="OnlyStatus"
             width={20}
             height={20}
             className="invert"

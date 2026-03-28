@@ -153,8 +153,10 @@ Deploy lightweight checkers to additional locations for distributed monitoring:
 
 ```sh
 docker run -d \
+  --name onlystatus-checker \
+  --restart unless-stopped \
   -e OPENSTATUS_KEY=<your-token> \
-  -e OPENSTATUS_INGEST_URL=https://your-instance.com \
+  -e OPENSTATUS_INGEST_URL=https://your-instance.com:8081 \
   neoyubi/onlystatus-checker:latest
 ```
 

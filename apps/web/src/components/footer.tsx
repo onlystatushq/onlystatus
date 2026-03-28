@@ -11,7 +11,7 @@ export function Footer() {
             <p className="text-sm leading-relaxed text-muted-foreground">
               This is a community fork, not a commercially supported product. It
               is maintained in spare time and may contain bugs. Provided as-is,
-              without warranty or liability of any kind. If you need rock-solid
+              without warranty of any kind. Use at your own risk. If you need rock-solid
               monitoring with dedicated support, go with the{" "}
               <a
                 href="https://www.openstatus.dev/"
@@ -50,7 +50,7 @@ export function Footer() {
             >
               OpenStatus
             </a>{" "}
-            and builds on top of it
+            , extended for self-hosted deployment.
           </p>
           <p className="font-mono text-xs text-muted-foreground">AGPL-3.0</p>
         </div>

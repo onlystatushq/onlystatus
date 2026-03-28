@@ -496,9 +496,9 @@ docker compose logs <service-name>
 The startup chain is strict. If an upstream service fails, everything downstream stays waiting:
 
 ```
-libsql (healthy) -> db-migrate (exit 0) -> workflows (healthy) -> server (healthy) -> dashboard, status-page
+libsql (healthy) -> db-migrate (exit 0) -> workflows (healthy) -> server (healthy) -> dashboard, status-page, private-location
 tinybird-local (healthy) -> tinybird-deploy (exit 0) -> checker
-cron -> depends on workflows (healthy)
+cron -> workflows (healthy)
 ```
 
 **Common causes:**

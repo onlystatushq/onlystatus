@@ -21,7 +21,7 @@ const features = [
   {
     icon: Mail,
     label: "Alerts",
-    desc: "Slack, Discord, PagerDuty, email, and more",
+    desc: "Slack, Discord, webhook, email, and more",
   },
   {
     icon: MapPin,

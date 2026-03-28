@@ -11,7 +11,7 @@ git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
 
 The `setup.sh` script generates `.env.docker` with random secrets. First startup takes a few minutes.
 
-### 4. Open
+Once all services are healthy:
 
 - **Dashboard**: [http://localhost:3002](http://localhost:3002)
 - **Status Pages**: [http://localhost:3003](http://localhost:3003)
@@ -38,8 +38,9 @@ Update your `.env.docker`:
 ```sh
 NEXT_PUBLIC_URL=https://status.example.com
 NEXT_PUBLIC_STATUS_PAGE_BASE_URL=https://pages.example.com
-STATUS_PAGE_DOMAIN=pages.example.com
 NEXTAUTH_URL=https://status.example.com
+# Optional: enables subdomain routing (requires wildcard DNS + TLS)
+# STATUS_PAGE_DOMAIN=pages.example.com
 ```
 
 Apply the production overlay for resource limits and log rotation:

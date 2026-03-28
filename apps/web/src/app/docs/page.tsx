@@ -187,7 +187,7 @@ export default function DocsPage() {
             Quick Start
           </h2>
           <p className="mb-2 text-sm text-muted-foreground leading-relaxed">
-            Three commands to get running. Requires Docker 24.0+ with Compose
+            Two commands to get running. Requires Docker 24.0+ with Compose
             v2, at least 2 GB RAM, and x86_64 architecture.
           </p>
           <p className="mb-6 text-sm text-muted-foreground leading-relaxed">
