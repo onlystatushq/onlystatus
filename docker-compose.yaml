@@ -17,7 +17,7 @@ services:
     # External services
     libsql:
         container_name: onlystatus-libsql
-        image: ghcr.io/tursodatabase/libsql-server:latest
+        image: ghcr.io/tursodatabase/libsql-server:v0.24.33
         networks:
             - onlystatus
         ports:
@@ -41,7 +41,7 @@ services:
 
     tinybird-local:
         container_name: onlystatus-tinybird
-        image: tinybirdco/tinybird-local:latest
+        image: tinybirdco/tinybird-local:latest  # pinned by platform; no version tags available
         platform: linux/amd64
         networks:
             - onlystatus
@@ -67,7 +67,7 @@ services:
 
     tinybird-deploy:
         container_name: onlystatus-tinybird-deploy
-        image: tinybirdco/tinybird-cli-docker:latest
+        image: tinybirdco/tinybird-cli-docker:latest  # no version tags available
         platform: linux/amd64
         networks:
             - onlystatus
@@ -229,7 +229,7 @@ services:
 
     cron:
         container_name: onlystatus-cron
-        image: alpine:latest
+        image: alpine:3.21
         networks:
             - onlystatus
         env_file:
