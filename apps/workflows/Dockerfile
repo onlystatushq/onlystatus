@@ -73,6 +73,16 @@ COPY \
     "/app/node_modules" "/app/node_modules"
 RUN bun build --compile --target bun  --sourcemap src/index.ts --outfile=app
 
+# migrate — includes devDependencies for drizzle-kit
+FROM oven/bun@sha256:f20d9cf365ab35529384f1717687c739c92e6f39157a35a95ef06f4049a10e4a AS migrate
+WORKDIR /app/
+COPY \
+    --link \
+    "." "/app/"
+RUN \
+    --mount=type=cache,target=/root/.bun/install/cache,sharing=locked \
+    bun install
+
 # libsql
 FROM oven/bun@sha256:f20d9cf365ab35529384f1717687c739c92e6f39157a35a95ef06f4049a10e4a AS libsql
 LABEL \

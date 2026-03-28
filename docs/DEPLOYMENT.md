@@ -145,7 +145,11 @@ Required for email notifications and alerts.
 
 ### Port Overrides (Optional)
 
-Override default ports if they conflict with other services on your host.
+Override default ports if they conflict with other services on your host. Port overrides go in `.env` (not `.env.docker`), because Docker Compose reads `.env` for port bindings. Copy `.env.example` to `.env` and uncomment the ports you need to change.
+
+```sh
+cp .env.example .env
+```
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -559,7 +563,7 @@ If a remote checker doesn't appear in the dashboard:
 
 ### Port Conflicts
 
-If services fail to bind their ports, another process is using them. Either stop the conflicting process or use port overrides in `.env.docker`:
+If services fail to bind their ports, another process is using them. Either stop the conflicting process or set port overrides in `.env` (copy from `.env.example`):
 
 ```sh
 LIBSQL_HTTP_PORT=18080

@@ -89,11 +89,11 @@ services:
         build:
             context: .
             dockerfile: apps/workflows/Dockerfile
-            target: build
+            target: migrate
         networks:
             - onlystatus
         working_dir: /app/packages/db
-        entrypoint: ["/bin/sh", "-c", "bun x drizzle-kit push --force; exit 0"]
+        entrypoint: ["/bin/sh", "-c", "bun x drizzle-kit push --force"]
         environment:
             - DATABASE_URL=http://libsql:8080
             - DATABASE_AUTH_TOKEN=dummy
