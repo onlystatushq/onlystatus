@@ -197,40 +197,20 @@ export default function DocsPage() {
 
           <div className="mb-6">
             <Terminal
-              title="clone & configure"
+              title="quick start"
               glow
               commands={[
-                "git clone https://github.com/neoyubi/onlystatus.git onlystatus",
-                "cd onlystatus",
-                "cp .env.docker.example .env.docker",
+                "git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus",
+                "./setup.sh && docker compose up -d",
               ]}
             />
           </div>
 
           <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
-            Generate the required secrets:
-          </p>
-          <div className="mb-6">
-            <Terminal
-              title="generate secrets"
-              commands={[
-                'sed -i "s/^AUTH_SECRET=$/AUTH_SECRET=$(openssl rand -base64 32)/" .env.docker',
-                'sed -i "s/^TOTP_ENCRYPTION_KEY=$/TOTP_ENCRYPTION_KEY=$(openssl rand -hex 32)/" .env.docker',
-                'sed -i "s/^CRON_SECRET=change-me-to-a-random-string$/CRON_SECRET=$(openssl rand -base64 32)/" .env.docker',
-              ]}
-            />
-          </div>
-
-          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
-            Start the stack:
-          </p>
-          <div className="mb-6">
-            <Terminal commands={["docker compose up -d"]} glow />
-          </div>
-
-          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
-            First startup takes a few minutes while images build and databases
-            initialize. Monitor progress:
+            The <Code>setup.sh</Code> script generates{" "}
+            <Code>.env.docker</Code> with random secrets. First startup takes a
+            few minutes while Docker builds images and initializes databases.
+            Monitor progress:
           </p>
           <div className="mb-6">
             <Terminal
@@ -328,6 +308,19 @@ export default function DocsPage() {
               "docker compose -f docker-compose.yaml -f docker-compose.prod.yml up -d",
             ]}
           />
+          <div className="mt-6 rounded-lg border border-border bg-card p-4">
+            <span className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              WebAuthn / Passkeys
+            </span>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Passkey login requires HTTPS in production. Browsers refuse
+              WebAuthn on plain HTTP (<Code>localhost</Code> is the only
+              exception, allowed by the spec for development). Set{" "}
+              <Code>NEXTAUTH_URL</Code> to your dashboard&apos;s public HTTPS
+              URL and ensure your reverse proxy passes <Code>Host</Code> and{" "}
+              <Code>X-Forwarded-Proto</Code> headers correctly.
+            </p>
+          </div>
         </section>
 
         {/* ── Reverse Proxy ──────────────────────────────────────────── */}

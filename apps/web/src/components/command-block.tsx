@@ -3,9 +3,8 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-const commands = `git clone https://github.com/neoyubi/onlystatus.git
-cd onlystatus
-docker compose up -d`;
+const commands = `git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
+./setup.sh && docker compose up -d`;
 
 export function CommandBlock() {
   const [copied, setCopied] = useState(false);

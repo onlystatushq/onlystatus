@@ -106,42 +106,35 @@ See the [full commit history](https://github.com/neoyubi/onlystatus/commits/main
 ### Quick Start
 
 ```sh
-# Clone the repo
-git clone https://github.com/neoyubi/onlystatus.git
-cd onlystatus
-
-# Configure environment
-cp .env.docker.example .env.docker
-
-# Start everything
-docker compose up -d
+git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
+./setup.sh && docker compose up -d
 ```
 
-Once running:
+That's it. The setup script generates `.env.docker` with random secrets. First startup takes a few minutes while Docker builds images and initializes databases.
+
+Once all services are healthy:
 - **Dashboard**: http://localhost:3002
 - **Status Pages**: http://localhost:3003
 
-Register an account at the dashboard login page. First user gets a workspace automatically.
+Register an account at the dashboard. First user gets a workspace automatically.
 
-For production, put the stack behind a reverse proxy (Traefik, nginx, Caddy) with TLS.
+For production deployment, reverse proxy configuration, custom domains, and WebAuthn/passkey setup, see the [deployment guide](docs/DEPLOYMENT.md).
 
-### Configuration
+### Port Conflicts
 
-Edit `.env.docker` before starting. The essentials:
+If any default ports (8080, 3001, 3002, 3003, etc.) conflict with existing services, copy `.env.example` to `.env` and uncomment the ports you need to change. See the [deployment guide](docs/DEPLOYMENT.md#port-overrides-optional) for details.
+
+### Email (Optional)
+
+For alert notifications, add SMTP settings to `.env.docker`:
 
 ```bash
-# Auth (generate a random string)
-AUTH_SECRET=your-secret-here
-
-# Email (for notifications, optional)
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=user
 SMTP_PASS=pass
 SMTP_FROM=alerts@example.com
 ```
-
-See [.env.docker.example](.env.docker.example) for all available options.
 
 ### Creating Monitors
 

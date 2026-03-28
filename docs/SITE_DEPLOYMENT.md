@@ -4,32 +4,12 @@ Self-hosted synthetic monitoring. No cloud dependencies. No feature gates. Just 
 
 ## Quick Start
 
-### 1. Clone
-
 ```sh
-git clone https://github.com/neoyubi/onlystatus.git onlystatus
-cd onlystatus
+git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
+./setup.sh && docker compose up -d
 ```
 
-### 2. Configure
-
-```sh
-cp .env.docker.example .env.docker
-```
-
-Generate the required secrets:
-
-```sh
-sed -i "s/^AUTH_SECRET=$/AUTH_SECRET=$(openssl rand -base64 32)/" .env.docker
-sed -i "s/^TOTP_ENCRYPTION_KEY=$/TOTP_ENCRYPTION_KEY=$(openssl rand -hex 32)/" .env.docker
-sed -i "s/^CRON_SECRET=change-me-to-a-random-string$/CRON_SECRET=$(openssl rand -base64 32)/" .env.docker
-```
-
-### 3. Deploy
-
-```sh
-docker compose up -d
-```
+The `setup.sh` script generates `.env.docker` with random secrets. First startup takes a few minutes.
 
 ### 4. Open
 

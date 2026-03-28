@@ -33,30 +33,18 @@ docker compose version  # v2.x
 
 ## Quick Start
 
-Three commands to get running:
+```sh
+git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
+./setup.sh && docker compose up -d
+```
+
+The `setup.sh` script generates `.env.docker` with random secrets. If you prefer to configure manually:
 
 ```sh
-git clone https://github.com/neoyubi/onlystatus.git onlystatus
-cd onlystatus
 cp .env.docker.example .env.docker
-```
-
-Generate the required secrets and write them to `.env.docker`:
-
-```sh
-# Generate AUTH_SECRET
 sed -i "s|^AUTH_SECRET=$|AUTH_SECRET=$(openssl rand -base64 32)|" .env.docker
-
-# Generate TOTP_ENCRYPTION_KEY
 sed -i "s|^TOTP_ENCRYPTION_KEY=$|TOTP_ENCRYPTION_KEY=$(openssl rand -hex 32)|" .env.docker
-
-# Generate CRON_SECRET
 sed -i "s|^CRON_SECRET=change-me-to-a-random-string$|CRON_SECRET=$(openssl rand -base64 32)|" .env.docker
-```
-
-Start the stack:
-
-```sh
 docker compose up -d
 ```
 
@@ -111,6 +99,21 @@ All configuration is done through `.env.docker`. Copy `.env.docker.example` as y
 | `TOTP_ENCRYPTION_KEY` | Encryption key for TOTP 2FA secrets. Generate with `openssl rand -hex 32` | _(none)_ |
 | `TOTP_KEY_VERSION` | Key version identifier for TOTP rotation | `v1` |
 | `NEXTAUTH_URL` | Public URL for auth callbacks (set when behind a reverse proxy) | _(unset)_ |
+
+#### WebAuthn / Passkeys
+
+WebAuthn requires HTTPS in production. Browsers refuse passkey operations on plain HTTP. The only exception is `localhost`, where browsers allow HTTP as a development convenience (this is part of the WebAuthn spec, not a workaround).
+
+For production behind a reverse proxy:
+
+1. Set `NEXTAUTH_URL` to your dashboard's public HTTPS URL (e.g., `https://status.example.com`)
+2. Ensure your reverse proxy terminates TLS before the dashboard
+3. The relying party ID is derived automatically from the `NEXTAUTH_URL` hostname
+
+If passkey registration or login fails, check:
+- `NEXTAUTH_URL` matches the exact URL users visit (protocol, hostname, port)
+- Your reverse proxy passes the `Host` and `X-Forwarded-Proto` headers correctly
+- The TLS certificate is valid (self-signed certs may cause issues with some browsers)
 
 ### Internal Services
 
