@@ -8,6 +8,7 @@ import {
   selectWorkspaceSchema,
   usersToWorkspaces,
   workspace,
+  workspaceSettingsSchema,
 } from "@openstatus/db/src/schema";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -110,5 +111,19 @@ export const workspaceRouter = createTRPCRouter({
         }
         throw e;
       }
+    }),
+
+  updateSettings: protectedProcedure
+    .input(workspaceSettingsSchema.partial())
+    .mutation(async (opts) => {
+      const current = opts.ctx.workspace.settings;
+      const merged = { ...current, ...opts.input };
+      await opts.ctx.db
+        .update(workspace)
+        .set({
+          settings: JSON.stringify(merged),
+          updatedAt: new Date(),
+        })
+        .where(eq(workspace.id, opts.ctx.workspace.id));
     }),
 });

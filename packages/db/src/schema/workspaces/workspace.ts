@@ -27,6 +27,7 @@ export const workspace = sqliteTable(
       sql`(strftime('%s', 'now'))`,
     ),
 
+    settings: text("settings").default("{}").notNull(),
     dsn: text("dsn"), // should be removed soon
   },
   (t) => ({

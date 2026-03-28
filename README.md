@@ -139,9 +139,10 @@ SMTP_FROM=alerts@example.com
 ### Creating Monitors
 
 1. Log into the dashboard
-2. Create a monitor with a URL and check frequency
-3. Set region to "Local Checker" (built-in) or add private locations for distributed checks
-4. Configure notifications (email, Slack, Discord, etc.)
+2. Create a monitor with a URL and check frequency. The built-in local checker is selected by default.
+3. Configure notifications (email, Slack, Discord, etc.)
+
+You can disable the local checker or add private locations after creating the monitor.
 
 ### Private Locations
 

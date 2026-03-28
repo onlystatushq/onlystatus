@@ -9,6 +9,7 @@ import {
 } from "@/components/content/section";
 import { FormCardGroup } from "@/components/forms/form-card";
 import { FormApiKey } from "@/components/forms/settings/form-api-key";
+import { FormDisplay } from "@/components/forms/settings/form-display";
 import { FormMembers } from "@/components/forms/settings/form-members";
 import { FormSlug } from "@/components/forms/settings/form-slug";
 import { FormWorkspace } from "@/components/forms/settings/form-workspace";
@@ -37,6 +38,15 @@ export default function Page() {
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: trpc.member.list.queryKey(),
+        });
+      },
+    }),
+  );
+  const updateSettingsMutation = useMutation(
+    trpc.workspace.updateSettings.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.workspace.get.queryKey(),
         });
       },
     }),
@@ -79,6 +89,14 @@ export default function Page() {
             }}
           />
           <FormApiKey />
+          <FormDisplay
+            defaultValues={{
+              showGithubNav: workspace.settings.showGithubNav,
+            }}
+            onSubmit={async (values) => {
+              await updateSettingsMutation.mutateAsync(values);
+            }}
+          />
         </FormCardGroup>
       </Section>
     </SectionGroup>

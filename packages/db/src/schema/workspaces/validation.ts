@@ -9,11 +9,22 @@ import { workspace } from "./workspace";
 export const workspacePlanSchema = z.enum(workspacePlans);
 export const workspaceRoleSchema = z.enum(workspaceRole);
 
+export const workspaceSettingsSchema = z.object({
+  showGithubNav: z.boolean().default(true),
+});
+
 /**
  * Workspace schema with limits and plan
  */
 export const selectWorkspaceSchema = createSelectSchema(workspace)
   .extend({
+    settings: z.string().transform((val) => {
+      try {
+        return workspaceSettingsSchema.parse(JSON.parse(val));
+      } catch {
+        return workspaceSettingsSchema.parse({});
+      }
+    }),
     limits: z.string().transform((val) => {
       try {
         const parsed = JSON.parse(val);

@@ -7,13 +7,14 @@ import {
   SectionTitle,
 } from "@/components/content/section";
 import { Section } from "@/components/content/section";
+import { Alert, AlertDescription } from "@openstatus/ui/components/ui/alert";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@openstatus/ui/components/ui/tabs";
-import { FileDown, FileJson, Key, Terminal } from "lucide-react";
+import { AlertTriangleIcon, FileDown, FileJson, Key, Terminal } from "lucide-react";
 import React from "react";
 
 const OS = ["macOs", "Windows", "Linux"] as const;
@@ -147,6 +148,13 @@ export default function Page() {
             .
           </SectionDescription>
         </SectionHeader>
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangleIcon className="size-4" />
+          <AlertDescription>
+            The CLI is untested and may not work with this fork yet. Support or a
+            custom implementation may be added in the future.
+          </AlertDescription>
+        </Alert>
         <Tabs defaultValue={OS[0]} className="flex flex-col gap-3">
           <TabsList>
             {OS.map((os) => (
