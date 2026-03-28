@@ -98,6 +98,7 @@ export const continentDict: Record<Continent, { code: string }> = {
   Asia: { code: "AS" },
   Africa: { code: "AF" },
   Oceania: { code: "OC" },
+  Private: { code: "PV" },
 };
 
 export const regionDict: Record<Region, RegionInfo> = {

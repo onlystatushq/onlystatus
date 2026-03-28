@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: process.env.SELF_HOST === "true" ? "standalone" : undefined,
-  serverExternalPackages: ["argon2", "nodemailer"],
+  serverExternalPackages: ["argon2", "nodemailer", "drizzle-orm"],
   turbopack: {
     root: process.env.TURBOPACK_ROOT,
   },
