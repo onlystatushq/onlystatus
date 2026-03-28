@@ -9,7 +9,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar";
-import { DiscordIcon } from "@openstatus/icons";
 import { GitHubIcon } from "@openstatus/icons";
 import {
   DropdownMenu,
@@ -21,7 +20,6 @@ import {
 import {
   Book,
   Braces,
-  CalendarClock,
   HelpCircle,
   LifeBuoy,
 } from "lucide-react";
@@ -60,7 +58,17 @@ export function NavHelp() {
                 </FormDialogSupportContact>
                 <DropdownMenuItem asChild>
                   <Link
-                    href="https://docs.openstatus.dev"
+                    href="https://github.com/neoyubi/onlystatus"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <GitHubIcon />
+                    Source Code
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="https://github.com/neoyubi/onlystatus/blob/main/docs/DEPLOYMENT.md"
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -69,40 +77,11 @@ export function NavHelp() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    href="https://api.openstatus.dev/v1"
+                    href="https://docs.openstatus.dev"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <Braces /> API Reference
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="https://openstatus.dev/cal"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <CalendarClock /> Book a Call
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="https://openstatus.dev/discord"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <DiscordIcon />
-                    Community
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="https://openstatus.dev/github"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <GitHubIcon />
-                    GitHub
+                    <Braces /> OpenStatus Docs
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

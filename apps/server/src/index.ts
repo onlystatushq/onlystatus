@@ -209,21 +209,15 @@ app.get(
     url: "/openapi.yaml",
     servers: [
       {
-        url: "https://api.openstatus.dev/",
-        description: "Production server",
-      },
-      {
         url: "http://localhost:3000/",
-        description: "Dev server",
+        description: "Local server",
       },
     ],
     metaData: {
-      title: "OpenStatus API",
-      description: "Start building with OpenStatus API",
+      title: "OnlyStatus API",
+      description: "OnlyStatus API Reference",
       ogDescription: "API Reference",
-      ogTitle: "OpenStatus API",
-      ogImage:
-        "https://openstatus.dev/api/og?title=OpenStatus%20API&description=API%20Reference",
+      ogTitle: "OnlyStatus API",
       twitterCard: "summary_large_image",
     },
   }),

@@ -7,6 +7,7 @@ import { and, eq, isNotNull } from "@openstatus/db";
 import { db } from "@openstatus/db/src/db";
 import { page, pageSubscriber } from "@openstatus/db/src/schema";
 import { SubscribeEmail, sendEmail } from "@openstatus/emails";
+import { getStatusPageUrl } from "@openstatus/utils";
 import type { pageSubscribersApi } from "./index";
 import { PageSubscriberSchema, ParamsSchema } from "./schema";
 
@@ -102,14 +103,14 @@ export function registerPostPageSubscriber(api: typeof pageSubscribersApi) {
       .returning()
       .get();
 
-    const link = `https://${_page.slug}.openstatus.dev/verify/${token}`;
+    const link = `${getStatusPageUrl(_page.slug, _page.customDomain)}/verify/${token}`;
 
     await sendEmail({
       react: SubscribeEmail({
         link,
         page: _page.title,
       }),
-      from: "OpenStatus <notification@notifications.openstatus.dev>",
+      from: `${_page.title || "OnlyStatus"} <${process.env.SMTP_FROM || "noreply@localhost"}>`,
       to: [input.email],
       subject: "Verify your subscription",
     });
