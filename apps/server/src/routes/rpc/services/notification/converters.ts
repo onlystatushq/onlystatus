@@ -38,10 +38,8 @@ export function dbProviderToProto(
     pagerduty: NotificationProvider.PAGERDUTY,
     opsgenie: NotificationProvider.OPSGENIE,
     slack: NotificationProvider.SLACK,
-    sms: NotificationProvider.SMS,
     telegram: NotificationProvider.TELEGRAM,
     webhook: NotificationProvider.WEBHOOK,
-    whatsapp: NotificationProvider.WHATSAPP,
   };
   return mapping[provider] ?? NotificationProvider.UNSPECIFIED;
 }
@@ -61,10 +59,8 @@ export function getExpectedDataCase(
     [NotificationProvider.PAGERDUTY]: "pagerduty",
     [NotificationProvider.OPSGENIE]: "opsgenie",
     [NotificationProvider.SLACK]: "slack",
-    [NotificationProvider.SMS]: "sms",
     [NotificationProvider.TELEGRAM]: "telegram",
     [NotificationProvider.WEBHOOK]: "webhook",
-    [NotificationProvider.WHATSAPP]: "whatsapp",
   };
   return mapping[provider];
 }
@@ -113,10 +109,8 @@ export function protoProviderToDb(
     [NotificationProvider.PAGERDUTY]: "pagerduty",
     [NotificationProvider.OPSGENIE]: "opsgenie",
     [NotificationProvider.SLACK]: "slack",
-    [NotificationProvider.SMS]: "sms",
     [NotificationProvider.TELEGRAM]: "telegram",
     [NotificationProvider.WEBHOOK]: "webhook",
-    [NotificationProvider.WHATSAPP]: "whatsapp",
   };
   return mapping[provider] ?? "email";
 }
@@ -231,17 +225,6 @@ export function dbDataToProto(
           };
         }
         break;
-      case "sms":
-        if (data.sms) {
-          protoData.data = {
-            case: "sms",
-            value: {
-              $typeName: "openstatus.notification.v1.SmsData",
-              phoneNumber: data.sms,
-            },
-          };
-        }
-        break;
       case "telegram":
         if (data.telegram) {
           protoData.data = {
@@ -268,17 +251,6 @@ export function dbDataToProto(
                     value: h.value,
                   }),
                 ) ?? [],
-            },
-          };
-        }
-        break;
-      case "whatsapp":
-        if (data.whatsapp) {
-          protoData.data = {
-            case: "whatsapp",
-            value: {
-              $typeName: "openstatus.notification.v1.WhatsappData",
-              phoneNumber: data.whatsapp,
             },
           };
         }
@@ -336,8 +308,6 @@ export function protoDataToDb(
       });
     case "slack":
       return JSON.stringify({ slack: data.data.value.webhookUrl });
-    case "sms":
-      return JSON.stringify({ sms: data.data.value.phoneNumber });
     case "telegram":
       return JSON.stringify({
         telegram: { chatId: data.data.value.chatId },
@@ -352,8 +322,6 @@ export function protoDataToDb(
           })),
         },
       });
-    case "whatsapp":
-      return JSON.stringify({ whatsapp: data.data.value.phoneNumber });
     default:
       return "{}";
   }

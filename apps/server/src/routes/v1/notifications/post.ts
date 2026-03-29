@@ -46,16 +46,8 @@ const postRoute = createRoute({
 export function registerPostNotification(api: typeof notificationsApi) {
   return api.openapi(postRoute, async (c) => {
     const workspaceId = c.get("workspace").id;
-    const workspacePlan = c.get("workspace").plan;
     const limits = c.get("workspace").limits;
     const input = c.req.valid("json");
-
-    if (input.provider === "sms" && workspacePlan === "free") {
-      throw new OpenStatusApiError({
-        code: "PAYMENT_REQUIRED",
-        message: "Upgrade for SMS",
-      });
-    }
 
     const count = (
       await db

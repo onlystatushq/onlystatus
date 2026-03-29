@@ -14,7 +14,6 @@ import {
   selectMonitorSchema,
   selectNotificationSchema,
   telegramDataSchema,
-  whatsappDataSchema,
 } from "@openstatus/db/src/schema";
 
 import { Events } from "@openstatus/analytics";
@@ -22,7 +21,6 @@ import { SchemaError } from "@openstatus/error";
 import { sendTest as sendGoogleChatTest } from "@openstatus/notification-google-chat";
 import { sendTest as sendGrafanaTest } from "@openstatus/notification-grafana-oncall";
 import { sendTest as sendTelegramTest } from "@openstatus/notification-telegram";
-import { sendTest as sendWhatsAppTest } from "@openstatus/notification-twillio-whatsapp";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -51,21 +49,17 @@ export const notificationRouter = createTRPCRouter({
       }
 
       const limitedProviders = [
-        "sms",
         "pagerduty",
         "opsgenie",
         "grafana-oncall",
-        "whatsapp",
       ];
       if (limitedProviders.includes(props.provider)) {
         const isAllowed =
           opts.ctx.workspace.limits[
             props.provider as
-              | "sms"
               | "pagerduty"
               | "opsgenie"
               | "grafana-oncall"
-              | "whatsapp"
           ];
 
         if (!isAllowed) {
@@ -403,22 +397,18 @@ export const notificationRouter = createTRPCRouter({
       }
 
       const limitedProviders = [
-        "sms",
         "pagerduty",
         "opsgenie",
         "grafana-oncall",
-        "whatsapp",
       ] as const;
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
       if (limitedProviders.includes(opts.input.provider as any)) {
         const isAllowed =
           opts.ctx.workspace.limits[
             opts.input.provider as
-              | "sms"
               | "pagerduty"
               | "opsgenie"
               | "grafana-oncall"
-              | "whatsapp"
           ];
 
         if (!isAllowed) {
@@ -502,18 +492,6 @@ export const notificationRouter = createTRPCRouter({
         await sendTelegramTest({
           chatId: _data.data.telegram.chatId,
         });
-
-        return;
-      }
-      if (opts.input.provider === "whatsapp") {
-        const _data = whatsappDataSchema.safeParse(opts.input.data);
-        if (!_data.success) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: SchemaError.fromZod(_data.error, opts.input).message,
-          });
-        }
-        await sendWhatsAppTest({ phoneNumber: _data.data.whatsapp });
 
         return;
       }

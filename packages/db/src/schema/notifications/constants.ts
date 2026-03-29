@@ -7,8 +7,6 @@ export const notificationProvider = [
   "pagerduty",
   "opsgenie",
   "slack",
-  "sms",
   "telegram",
   "webhook",
-  "whatsapp",
 ] as const;

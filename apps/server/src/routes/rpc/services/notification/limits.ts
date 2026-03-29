@@ -11,11 +11,9 @@ import {
  * Providers that require a paid plan.
  */
 const LIMITED_PROVIDERS = new Set([
-  NotificationProvider.SMS,
   NotificationProvider.PAGERDUTY,
   NotificationProvider.OPSGENIE,
   NotificationProvider.GRAFANA_ONCALL,
-  NotificationProvider.WHATSAPP,
 ]);
 
 /**
@@ -25,16 +23,12 @@ function providerToLimitKey(
   provider: NotificationProvider,
 ): keyof Limits | null {
   switch (provider) {
-    case NotificationProvider.SMS:
-      return "sms";
     case NotificationProvider.PAGERDUTY:
       return "pagerduty";
     case NotificationProvider.OPSGENIE:
       return "opsgenie";
     case NotificationProvider.GRAFANA_ONCALL:
       return "grafana-oncall";
-    case NotificationProvider.WHATSAPP:
-      return "whatsapp";
     default:
       return null;
   }
@@ -61,14 +55,10 @@ function providerToDisplayName(provider: NotificationProvider): string {
       return "Opsgenie";
     case NotificationProvider.SLACK:
       return "Slack";
-    case NotificationProvider.SMS:
-      return "SMS";
     case NotificationProvider.TELEGRAM:
       return "Telegram";
     case NotificationProvider.WEBHOOK:
       return "Webhook";
-    case NotificationProvider.WHATSAPP:
-      return "WhatsApp";
     default:
       return "Unknown";
   }

@@ -6,7 +6,6 @@ import { sendTest as sendOpsgenieTest } from "@openstatus/notification-opsgenie"
 import { sendTest as sendPagerDutyTest } from "@openstatus/notification-pagerduty";
 import { sendTestSlackMessage } from "@openstatus/notification-slack";
 import { sendTest as sendTelegramTest } from "@openstatus/notification-telegram";
-import { sendTest as sendWhatsAppTest } from "@openstatus/notification-twillio-whatsapp";
 import { sendTest as sendWebhookTest } from "@openstatus/notification-webhook";
 import {
   type NotificationData,
@@ -40,16 +39,6 @@ export async function sendTestNotification(
           );
         }
         await sendTelegramTest({ chatId: data.data.value.chatId });
-        return { success: true };
-      }
-
-      case NotificationProvider.WHATSAPP: {
-        if (data.data.case !== "whatsapp") {
-          throw invalidNotificationDataError(
-            "Expected whatsapp data for WhatsApp provider",
-          );
-        }
-        await sendWhatsAppTest({ phoneNumber: data.data.value.phoneNumber });
         return { success: true };
       }
 
@@ -151,6 +140,7 @@ export async function sendTestNotification(
       // Providers that don't support test notifications yet
       case NotificationProvider.EMAIL:
       case NotificationProvider.SMS:
+      case NotificationProvider.WHATSAPP:
         throw providerNotSupportedError(NotificationProvider[provider]);
 
       default:

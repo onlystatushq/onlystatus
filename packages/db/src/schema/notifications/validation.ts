@@ -52,7 +52,6 @@ export const webhookDataSchema = z.object({
   }),
 });
 export const emailDataSchema = z.object({ email: emailSchema });
-export const phoneDataSchema = z.object({ sms: phoneSchema });
 export const slackDataSchema = z.object({ slack: urlSchema });
 export const discordDataSchema = z.object({ discord: urlSchema });
 export const googleChatDataSchema = z.object({ "google-chat": urlSchema });
@@ -73,6 +72,10 @@ export const grafanaOncallDataSchema = z.object({
   }),
 });
 
+/** @deprecated SMS provider has been removed. Kept for twillio-sms package compatibility. */
+export const phoneDataSchema = z.object({ sms: phoneSchema });
+
+/** @deprecated WhatsApp provider has been removed. Kept for twillio-whatsapp package compatibility. */
 export const whatsappDataSchema = z.object({
   whatsapp: phoneSchema,
 });
@@ -84,11 +87,9 @@ export const NotificationDataSchema = z.union([
   ntfyDataSchema,
   opsgenieDataSchema,
   pagerdutyDataSchema,
-  phoneDataSchema,
   telegramDataSchema,
   slackDataSchema,
   webhookDataSchema,
-  whatsappDataSchema,
   googleChatDataSchema,
 ]);
 
@@ -139,12 +140,6 @@ export const InsertNotificationWithDataSchema = z.discriminatedUnion(
     ),
     insertNotificationSchema.extend(
       z.object({
-        provider: z.literal("sms"),
-        data: phoneDataSchema,
-      }).shape,
-    ),
-    insertNotificationSchema.extend(
-      z.object({
         provider: z.literal("slack"),
         data: slackDataSchema,
       }).shape,
@@ -159,12 +154,6 @@ export const InsertNotificationWithDataSchema = z.discriminatedUnion(
       z.object({
         provider: z.literal("webhook"),
         data: webhookDataSchema,
-      }).shape,
-    ),
-    insertNotificationSchema.extend(
-      z.object({
-        provider: z.literal("whatsapp"),
-        data: whatsappDataSchema,
       }).shape,
     ),
   ],
