@@ -3,8 +3,9 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-const commands = `git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
-./setup.sh && docker compose up -d`;
+const commands = `git clone https://github.com/neoyubi/onlystatus.git
+cd onlystatus && ./setup.sh
+docker compose up -d`;
 
 export function CommandBlock() {
   const [copied, setCopied] = useState(false);
@@ -26,7 +27,7 @@ export function CommandBlock() {
         </span>
       </div>
       <div className="relative p-4">
-        <pre className="font-[family-name:var(--font-commit-mono)] text-sm leading-relaxed">
+        <pre className="pr-10 font-[family-name:var(--font-commit-mono)] text-sm leading-relaxed">
           <code>
             {commands.split("\n").map((line, i) => (
               <div key={i}>

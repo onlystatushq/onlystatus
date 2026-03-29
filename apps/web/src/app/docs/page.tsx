@@ -331,7 +331,7 @@ export default function DocsPage() {
 
           {/* Traefik */}
           <div className="mb-10">
-            <h3 className="mb-3 font-mono text-base font-semibold">Traefik</h3>
+            <h3 className="mb-3 text-base font-semibold">Traefik</h3>
             <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
               If Traefik is already running on your host, create a{" "}
               <Code>docker-compose.traefik.yml</Code> overlay:
@@ -387,7 +387,7 @@ export default function DocsPage() {
 
           {/* nginx */}
           <div className="mb-10">
-            <h3 className="mb-3 font-mono text-base font-semibold">nginx</h3>
+            <h3 className="mb-3 text-base font-semibold">nginx</h3>
             <Terminal
               title="nginx.conf"
               shell={false}
@@ -438,7 +438,7 @@ export default function DocsPage() {
 
           {/* Caddy */}
           <div>
-            <h3 className="mb-3 font-mono text-base font-semibold">Caddy</h3>
+            <h3 className="mb-3 text-base font-semibold">Caddy</h3>
             <Terminal
               title="Caddyfile"
               shell={false}
@@ -572,7 +572,7 @@ export default function DocsPage() {
                   {step.n}
                 </div>
                 <div>
-                  <span className="font-mono text-sm font-semibold">
+                  <span className="text-sm font-semibold">
                     {step.title}
                   </span>
                   <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
@@ -694,7 +694,7 @@ export default function DocsPage() {
         {/* ── Further Reading ────────────────────────────────────────── */}
         <section className="mb-8">
           <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-card/50 p-6">
-            <h3 className="mb-3 font-mono text-sm font-semibold">
+            <h3 className="mb-3 text-sm font-semibold">
               More in the full guide
             </h3>
             <p className="mb-4 text-sm text-muted-foreground leading-relaxed">

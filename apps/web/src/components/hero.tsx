@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center px-6 py-24">
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 text-center">
-        <span className="rounded-full border border-border px-3 py-1 font-mono text-xs text-muted-foreground">
+        <span className="rounded-full border border-border px-4 py-1.5 text-sm text-muted-foreground">
           self-hosted / open source
         </span>
 

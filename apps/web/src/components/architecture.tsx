@@ -106,7 +106,7 @@ export function Architecture() {
                   >
                     <div className="mb-2 flex items-center gap-2.5">
                       <node.icon className="size-4 text-muted-foreground" />
-                      <span className="font-mono text-sm font-semibold">
+                      <span className="text-sm font-semibold">
                         {node.name}
                       </span>
                       <span className="ml-auto rounded-full border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
@@ -131,7 +131,7 @@ export function Architecture() {
         <div className="mt-8 rounded-lg border border-dashed border-muted-foreground/30 bg-card/50 p-4">
           <div className="flex items-center gap-2.5">
             <Globe className="size-4 text-muted-foreground" />
-            <span className="font-mono text-sm font-semibold">
+            <span className="text-sm font-semibold">
               Remote Checkers
             </span>
             <span className="ml-auto rounded-full border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground">

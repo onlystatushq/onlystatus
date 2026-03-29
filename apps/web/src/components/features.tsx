@@ -60,7 +60,7 @@ export function Features() {
             >
               <div className="mb-1.5 flex items-center gap-2.5">
                 <f.icon className="size-4 text-muted-foreground" />
-                <span className="font-mono text-sm font-semibold">
+                <span className="text-sm font-semibold">
                   {f.label}
                 </span>
               </div>
