@@ -14,12 +14,8 @@ export async function verifyPassword(
   plain: string,
 ): Promise<boolean> {
   try {
-    console.log("[auth] verifyPassword hash:", hash.substring(0, 40), "pw_len:", plain.length, "pw_type:", typeof plain);
-    const result = await argon2.verify(hash, plain);
-    console.log("[auth] verifyPassword result:", result);
-    return result;
-  } catch (e) {
-    console.error("[auth] argon2.verify threw:", e);
+    return await argon2.verify(hash, plain);
+  } catch {
     return false;
   }
 }

@@ -49,6 +49,9 @@ export default async function middleware(req: NextRequest) {
     console.log("User authenticated, redirecting to", redirectTo);
     if (redirectTo) {
       const redirectToUrl = new URL(redirectTo, req.url);
+      if (redirectToUrl.origin !== new URL(req.url).origin) {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
       return NextResponse.redirect(redirectToUrl);
     }
   }
