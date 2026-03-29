@@ -10,15 +10,16 @@ RUN apk update \
 RUN apk add --no-cache tzdata
 ENV TZ=UTC
 
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
+
 ENV CGO_ENABLED=0
-ENV GOOS=linux
-ENV GOARCH=amd64
 
 COPY go.* .
 RUN go mod download
 
 COPY . .
-RUN go build -trimpath -ldflags "-s -w" -o checker-server ./cmd/server/main.go
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags "-s -w" -o checker-server ./cmd/server/main.go
 
 FROM alpine@sha256:c3f8e73fdb79deaebaa2037150150191b9dcbfba68b4a46d70103204c53f4709 AS runtime
 

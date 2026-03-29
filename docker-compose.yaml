@@ -275,7 +275,7 @@ services:
             - AUTH_TRUST_HOST=true
             - NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL:-http://localhost:3002}
             - NEXT_PUBLIC_STATUS_PAGE_BASE_URL=${NEXT_PUBLIC_STATUS_PAGE_BASE_URL:-http://localhost:3003}
-            - NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION=${NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION:-true}
+            - NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION=${ALLOW_PUBLIC_REGISTRATION:-true}
             - NEXT_PUBLIC_SHOW_GITHUB_NAV=${NEXT_PUBLIC_SHOW_GITHUB_NAV:-true}
             - NEXT_PUBLIC_GITHUB_URL=${NEXT_PUBLIC_GITHUB_URL:-https://github.com/onlystatushq/onlystatus}
         entrypoint: ["/bin/sh", "-c"]
@@ -320,7 +320,7 @@ services:
             - AUTH_TRUST_HOST=true
             - NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL:-http://localhost:3002}
             - NEXT_PUBLIC_STATUS_PAGE_BASE_URL=${NEXT_PUBLIC_STATUS_PAGE_BASE_URL:-http://localhost:3003}
-            - NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION=${NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION:-true}
+            - NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION=${ALLOW_PUBLIC_REGISTRATION:-true}
             - NEXT_PUBLIC_SHOW_GITHUB_NAV=${NEXT_PUBLIC_SHOW_GITHUB_NAV:-true}
             - NEXT_PUBLIC_GITHUB_URL=${NEXT_PUBLIC_GITHUB_URL:-https://github.com/onlystatushq/onlystatus}
         entrypoint: ["/bin/sh", "-c"]

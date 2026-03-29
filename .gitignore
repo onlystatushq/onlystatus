@@ -88,4 +88,8 @@ data/
 /uploads/
 docker-compose.dev.yml
 docker-compose.traefik.yml
+docker-compose.local.yml
 .agents/
+.loop/
+loop-task.json
+prompts/
