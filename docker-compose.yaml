@@ -63,6 +63,9 @@ services:
             timeout: 5s
             retries: 5
             start_period: 20s
+        # Tinybird-local needs ~1.5-2GB RAM. The deploy.resources.limits syntax
+        # only works in Docker Swarm; use mem_limit for standalone compose.
+        mem_limit: 2G
         restart: unless-stopped
 
     tinybird-deploy:
@@ -290,6 +293,8 @@ services:
                 condition: service_healthy
             server:
                 condition: service_healthy
+            tinybird-deploy:
+                condition: service_completed_successfully
         healthcheck:
             test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
             interval: 15s
@@ -335,6 +340,8 @@ services:
                 condition: service_healthy
             server:
                 condition: service_healthy
+            tinybird-deploy:
+                condition: service_completed_successfully
         healthcheck:
             test: ["CMD-SHELL", "curl -f http://localhost:3000/ || exit 1"]
             interval: 15s
