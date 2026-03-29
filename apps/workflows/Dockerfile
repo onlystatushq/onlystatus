@@ -102,10 +102,10 @@ LABEL \
     org.opencontainers.image.authors="OpenStatus Team" \
     org.opencontainers.image.base.digest="sha256:b32674fb57780ad57d7b0749242d3f585f462f4ec4a60ae0adacd945f9cb9734" \
     org.opencontainers.image.base.name="docker.io/debian:bullseye-slim" \
-    org.opencontainers.image.description="Background job processing and probe scheduling for OpenStatus" \
-    org.opencontainers.image.source="https://github.com/openstatusHQ/openstatus" \
-    org.opencontainers.image.title="OpenStatus Workflows" \
-    org.opencontainers.image.vendor="OpenStatus"
+    org.opencontainers.image.description="Background job processing and probe scheduling for OnlyStatus" \
+    org.opencontainers.image.source="https://github.com/onlystatushq/onlystatus" \
+    org.opencontainers.image.title="OnlyStatus Workflows" \
+    org.opencontainers.image.vendor="OnlyStatus"
 WORKDIR /app/
 COPY \
     --from=build \

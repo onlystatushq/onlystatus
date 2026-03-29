@@ -22,6 +22,11 @@ COPY . .
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags "-s -w" -o checker-server ./cmd/server/main.go
 
 FROM alpine@sha256:c3f8e73fdb79deaebaa2037150150191b9dcbfba68b4a46d70103204c53f4709 AS runtime
+LABEL \
+    org.opencontainers.image.description="Synthetic monitoring checker for OnlyStatus" \
+    org.opencontainers.image.source="https://github.com/onlystatushq/onlystatus" \
+    org.opencontainers.image.title="OnlyStatus Checker" \
+    org.opencontainers.image.vendor="OnlyStatus"
 
 RUN apk add --no-cache ca-certificates tzdata wget
 

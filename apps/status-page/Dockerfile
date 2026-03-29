@@ -34,7 +34,11 @@ FROM node@sha256:0afb7822fac7bf9d7c1bf3b6e6c496dee6b2b64d8dfa365501a3c68e8eba94b
 LABEL \
     io.dofigen.version="2.5.1" \
     org.opencontainers.image.base.digest="sha256:0afb7822fac7bf9d7c1bf3b6e6c496dee6b2b64d8dfa365501a3c68e8eba94b2" \
-    org.opencontainers.image.base.name="docker.io/node:24-slim"
+    org.opencontainers.image.base.name="docker.io/node:24-slim" \
+    org.opencontainers.image.description="Public status page for OnlyStatus" \
+    org.opencontainers.image.source="https://github.com/onlystatushq/onlystatus" \
+    org.opencontainers.image.title="OnlyStatus Status Page" \
+    org.opencontainers.image.vendor="OnlyStatus"
 WORKDIR /app/apps/status-page
 COPY \
     --from=builder \

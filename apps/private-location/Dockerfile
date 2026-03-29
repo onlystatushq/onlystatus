@@ -30,10 +30,10 @@ LABEL \
     org.opencontainers.image.authors="OpenStatus Team" \
     org.opencontainers.image.base.digest="sha256:5405e8f36ce1878720f71217d664aa3dea32e5e5df11acbf07fc78ef5661465b" \
     org.opencontainers.image.base.name="docker.io/alpine:3.21" \
-    org.opencontainers.image.description="Private location orchestrator for OpenStatus" \
-    org.opencontainers.image.source="https://github.com/openstatusHQ/openstatus" \
-    org.opencontainers.image.title="OpenStatus Private Location" \
-    org.opencontainers.image.vendor="OpenStatus"
+    org.opencontainers.image.description="Private location orchestrator for OnlyStatus" \
+    org.opencontainers.image.source="https://github.com/onlystatushq/onlystatus" \
+    org.opencontainers.image.title="OnlyStatus Private Location" \
+    org.opencontainers.image.vendor="OnlyStatus"
 ENV \
     GIN_MODE="release" \
     TZ="UTC" \
