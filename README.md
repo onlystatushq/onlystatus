@@ -110,7 +110,7 @@ git clone https://github.com/onlystatushq/onlystatus.git && cd onlystatus
 ./setup.sh && docker compose up -d
 ```
 
-That's it. The setup script generates `.env.docker` with random secrets. First startup takes a few minutes while Docker builds images and initializes databases.
+That's it. The setup script generates `.env.docker` with random secrets. First startup takes a few minutes while Docker builds images and initializes databases. Images are environment-agnostic: `NEXT_PUBLIC_*` variables are injected at runtime, so you can change URLs without rebuilding.
 
 Once all services are healthy:
 - **Dashboard**: http://localhost:3002

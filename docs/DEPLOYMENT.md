@@ -128,10 +128,15 @@ These connect services within the Docker network. Change only if you've modified
 
 ### Public URLs
 
+These `NEXT_PUBLIC_*` variables are **runtime-configurable**. The Docker images are environment-agnostic, so changing these values only requires a container restart, not a rebuild.
+
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `NEXT_PUBLIC_URL` | Dashboard's public URL (what users see in their browser) | `http://localhost:3002` |
 | `NEXT_PUBLIC_STATUS_PAGE_BASE_URL` | Status page base URL | `http://localhost:3003` |
+| `NEXT_PUBLIC_SHOW_GITHUB_NAV` | Show GitHub repo link in the nav bar | `true` |
+| `NEXT_PUBLIC_GITHUB_URL` | GitHub repo URL for the nav link | `https://github.com/onlystatushq/onlystatus` |
+| `NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION` | Show registration form on login page | `true` |
 | `STATUS_PAGE_DOMAIN` | Optional. Enables subdomain-based status page routing (e.g., `pages.example.com` enables `mypage.pages.example.com`). Requires wildcard DNS and TLS. | `localhost` |
 
 ### Email (Optional)
@@ -421,6 +426,14 @@ If using the production overlay:
 
 ```sh
 docker compose -f docker-compose.yaml -f docker-compose.prod.yml up -d --build
+```
+
+### Changing URLs without rebuilding
+
+`NEXT_PUBLIC_*` variables are injected at runtime, not baked into the image at build time. If you only need to change URLs or toggle UI settings, update `.env.docker` and restart without `--build`:
+
+```sh
+docker compose up -d
 ```
 
 ## Backup & Restore

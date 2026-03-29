@@ -41,14 +41,32 @@ const configVars: {
   },
   {
     name: "NEXT_PUBLIC_URL",
-    desc: "Dashboard's public URL",
+    desc: "Dashboard's public URL (runtime, no rebuild needed)",
     default: "http://localhost:3002",
     group: "Public URLs",
   },
   {
     name: "NEXT_PUBLIC_STATUS_PAGE_BASE_URL",
-    desc: "Status page base URL",
+    desc: "Status page base URL (runtime, no rebuild needed)",
     default: "http://localhost:3003",
+    group: "Public URLs",
+  },
+  {
+    name: "NEXT_PUBLIC_SHOW_GITHUB_NAV",
+    desc: "Show GitHub link in nav (runtime)",
+    default: "true",
+    group: "Public URLs",
+  },
+  {
+    name: "NEXT_PUBLIC_GITHUB_URL",
+    desc: "GitHub repo URL for nav link (runtime)",
+    default: "https://github.com/onlystatushq/onlystatus",
+    group: "Public URLs",
+  },
+  {
+    name: "NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION",
+    desc: "Show registration form (runtime)",
+    default: "true",
     group: "Public URLs",
   },
   {
@@ -210,7 +228,9 @@ export default function DocsPage() {
             The <Code>setup.sh</Code> script generates{" "}
             <Code>.env.docker</Code> with random secrets. First startup takes a
             few minutes while Docker builds images and initializes databases.
-            Monitor progress:
+            Images are environment-agnostic: <Code>NEXT_PUBLIC_*</Code>{" "}
+            variables are injected at runtime, so you can change URLs without
+            rebuilding. Monitor progress:
           </p>
           <div className="mb-6">
             <Terminal
@@ -642,9 +662,14 @@ export default function DocsPage() {
           <h2 className="mb-4 font-cal text-2xl tracking-tight sm:text-3xl">
             Configuration Reference
           </h2>
-          <p className="mb-6 text-sm text-muted-foreground leading-relaxed">
+          <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
             All settings live in <Code>.env.docker</Code>. Copy{" "}
             <Code>.env.docker.example</Code> as your starting point.
+          </p>
+          <p className="mb-6 text-sm text-muted-foreground leading-relaxed">
+            <Code>NEXT_PUBLIC_*</Code> variables are runtime-configurable.
+            Changing them only requires a container restart (
+            <Code>docker compose up -d</Code>), not an image rebuild.
           </p>
 
           {groups.map((group) => (

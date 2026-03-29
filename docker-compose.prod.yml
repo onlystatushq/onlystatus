@@ -1,4 +1,8 @@
 # Production overlay - use with: docker compose -f docker-compose.yaml -f docker-compose.prod.yml up -d
+#
+# Adds resource limits, logging rotation, and production NODE_ENV.
+# For reverse proxy and TLS setup, see docs/DEPLOYMENT.md.
+
 services:
     workflows:
         deploy:
@@ -27,6 +31,11 @@ services:
             resources:
                 limits:
                     memory: 256M
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
 
     dashboard:
         deploy:
@@ -35,6 +44,11 @@ services:
                     memory: 1G
         environment:
             - NODE_ENV=production
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
 
     status-page:
         deploy:
@@ -43,15 +57,41 @@ services:
                     memory: 512M
         environment:
             - NODE_ENV=production
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
 
     libsql:
         deploy:
             resources:
                 limits:
                     memory: 512M
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
 
     tinybird-local:
         deploy:
             resources:
                 limits:
                     memory: 1G
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
+
+    private-location:
+        deploy:
+            resources:
+                limits:
+                    memory: 256M
+        logging:
+            driver: json-file
+            options:
+                max-size: "10m"
+                max-file: "3"
