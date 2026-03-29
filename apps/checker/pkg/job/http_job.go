@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff/v5"
@@ -100,7 +101,7 @@ func (jr jobRunner) HTTPJob(ctx context.Context, monitor *v1.HTTPMonitor) (*Http
 	}
 
 	req := request.HttpCheckerRequest{
-		URL:             monitor.Url,
+		URL:             strings.TrimSpace(monitor.Url),
 		MonitorID:       monitor.Id,
 		Method:          monitor.Method,
 		Body:            monitor.Body,
