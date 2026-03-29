@@ -1,4 +1,4 @@
-FROM golang:1.26-alpine as builder
+FROM golang@sha256:2389ebfa5b7f43eeafbd6be0c3700cc46690ef842ad962f6c5bd6be49ed82039 AS builder
 
 WORKDIR /go/src/app
 COPY ca/ca-bundle.crt /usr/local/share/ca-certificates/ca-bundle.crt
@@ -20,7 +20,7 @@ RUN go mod download
 COPY . .
 RUN go build -trimpath -ldflags "-s -w" -o checker-server ./cmd/server/main.go
 
-FROM alpine:3.21
+FROM alpine@sha256:c3f8e73fdb79deaebaa2037150150191b9dcbfba68b4a46d70103204c53f4709 AS runtime
 
 RUN apk add --no-cache ca-certificates tzdata wget
 
