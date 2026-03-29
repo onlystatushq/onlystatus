@@ -49,7 +49,7 @@ export function Footer() {
               className="underline underline-offset-4 transition-colors hover:text-foreground"
             >
               OpenStatus
-            </a>{" "}
+            </a>
             , extended for self-hosted deployment.
           </p>
           <p className="font-mono text-xs text-muted-foreground">AGPL-3.0</p>

@@ -56,34 +56,16 @@ const moreActions = [
     href: "/monitors",
   },
   {
-    id: "cal",
-    title: "Schedule a call",
-    description: "Book a meeting with us to get you started with OpenStatus.",
-    href: "https://openstatus.dev/cal",
-  },
-  {
     id: "docs",
     title: "Documentation",
-    description: "Read our documentation to get started with OpenStatus.",
-    href: "https://docs.openstatus.dev",
-  },
-  {
-    id: "changelog",
-    title: "Changelog",
-    description: "See what's new in OpenStatus.",
-    href: "https://openstatus.dev/changelog",
-  },
-  {
-    id: "discord",
-    title: "Discord",
-    description: "Join our Discord server if you get stuck.",
-    href: "https://discord.gg/openstatus",
+    description: "Read the deployment guide and documentation.",
+    href: "https://onlystatus.dev/docs",
   },
   {
     id: "github",
     title: "GitHub",
     description: "Leave a star on GitHub, request features or report issues.",
-    href: "https://github.com/openstatus-dev/openstatus",
+    href: "https://github.com/neoyubi/onlystatus",
   },
 ];
 
@@ -159,7 +141,7 @@ export function Client() {
         <SectionHeader>
           <SectionTitle>Getting Started</SectionTitle>
           <SectionDescription>
-            Welcome to OpenStatus. Let&apos;s get you set up.
+            Welcome to OnlyStatus. Let&apos;s get you set up.
           </SectionDescription>
         </SectionHeader>
       </Section>
@@ -264,14 +246,14 @@ export function Client() {
           <Section>
             <SectionHeader className="h-8 flex-row items-center justify-between">
               <SectionDescription>
-                We&apos;d love to know what you are looking for with openstatus.
+                We&apos;d love to know what you are looking for with OnlyStatus.
                 This will help us improve our product and services.
               </SectionDescription>
             </SectionHeader>
             <LearnFromForm
               onSubmit={async (values) => {
                 await createFeedbackMutation.mutateAsync({
-                  message: `I want to use OpenStatus for *${values.from}${
+                  message: `I want to use OnlyStatus for *${values.from}${
                     values.other ? `: ${values.other || "others"}` : ""
                   }*`,
                 });

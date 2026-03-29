@@ -142,7 +142,7 @@ export default function Page() {
         <SectionHeader>
           <SectionTitle>Overview</SectionTitle>
           <SectionDescription>
-            Welcome to your OpenStatus dashboard.
+            Welcome to your OnlyStatus dashboard.
           </SectionDescription>
         </SectionHeader>
         <MetricCardGroup>

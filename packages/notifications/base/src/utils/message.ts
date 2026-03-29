@@ -116,7 +116,7 @@ export function buildCommonMessageData(
     regionsDisplay,
     latencyDisplay:
       typeof latency === "number" ? `${latency.toLocaleString()}ms` : "N/A",
-    dashboardUrl: `https://app.openstatus.dev/monitors/${monitor.id}`,
+    dashboardUrl: `${process.env.NEXT_PUBLIC_URL || ""}/monitors/${monitor.id}`,
     incidentDuration,
   };
 }

@@ -81,7 +81,7 @@ export function NavHelp() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    <Braces /> OpenStatus Docs
+                    <Braces /> Upstream Docs (OpenStatus)
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
