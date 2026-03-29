@@ -20,13 +20,12 @@ import {
   FormLabel,
 } from "@openstatus/ui/components/ui/form";
 import { Switch } from "@openstatus/ui/components/ui/switch";
+import { getEnv } from "@openstatus/utils";
 import { InfoIcon } from "lucide-react";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-
-const ENV_OVERRIDE = process.env.NEXT_PUBLIC_SHOW_GITHUB_NAV === "false";
 
 const schema = z.object({
   showGithubNav: z.boolean(),
@@ -42,6 +41,7 @@ export function FormDisplay({
   defaultValues?: FormValues;
   onSubmit: (values: FormValues) => Promise<void>;
 }) {
+  const envOverride = getEnv("NEXT_PUBLIC_SHOW_GITHUB_NAV") === "false";
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues ?? {
@@ -79,7 +79,7 @@ export function FormDisplay({
             </FormCardDescription>
           </FormCardHeader>
           <FormCardContent className="grid gap-4">
-            {ENV_OVERRIDE && (
+            {envOverride && (
               <Alert variant="default">
                 <InfoIcon className="size-4" />
                 <AlertDescription>
@@ -105,7 +105,7 @@ export function FormDisplay({
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={ENV_OVERRIDE}
+                      disabled={envOverride}
                     />
                   </FormControl>
                 </FormItem>
@@ -113,7 +113,7 @@ export function FormDisplay({
             />
           </FormCardContent>
           <FormCardFooter>
-            <Button type="submit" disabled={isPending || ENV_OVERRIDE} size="sm">
+            <Button type="submit" disabled={isPending || envOverride} size="sm">
               {isPending ? "Submitting..." : "Submit"}
             </Button>
           </FormCardFooter>

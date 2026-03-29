@@ -3,21 +3,20 @@
 import { useTRPC } from "@/lib/trpc/client";
 import { Button } from "@openstatus/ui/components/ui/button";
 import { useIsMobile } from "@openstatus/ui/hooks/use-mobile";
+import { getEnv } from "@openstatus/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Bug, Github } from "lucide-react";
-
-const GITHUB_URL =
-  process.env.NEXT_PUBLIC_GITHUB_URL ??
-  "https://github.com/openstatusHQ/openstatus";
-
-const ENV_OVERRIDE = process.env.NEXT_PUBLIC_SHOW_GITHUB_NAV === "false";
 
 export function NavFeedback() {
   const isMobile = useIsMobile();
   const trpc = useTRPC();
   const { data: workspace } = useQuery(trpc.workspace.get.queryOptions());
 
-  if (isMobile || ENV_OVERRIDE) {
+  const GITHUB_URL =
+    getEnv("NEXT_PUBLIC_GITHUB_URL") ??
+    "https://github.com/openstatusHQ/openstatus";
+
+  if (isMobile || getEnv("NEXT_PUBLIC_SHOW_GITHUB_NAV") === "false") {
     return null;
   }
 

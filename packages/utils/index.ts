@@ -1,3 +1,4 @@
+export { getEnv } from "./src/env";
 export { getStatusPageUrl, getStatusPageHost } from "./src/status-page-url";
 import { base } from "@openstatus/assertions";
 import { monitorMethods, monitorStatus } from "@openstatus/db/src/schema";

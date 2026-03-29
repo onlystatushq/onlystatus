@@ -75,6 +75,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script src="/api/__env" />
+      </head>
       <body
         className={cn(
           outfit.variable,

@@ -1,5 +1,8 @@
-const STATUS_PAGE_BASE_URL =
-  process.env.NEXT_PUBLIC_STATUS_PAGE_BASE_URL || "http://localhost:3003";
+import { getEnv } from "./env";
+
+function getBaseUrl(): string {
+  return getEnv("NEXT_PUBLIC_STATUS_PAGE_BASE_URL") || "http://localhost:3003";
+}
 
 /**
  * Build the public URL for a status page.
@@ -10,7 +13,7 @@ export function getStatusPageUrl(
   customDomain?: string | null,
 ): string {
   if (customDomain) return `https://${customDomain}`;
-  return `${STATUS_PAGE_BASE_URL}/${slug}`;
+  return `${getBaseUrl()}/${slug}`;
 }
 
 /**
@@ -19,7 +22,7 @@ export function getStatusPageUrl(
  */
 export function getStatusPageHost(): string {
   try {
-    return new URL(STATUS_PAGE_BASE_URL).host;
+    return new URL(getBaseUrl()).host;
   } catch {
     return "localhost:3003";
   }

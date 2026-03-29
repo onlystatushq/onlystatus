@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useTRPC } from "@/lib/trpc/client";
 import { Button } from "@openstatus/ui/components/ui/button";
 import { Input } from "@openstatus/ui/components/ui/input";
 import { Label } from "@openstatus/ui/components/ui/label";
-import { useSearchParams } from "next/navigation";
-import { useTRPC } from "@/lib/trpc/client";
+import { getEnv } from "@openstatus/utils";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   getPasskeyLoginOptions,
   signInWithCredentialsAction,
@@ -325,7 +326,7 @@ export default function Page() {
           </Button>
         )}
       </form>
-      {process.env.NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION === "true" && (
+      {getEnv("NEXT_PUBLIC_ALLOW_PUBLIC_REGISTRATION") === "true" && (
         <p className="px-8 text-center text-muted-foreground text-sm">
           Don't have an account?{" "}
           <a

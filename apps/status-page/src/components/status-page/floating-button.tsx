@@ -31,6 +31,7 @@ import {
 } from "@openstatus/ui/components/ui/select";
 import { Separator } from "@openstatus/ui/components/ui/separator";
 import { cn } from "@openstatus/ui/lib/utils";
+import { getEnv } from "@openstatus/utils";
 import { Check, ChevronsUpDown, Settings } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 import type React from "react";
@@ -318,8 +319,8 @@ export function FloatingButton({
               <a
                 href={
                   pageId
-                    ? `${process.env.NEXT_PUBLIC_URL || "http://localhost:3002"}/status-pages/${pageId}/edit?type=${barType}&value=${cardType}&uptime=${showUptime}&theme=${communityTheme}`
-                    : `${process.env.NEXT_PUBLIC_URL || "http://localhost:3002"}/status-pages`
+                    ? `${getEnv("NEXT_PUBLIC_URL") || "http://localhost:3002"}/status-pages/${pageId}/edit?type=${barType}&value=${cardType}&uptime=${showUptime}&theme=${communityTheme}`
+                    : `${getEnv("NEXT_PUBLIC_URL") || "http://localhost:3002"}/status-pages`
                 }
                 target="_blank"
                 rel="noreferrer"

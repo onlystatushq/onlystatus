@@ -13,7 +13,7 @@ ENV \
     TINY_BIRD_API_KEY="test" \
     SELF_HOST="true" \
     NODE_ENV="production" \
-    NEXT_PUBLIC_URL="http://localhost:3002" \
+    NEXT_PUBLIC_URL="" \
     UNKEY_TOKEN="test" \
     UNKEY_API_ID="test" \
     DATABASE_URL="http://libsql:8080" \

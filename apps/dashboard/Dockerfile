@@ -14,7 +14,7 @@ ENV \
     AUTH_SECRET="build-time-placeholder-min-32-chars-long" \
     TINY_BIRD_API_KEY="test" \
     UNKEY_TOKEN="test" \
-    NEXT_PUBLIC_URL="http://localhost:3002" \
+    NEXT_PUBLIC_URL="" \
     UNKEY_API_ID="test" \
     PATH="$PNPM_HOME:$PATH" \
     NODE_ENV="production" \
