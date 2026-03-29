@@ -64,11 +64,6 @@ export function NavUser() {
                 <AvatarFallback className="rounded-lg uppercase">
                   {userName.slice(0, 2)}
                 </AvatarFallback>
-                {/*                   <img
-                    src={`https://api.dicebear.com/9.x/glass/svg?seed=${workspace.slug}`}
-                    alt="avatar"
-                  />
-                   */}
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{userName}</span>
@@ -143,7 +138,7 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={() => signOut({ redirect: false }).then(() => { window.location.href = "/login"; })}
             >
               <LogOut />
               Log out

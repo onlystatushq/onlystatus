@@ -45,8 +45,8 @@ export function WorkspaceSwitcher() {
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary">
                 <div className="size-8 overflow-hidden rounded-lg">
                   <img
-                    src={`https://api.dicebear.com/9.x/glass/svg?seed=${workspace.slug}`}
-                    alt="avatar"
+                    src="/icon.png"
+                    alt="OnlyStatus"
                   />
                 </div>
               </div>

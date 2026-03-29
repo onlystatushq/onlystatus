@@ -2,7 +2,7 @@
 
 The OnlyStatus maintainers take security bugs seriously. We appreciate your efforts to responsibly disclose your findings, and will make every effort to acknowledge your contributions.
 
-To report a security issue, please open a [GitHub issue](https://github.com/neoyubi/onlystatus/issues) with the label "security", or reach out via email at security@example.com.
+To report a security issue, please open a [GitHub issue](https://github.com/onlystatushq/onlystatus/issues) with the label "security".
 
 ## Please do the following
 

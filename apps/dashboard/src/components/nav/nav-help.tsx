@@ -58,7 +58,7 @@ export function NavHelp() {
                 </FormDialogSupportContact>
                 <DropdownMenuItem asChild>
                   <Link
-                    href="https://github.com/neoyubi/onlystatus"
+                    href="https://github.com/onlystatushq/onlystatus"
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -68,7 +68,7 @@ export function NavHelp() {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link
-                    href="https://github.com/neoyubi/onlystatus/blob/main/docs/DEPLOYMENT.md"
+                    href="https://github.com/onlystatushq/onlystatus/blob/main/docs/DEPLOYMENT.md"
                     target="_blank"
                     rel="noreferrer"
                   >

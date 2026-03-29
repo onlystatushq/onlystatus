@@ -93,7 +93,7 @@ export function Nav() {
             )}
           </div>
           <a
-            href="https://github.com/neoyubi/onlystatus"
+            href="https://github.com/onlystatushq/onlystatus"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground transition-colors hover:text-foreground"

@@ -5,7 +5,7 @@ Self-hosted synthetic monitoring. No cloud dependencies. No feature gates. Just 
 ## Quick Start
 
 ```sh
-git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
+git clone https://github.com/onlystatushq/onlystatus.git && cd onlystatus
 ./setup.sh && docker compose up -d
 ```
 
@@ -66,7 +66,7 @@ docker run -d \
   --restart unless-stopped \
   -e OPENSTATUS_KEY=<your-token> \
   -e OPENSTATUS_INGEST_URL=https://your-instance.com:8081 \
-  neoyubi/onlystatus-checker:latest
+  ghcr.io/onlystatushq/onlystatus-checker:latest
 ```
 
 No inbound ports needed. The checker pulls work and pushes results over HTTPS.

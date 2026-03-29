@@ -1,11 +1,11 @@
 export const statusPages = [
   {
     id: 1,
-    name: "OpenStatus Status",
+    name: "OnlyStatus",
     description: "See our uptime history and status reports.",
     slug: "status",
-    favicon: "https://openstatus.dev/favicon.ico",
-    domain: "status.openstatus.dev",
+    favicon: "/icon.png",
+    domain: "",
     protected: true,
     showValues: false,
     // NOTE: the worst status of a report

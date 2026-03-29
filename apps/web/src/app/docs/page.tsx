@@ -200,7 +200,7 @@ export default function DocsPage() {
               title="quick start"
               glow
               commands={[
-                "git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus",
+                "git clone https://github.com/onlystatushq/onlystatus.git && cd onlystatus",
                 "./setup.sh && docker compose up -d",
               ]}
             />
@@ -627,7 +627,7 @@ export default function DocsPage() {
               "  --restart unless-stopped \\",
               "  -e OPENSTATUS_KEY=<your-token> \\",
               "  -e OPENSTATUS_INGEST_URL=https://your-instance.com:8081 \\",
-              "  neoyubi/onlystatus-checker:latest",
+              "  ghcr.io/onlystatushq/onlystatus-checker:latest",
             ]}
           />
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
@@ -702,7 +702,7 @@ export default function DocsPage() {
               details are covered in the repository&apos;s deployment guide.
             </p>
             <a
-              href="https://github.com/neoyubi/onlystatus/blob/main/docs/DEPLOYMENT.md"
+              href="https://github.com/onlystatushq/onlystatus/blob/main/docs/DEPLOYMENT.md"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm text-foreground underline underline-offset-4 transition-colors hover:text-success"

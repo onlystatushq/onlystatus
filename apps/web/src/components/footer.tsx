@@ -34,7 +34,7 @@ export function Footer() {
         <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-4 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             <a
-              href="https://github.com/neoyubi/onlystatus"
+              href="https://github.com/onlystatushq/onlystatus"
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground underline underline-offset-4 transition-colors hover:text-success"

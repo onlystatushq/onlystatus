@@ -7,7 +7,7 @@
     ·
     <a href="#getting-started">Getting Started</a>
     ·
-    <a href="https://github.com/neoyubi/onlystatus/issues">Issues</a>
+    <a href="https://github.com/onlystatushq/onlystatus/issues">Issues</a>
   </p>
 </p>
 
@@ -51,7 +51,7 @@ Here's what was replaced to make the stack fully self-contained:
 | Sentry | Removed |
 | Plan-based feature gating | All workspaces default to full access |
 
-See the [full commit history](https://github.com/neoyubi/onlystatus/commits/main) for details.
+See the [full commit history](https://github.com/onlystatushq/onlystatus/commits/main) for details.
 
 ## Features
 
@@ -106,7 +106,7 @@ See the [full commit history](https://github.com/neoyubi/onlystatus/commits/main
 ### Quick Start
 
 ```sh
-git clone https://github.com/neoyubi/onlystatus.git && cd onlystatus
+git clone https://github.com/onlystatushq/onlystatus.git && cd onlystatus
 ./setup.sh && docker compose up -d
 ```
 
@@ -158,7 +158,7 @@ docker run -d \
   --restart unless-stopped \
   -e OPENSTATUS_KEY=<your-token> \
   -e OPENSTATUS_INGEST_URL=https://your-instance.com:8081 \
-  neoyubi/onlystatus-checker:latest
+  ghcr.io/onlystatushq/onlystatus-checker:latest
 ```
 
 The checker only needs outbound access to your OnlyStatus instance. No inbound ports required.
@@ -191,7 +191,7 @@ pnpm dev:web          # Landing page
 
 ## Contributing
 
-Contributions welcome. Check the [open issues](https://github.com/neoyubi/onlystatus/issues) or submit a PR.
+Contributions welcome. Check the [open issues](https://github.com/onlystatushq/onlystatus/issues) or submit a PR.
 
 ## Credits
 

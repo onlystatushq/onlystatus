@@ -3,7 +3,7 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
-const commands = `git clone https://github.com/neoyubi/onlystatus.git
+const commands = `git clone https://github.com/onlystatushq/onlystatus.git
 cd onlystatus && ./setup.sh
 docker compose up -d`;
 

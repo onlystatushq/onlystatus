@@ -65,7 +65,7 @@ const moreActions = [
     id: "github",
     title: "GitHub",
     description: "Leave a star on GitHub, request features or report issues.",
-    href: "https://github.com/neoyubi/onlystatus",
+    href: "https://github.com/onlystatushq/onlystatus",
   },
 ];
 

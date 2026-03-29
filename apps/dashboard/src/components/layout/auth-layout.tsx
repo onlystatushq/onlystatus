@@ -1,11 +1,9 @@
-import Image from "next/image";
-
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid min-h-screen grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
       <aside className="col-span-1 flex w-full flex-col gap-4 border border-border bg-sidebar p-4 backdrop-blur-[2px] md:p-8 xl:col-span-2">
         <a href="/" className="relative h-8 w-8">
-          <Image
+          <img
             src="/icon.png"
             alt="OnlyStatus"
             height={32}

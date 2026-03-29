@@ -40,7 +40,7 @@ export function Hero() {
             Get Started
           </Link>
           <a
-            href="https://github.com/neoyubi/onlystatus"
+            href="https://github.com/onlystatushq/onlystatus"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2.5 font-medium text-sm text-foreground transition-colors hover:bg-accent"

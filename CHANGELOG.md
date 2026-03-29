@@ -40,7 +40,7 @@ Changes from the upstream [OpenStatus](https://github.com/openstatusHQ/openstatu
 
 ## Private Locations
 
-- Private checker published to Docker Hub (`neoyubi/onlystatus-checker`)
+- Private checker published to Docker Hub (`ghcr.io/onlystatushq/onlystatus-checker`)
 - Lightweight Go binary, pull-based architecture (no inbound ports needed)
 - Dashboard UI for creating locations and managing tokens
 
