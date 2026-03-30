@@ -19,6 +19,8 @@ If you need rock-solid uptime monitoring with dedicated support, go with the [Op
 
 If you are the "I'll run it myself" type and you love self-hosting, this is the repo for you.
 
+This project is in early stages. The core monitoring works well, but you may hit edge cases with deployment or configuration. If you run into issues, open an issue or email hq@onlystatus.dev.
+
 ## Overview
 
 OnlyStatus is a fully self-hosted synthetic monitoring platform. Monitor your websites and APIs with HTTP, TCP, and DNS checks, get alerts when things break, and give your users a clean status page.
@@ -102,6 +104,8 @@ See the [full commit history](https://github.com/onlystatushq/onlystatus/commits
 ### Requirements
 
 - Docker and Docker Compose
+- **Minimum 4GB RAM** (Tinybird alone needs ~2GB at steady state)
+- Recommended 6GB+ for comfortable headroom
 
 ### Quick Start
 
@@ -158,7 +162,7 @@ docker run -d \
   --restart unless-stopped \
   -e OPENSTATUS_KEY=<your-token> \
   -e OPENSTATUS_INGEST_URL=https://your-instance.com:8081 \
-  ghcr.io/onlystatushq/onlystatus-checker:latest
+  ghcr.io/onlystatushq/onlystatus-private-checker:latest
 ```
 
 The checker only needs outbound access to your OnlyStatus instance. No inbound ports required.

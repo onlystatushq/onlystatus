@@ -20,9 +20,26 @@ Complete guide for deploying OnlyStatus, a self-hosted synthetic monitoring plat
 ## Prerequisites
 
 - **Docker** 24.0+ with **Docker Compose** v2
-- **2 GB RAM** minimum (4 GB recommended)
+- **4 GB RAM** minimum, **6 GB recommended** (Tinybird-local alone uses ~1.5-2 GB at steady state)
 - **10 GB disk** for images and data
 - **x86_64 architecture** (Tinybird analytics does not support ARM natively; Apple Silicon users need Rosetta/QEMU)
+
+### Resource Breakdown
+
+| Service | Typical Usage | Limit (prod overlay) |
+|---------|--------------|---------------------|
+| Tinybird-local | ~1.5-2 GB | 2 GB |
+| Dashboard (Next.js) | ~200-400 MB | 1 GB |
+| Status Page (Next.js) | ~200-400 MB | 512 MB |
+| Workflows (Hono) | ~150 MB | 512 MB |
+| Server (Hono) | ~100 MB | 512 MB |
+| libSQL | ~50-100 MB | 512 MB |
+| Checker (Go) | ~30 MB | 256 MB |
+| Private Location (Go) | ~30 MB | 256 MB |
+
+Tinybird is the dominant consumer. If you are running on a VPS with limited RAM, make sure it has at least 2 GB available for Tinybird or the process will be OOM-killed and analytics will stop working.
+
+The production overlay (`docker-compose.prod.yml`) sets `mem_limit` for each service. These use standalone compose syntax, not Swarm-mode `deploy.resources.limits`.
 
 Verify your setup:
 
@@ -368,7 +385,7 @@ docker run -d \
   --restart unless-stopped \
   -e OPENSTATUS_KEY=<your-token> \
   -e OPENSTATUS_INGEST_URL=https://your-instance.com:8081 \
-  ghcr.io/onlystatushq/onlystatus-checker:latest
+  ghcr.io/onlystatushq/onlystatus-private-checker:latest
 ```
 
 Replace:
