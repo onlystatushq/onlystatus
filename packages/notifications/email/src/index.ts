@@ -110,6 +110,7 @@ export const sendCertExpiry = async ({
   monitor,
   notification,
   statusCode,
+  message,
   cronTimestamp,
   regions,
   latency,
@@ -136,5 +137,6 @@ export const sendCertExpiry = async ({
     latency: latency ? `${latency}ms` : "N/A",
     region: region ?? "N/A",
     timestamp: new Date(cronTimestamp).toISOString(),
+    message,
   });
 };
