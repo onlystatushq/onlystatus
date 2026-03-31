@@ -28,6 +28,11 @@ type Data = NonNullable<
   RouterOutputs["statusPage"]["getUptime"]
 >[number]["data"];
 
+type CertData = {
+  certExpiryDays: number | null;
+  certValid: number | null;
+};
+
 export function StatusMonitor({
   className,
   status = "success",
@@ -35,6 +40,7 @@ export function StatusMonitor({
   data = [],
   monitor,
   uptime,
+  certData,
   isLoading = false,
   ...props
 }: React.ComponentProps<"div"> & {
@@ -46,8 +52,14 @@ export function StatusMonitor({
     description?: string | null;
   };
   data?: Data;
+  certData?: CertData | null;
   isLoading?: boolean;
 }) {
+  const showCertBadge =
+    certData != null &&
+    ((certData.certExpiryDays != null && certData.certExpiryDays <= 14) ||
+      (certData.certValid != null && certData.certValid === 0));
+
   return (
     <div
       data-slot="status-monitor"
@@ -63,6 +75,13 @@ export function StatusMonitor({
           </StatusMonitorDescription>
         </div>
         <div className="flex flex-row items-center gap-2">
+          {showCertBadge && certData != null ? (
+            <span className="font-mono text-warning text-xs leading-none">
+              {certData.certValid === 0
+                ? "Cert: Untrusted"
+                : `Cert: ${certData.certExpiryDays}d`}
+            </span>
+          ) : null}
           {/* TODO: check if we can improve that cuz its looking ugly */}
           {showUptime ? (
             <>
