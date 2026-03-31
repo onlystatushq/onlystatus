@@ -9,7 +9,6 @@ package v1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/structpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -271,22 +270,28 @@ func (*IngestTCPResponse) Descriptor() ([]byte, []int) {
 }
 
 type IngestHTTPRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	MonitorId     string                 `protobuf:"bytes,2,opt,name=monitorId,proto3" json:"monitorId,omitempty"`
-	Latency       int64                  `protobuf:"varint,3,opt,name=latency,proto3" json:"latency,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	CronTimestamp int64                  `protobuf:"varint,5,opt,name=cronTimestamp,proto3" json:"cronTimestamp,omitempty"`
-	Url           string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
-	RequestStatus string                 `protobuf:"bytes,7,opt,name=requestStatus,proto3" json:"requestStatus,omitempty"`
-	Message       string                 `protobuf:"bytes,8,opt,name=message,proto3" json:"message,omitempty"`
-	Body          string                 `protobuf:"bytes,9,opt,name=body,proto3" json:"body,omitempty"`
-	Headers       string                 `protobuf:"bytes,10,opt,name=headers,proto3" json:"headers,omitempty"`
-	Timing        string                 `protobuf:"bytes,11,opt,name=timing,proto3" json:"timing,omitempty"`
-	StatusCode    int64                  `protobuf:"varint,12,opt,name=statusCode,proto3" json:"statusCode,omitempty"`
-	Error         int64                  `protobuf:"varint,13,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	MonitorId       string                 `protobuf:"bytes,2,opt,name=monitorId,proto3" json:"monitorId,omitempty"`
+	Latency         int64                  `protobuf:"varint,3,opt,name=latency,proto3" json:"latency,omitempty"`
+	Timestamp       int64                  `protobuf:"varint,4,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	CronTimestamp   int64                  `protobuf:"varint,5,opt,name=cronTimestamp,proto3" json:"cronTimestamp,omitempty"`
+	Url             string                 `protobuf:"bytes,6,opt,name=url,proto3" json:"url,omitempty"`
+	RequestStatus   string                 `protobuf:"bytes,7,opt,name=requestStatus,proto3" json:"requestStatus,omitempty"`
+	Message         string                 `protobuf:"bytes,8,opt,name=message,proto3" json:"message,omitempty"`
+	Body            string                 `protobuf:"bytes,9,opt,name=body,proto3" json:"body,omitempty"`
+	Headers         string                 `protobuf:"bytes,10,opt,name=headers,proto3" json:"headers,omitempty"`
+	Timing          string                 `protobuf:"bytes,11,opt,name=timing,proto3" json:"timing,omitempty"`
+	StatusCode      int64                  `protobuf:"varint,12,opt,name=statusCode,proto3" json:"statusCode,omitempty"`
+	Error           int64                  `protobuf:"varint,13,opt,name=error,proto3" json:"error,omitempty"`
+	CertExpiryDays  int32                  `protobuf:"varint,14,opt,name=certExpiryDays,proto3" json:"certExpiryDays,omitempty"`
+	CertValid       int32                  `protobuf:"varint,15,opt,name=certValid,proto3" json:"certValid,omitempty"`
+	CertIssuer      string                 `protobuf:"bytes,16,opt,name=certIssuer,proto3" json:"certIssuer,omitempty"`
+	CertExpiresAt   int64                  `protobuf:"varint,17,opt,name=certExpiresAt,proto3" json:"certExpiresAt,omitempty"`
+	CertFingerprint string                 `protobuf:"bytes,18,opt,name=certFingerprint,proto3" json:"certFingerprint,omitempty"`
+	CertError       string                 `protobuf:"bytes,19,opt,name=certError,proto3" json:"certError,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *IngestHTTPRequest) Reset() {
@@ -408,6 +413,48 @@ func (x *IngestHTTPRequest) GetError() int64 {
 		return x.Error
 	}
 	return 0
+}
+
+func (x *IngestHTTPRequest) GetCertExpiryDays() int32 {
+	if x != nil {
+		return x.CertExpiryDays
+	}
+	return 0
+}
+
+func (x *IngestHTTPRequest) GetCertValid() int32 {
+	if x != nil {
+		return x.CertValid
+	}
+	return 0
+}
+
+func (x *IngestHTTPRequest) GetCertIssuer() string {
+	if x != nil {
+		return x.CertIssuer
+	}
+	return ""
+}
+
+func (x *IngestHTTPRequest) GetCertExpiresAt() int64 {
+	if x != nil {
+		return x.CertExpiresAt
+	}
+	return 0
+}
+
+func (x *IngestHTTPRequest) GetCertFingerprint() string {
+	if x != nil {
+		return x.CertFingerprint
+	}
+	return ""
+}
+
+func (x *IngestHTTPRequest) GetCertError() string {
+	if x != nil {
+		return x.CertError
+	}
+	return ""
 }
 
 type IngestHTTPResponse struct {
@@ -654,7 +701,7 @@ var File_private_location_v1_private_location_proto protoreflect.FileDescriptor
 
 const file_private_location_v1_private_location_proto_rawDesc = "" +
 	"\n" +
-	"*private_location/v1/private_location.proto\x12\x13private_location.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a%private_location/v1/dns_monitor.proto\x1a&private_location/v1/http_monitor.proto\x1a%private_location/v1/tcp_monitor.proto\"\x11\n" +
+	"*private_location/v1/private_location.proto\x12\x13private_location.v1\x1a%private_location/v1/dns_monitor.proto\x1a&private_location/v1/http_monitor.proto\x1a%private_location/v1/tcp_monitor.proto\"\x11\n" +
 	"\x0fMonitorsRequest\"\xe1\x01\n" +
 	"\x10MonitorsResponse\x12E\n" +
 	"\rhttp_monitors\x18\x01 \x03(\v2 .private_location.v1.HTTPMonitorR\fhttpMonitors\x12B\n" +
@@ -672,7 +719,7 @@ const file_private_location_v1_private_location_proto_rawDesc = "" +
 	"\x05error\x18\t \x01(\x03R\x05error\x12\x16\n" +
 	"\x06timing\x18\n" +
 	" \x01(\tR\x06timing\"\x13\n" +
-	"\x11IngestTCPResponse\"\xed\x02\n" +
+	"\x11IngestTCPResponse\"\xc1\x04\n" +
 	"\x11IngestHTTPRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
 	"\tmonitorId\x18\x02 \x01(\tR\tmonitorId\x12\x18\n" +
@@ -689,7 +736,15 @@ const file_private_location_v1_private_location_proto_rawDesc = "" +
 	"\n" +
 	"statusCode\x18\f \x01(\x03R\n" +
 	"statusCode\x12\x14\n" +
-	"\x05error\x18\r \x01(\x03R\x05error\"\x14\n" +
+	"\x05error\x18\r \x01(\x03R\x05error\x12&\n" +
+	"\x0ecertExpiryDays\x18\x0e \x01(\x05R\x0ecertExpiryDays\x12\x1c\n" +
+	"\tcertValid\x18\x0f \x01(\x05R\tcertValid\x12\x1e\n" +
+	"\n" +
+	"certIssuer\x18\x10 \x01(\tR\n" +
+	"certIssuer\x12$\n" +
+	"\rcertExpiresAt\x18\x11 \x01(\x03R\rcertExpiresAt\x12(\n" +
+	"\x0fcertFingerprint\x18\x12 \x01(\tR\x0fcertFingerprint\x12\x1c\n" +
+	"\tcertError\x18\x13 \x01(\tR\tcertError\"\x14\n" +
 	"\x12IngestHTTPResponse\"!\n" +
 	"\aRecords\x12\x16\n" +
 	"\x06record\x18\x01 \x03(\tR\x06record\"\xc6\x03\n" +

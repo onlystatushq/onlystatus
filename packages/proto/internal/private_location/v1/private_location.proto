@@ -58,6 +58,12 @@ message IngestHTTPRequest {
     string timing = 11;
     int64 statusCode = 12;
     int64 error = 13;
+    int32 certExpiryDays = 14;
+    int32 certValid = 15;
+    string certIssuer = 16;
+    int64 certExpiresAt = 17;
+    string certFingerprint = 18;
+    string certError = 19;
 }
 
 message IngestHTTPResponse {
