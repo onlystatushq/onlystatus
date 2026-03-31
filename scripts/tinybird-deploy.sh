@@ -126,6 +126,7 @@ log "Deploying schemas ($DEPLOY_MODE mode)..."
 # fresh deploys (column change limit). The __v0 file has the current schema with
 # requestStatus/id columns that pipes depend on. Remove the outdated versioned file.
 rm -f /tmp/tb-work/datasources/tcp_response.datasource
+rm -f /tmp/tb-work/endpoints/endpoint__cert_*
 printf 'y\n%.0s' $(seq 1 50) | tb push --force --override-datasource 2>&1 || true
 
 # Verify critical schema exists
