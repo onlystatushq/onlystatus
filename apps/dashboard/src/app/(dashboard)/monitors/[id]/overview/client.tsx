@@ -33,8 +33,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@openstatus/ui/components/ui/tabs";
+import { cn } from "@openstatus/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { endOfDay } from "date-fns";
+import { endOfDay, format } from "date-fns";
+import { ShieldAlert, ShieldCheck } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useQueryStates } from "nuqs";
 import React, { useMemo } from "react";
@@ -50,6 +52,13 @@ export function Client() {
   const { data: monitor } = useQuery(
     trpc.monitor.get.queryOptions({ id: Number.parseInt(id) }),
   );
+
+  const { data: certData } = useQuery({
+    ...trpc.tinybird.certStatus.queryOptions({ monitorId: id }),
+    enabled: !!monitor && monitor.jobType === "http",
+    select: (res) => res?.data?.[0] ?? null,
+  });
+
   // Default to monitor's configured regions + private locations when no explicit filter
   const selectedRegions = regions ?? (monitor ? [
     ...monitor.regions,
@@ -95,6 +104,13 @@ export function Client() {
     [monitor?.privateLocations],
   );
 
+  function getCertExpiryClassName(days: number) {
+    if (days <= 1) return "text-destructive font-semibold";
+    if (days <= 14) return "text-warning font-semibold";
+    if (days <= 30) return "text-warning";
+    return "text-success";
+  }
+
   if (!monitor) return null;
 
   return (
@@ -124,6 +140,34 @@ export function Client() {
             <ButtonReset only={["period", "regions"]} />
           </div>
         </div>
+        {certData && certData.certExpiryDays != null && (
+          <div className="flex items-center gap-4 rounded-lg border p-4">
+            {certData.certValid ? (
+              <ShieldCheck className={cn(
+                "h-8 w-8 shrink-0",
+                getCertExpiryClassName(certData.certExpiryDays),
+              )} />
+            ) : (
+              <ShieldAlert className="h-8 w-8 shrink-0 text-warning" />
+            )}
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">
+                SSL Certificate
+              </p>
+              <p className={cn("text-2xl font-bold", getCertExpiryClassName(certData.certExpiryDays))}>
+                {certData.certExpiryDays < 0
+                  ? `Expired ${Math.abs(certData.certExpiryDays)}d ago`
+                  : `${certData.certExpiryDays} days`}
+              </p>
+            </div>
+            <div className="ml-auto text-right text-sm text-muted-foreground">
+              {certData.certIssuer && <p>Issuer: {certData.certIssuer}</p>}
+              {certData.certExpiresAt && (
+                <p>Expires: {format(new Date(certData.certExpiresAt), "MMM d, yyyy")}</p>
+              )}
+            </div>
+          </div>
+        )}
         <GlobalUptimeSection
           monitorId={id}
           jobType={monitor.jobType as "http" | "tcp"}

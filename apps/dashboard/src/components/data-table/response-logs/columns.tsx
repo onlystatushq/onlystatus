@@ -20,7 +20,7 @@ import {
 } from "@openstatus/ui/components/ui/tooltip";
 import { cn } from "@openstatus/ui/lib/utils";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Clock, Workflow } from "lucide-react";
+import { Clock, ShieldAlert, Workflow } from "lucide-react";
 
 type ResponseLog = RouterOutputs["tinybird"]["list"]["data"][number];
 
@@ -36,16 +36,27 @@ export function getColumns(
       enableHiding: false,
       cell: ({ row }) => {
         const value = row.getValue("requestStatus");
-        if (value === "error") {
-          return <div className="h-2.5 w-2.5 rounded-[2px] bg-destructive" />;
-        }
-        if (value === "degraded") {
-          return <div className="h-2.5 w-2.5 rounded-[2px] bg-warning" />;
-        }
-        if (value === "success") {
-          return <div className="h-2.5 w-2.5 rounded-[2px] bg-success" />;
-        }
-        return <div className="text-muted-foreground">-</div>;
+        const certValid = (row.original as ResponseLog & { certValid?: number }).certValid;
+        const indicator = (() => {
+          if (value === "error") {
+            return <div className="h-2.5 w-2.5 rounded-[2px] bg-destructive" />;
+          }
+          if (value === "degraded") {
+            return <div className="h-2.5 w-2.5 rounded-[2px] bg-warning" />;
+          }
+          if (value === "success") {
+            return <div className="h-2.5 w-2.5 rounded-[2px] bg-success" />;
+          }
+          return <div className="text-muted-foreground">-</div>;
+        })();
+        return (
+          <div className="flex items-center gap-1">
+            {indicator}
+            {certValid === 0 && (
+              <ShieldAlert className="h-3 w-3 text-warning" />
+            )}
+          </div>
+        );
       },
     },
     {

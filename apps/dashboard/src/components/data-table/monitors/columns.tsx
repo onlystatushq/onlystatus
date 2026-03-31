@@ -3,7 +3,9 @@
 import { TableCellLink } from "@/components/data-table/table-cell-link";
 import { Badge } from "@openstatus/ui/components/ui/badge";
 import { Checkbox } from "@openstatus/ui/components/ui/checkbox";
+import { cn } from "@openstatus/ui/lib/utils";
 import type { ColumnDef } from "@tanstack/react-table";
+import { ShieldAlert } from "lucide-react";
 import { DataTableRowActions } from "./data-table-row-actions";
 
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
@@ -19,6 +21,10 @@ type Monitor = RouterOutputs["monitor"]["list"][number] & {
     | RouterOutputs["tinybird"]["globalMetrics"]["data"][number]
     // NOTE: after loading the data, if the monitor has no metrics, the value will be `false`
     | false;
+  certStatus?: {
+    certExpiryDays: number | null;
+    certValid: number | null;
+  } | null;
 };
 
 export const columns: ColumnDef<Monitor>[] = [
@@ -210,6 +216,41 @@ export const columns: ColumnDef<Monitor>[] = [
       );
     },
     enableHiding: false,
+    enableGlobalFilter: false,
+  },
+  {
+    id: "certificate",
+    accessorFn: (row) => row.certStatus?.certExpiryDays,
+    header: "Cert",
+    cell: ({ row }) => {
+      const cert = row.original.certStatus;
+      if (!cert || cert.certExpiryDays == null) {
+        return <span className="text-muted-foreground">-</span>;
+      }
+      if (!cert.certValid) {
+        return (
+          <span className="inline-flex items-center gap-1 text-warning">
+            <ShieldAlert className="h-3 w-3" />
+            Untrusted
+          </span>
+        );
+      }
+      const days = cert.certExpiryDays;
+      return (
+        <span
+          className={cn(
+            "font-mono",
+            days <= 1 && "text-destructive font-semibold",
+            days > 1 && days <= 14 && "text-warning font-semibold",
+            days > 14 && days <= 30 && "text-warning",
+            days > 30 && "text-success",
+          )}
+        >
+          {days}d
+        </span>
+      );
+    },
+    enableHiding: true,
     enableGlobalFilter: false,
   },
   {

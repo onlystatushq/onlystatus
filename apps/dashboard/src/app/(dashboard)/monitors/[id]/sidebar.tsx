@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { TableCellLink } from "@/components/data-table/table-cell-link";
 import { SidebarRight } from "@/components/nav/sidebar-right";
 import { monitorTypes } from "@/data/monitors.client";
@@ -7,8 +8,9 @@ import { formatMilliseconds } from "@/lib/formatter";
 import { useTRPC } from "@/lib/trpc/client";
 import { deserialize } from "@openstatus/assertions";
 import { Badge } from "@openstatus/ui/components/ui/badge";
+import { cn } from "@openstatus/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Logs } from "lucide-react";
+import { Logs, ShieldAlert, ShieldCheck } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 
 export function Sidebar() {
@@ -19,10 +21,62 @@ export function Sidebar() {
     trpc.monitor.get.queryOptions({ id: Number.parseInt(id) }),
   );
 
+  const { data: certData } = useQuery({
+    ...trpc.tinybird.certStatus.queryOptions({ monitorId: id }),
+    enabled: !!monitor && monitor.jobType === "http",
+    select: (res) => res?.data?.[0] ?? null,
+  });
+
   if (!monitor) return null;
 
   const assertions = monitor.assertions ? deserialize(monitor.assertions) : [];
   const type = monitorTypes.find((type) => type.id === monitor.jobType);
+
+  function getCertExpiryClassName(days: number) {
+    if (days <= 1) return "text-destructive font-semibold";
+    if (days <= 14) return "text-warning font-semibold";
+    if (days <= 30) return "text-warning";
+    return "text-success";
+  }
+
+  const certSection: {
+    label: string;
+    items: { label: string; value: React.ReactNode; isNested?: boolean }[];
+  } | null =
+    monitor.jobType === "http" && certData && certData.certExpiryDays != null
+      ? {
+          label: "Certificate",
+          items: [
+            {
+              label: "Status",
+              value: certData.certValid ? (
+                <span className="inline-flex items-center gap-1 text-success">
+                  <ShieldCheck className="h-3 w-3" />
+                  Valid
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-warning">
+                  <ShieldAlert className="h-3 w-3" />
+                  Untrusted
+                </span>
+              ),
+            },
+            {
+              label: "Expires In",
+              value: (
+                <span className={getCertExpiryClassName(certData.certExpiryDays)}>
+                  {certData.certExpiryDays < 0
+                    ? `Expired ${Math.abs(certData.certExpiryDays)}d ago`
+                    : `${certData.certExpiryDays} days`}
+                </span>
+              ),
+            },
+            ...(certData.certIssuer
+              ? [{ label: "Issuer", value: certData.certIssuer }]
+              : []),
+          ],
+        }
+      : null;
 
   return (
     <SidebarRight
@@ -84,6 +138,7 @@ export function Sidebar() {
             },
           ],
         },
+        ...(certSection ? [certSection] : []),
         {
           label: "Configuration",
           items: [
