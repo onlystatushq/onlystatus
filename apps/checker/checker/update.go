@@ -19,8 +19,8 @@ type UpdateData struct {
 	CronTimestamp   int64  `json:"cronTimestamp"`
 	StatusCode      int    `json:"statusCode,omitempty"`
 	Latency         int64  `json:"latency,omitempty"`
-	CertExpiryDays  int    `json:"certExpiryDays,omitempty"`
-	CertValid       bool   `json:"certValid,omitempty"`
+	CertExpiryDays  int    `json:"certExpiryDays"`
+	CertValid       bool   `json:"certValid"`
 	CertFingerprint string `json:"certFingerprint,omitempty"`
 }
 

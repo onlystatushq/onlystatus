@@ -42,8 +42,8 @@ type PingData struct {
 	Timestamp       int64  `json:"timestamp"`
 	StatusCode      int    `json:"statusCode,omitempty"`
 	Error           uint8  `json:"error"`
-	CertExpiryDays  int    `json:"certExpiryDays,omitempty"`
-	CertValid       int8   `json:"certValid,omitempty"`
+	CertExpiryDays  int    `json:"certExpiryDays"`
+	CertValid       int8   `json:"certValid"`
 	CertIssuer      string `json:"certIssuer,omitempty"`
 	CertExpiresAt   int64  `json:"certExpiresAt,omitempty"`
 	CertFingerprint string `json:"certFingerprint,omitempty"`
