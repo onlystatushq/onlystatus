@@ -134,6 +134,84 @@ if ! has_core_datasource; then
   exit 1
 fi
 
+# Ensure cert endpoint pipes exist. The Tinybird Forward CLI (local) has a
+# template parameter parsing bug that causes tb push to skip these pipes.
+# Fall back to creating them via the HTTP API if they are missing.
+log "Ensuring cert endpoint pipes..."
+python3 -c "
+import urllib.request, json, sys
+
+host = '$TINYBIRD_HOST'
+token = '$TOKEN'
+hdr = {'Authorization': 'Bearer ' + token}
+
+# Check which pipes exist
+try:
+    req = urllib.request.Request(host + '/v0/pipes', headers=hdr)
+    resp = urllib.request.urlopen(req, timeout=5)
+    existing = {p['name'] for p in json.loads(resp.read()).get('pipes', [])}
+except:
+    existing = set()
+
+cert_pipes = {
+    'endpoint__cert_status__v1': {
+        'node': 'cert_latest',
+        'sql': '''SELECT monitorId, argMax(t.certExpiryDays, t.cronTimestamp) AS certExpiryDays,
+            argMax(t.certValid, t.cronTimestamp) AS certValid,
+            argMax(t.certIssuer, t.cronTimestamp) AS certIssuer,
+            argMax(t.certExpiresAt, t.cronTimestamp) AS certExpiresAt,
+            argMax(t.certFingerprint, t.cronTimestamp) AS certFingerprint,
+            argMax(t.certError, t.cronTimestamp) AS certError,
+            max(t.cronTimestamp) AS lastChecked
+            FROM (SELECT * FROM ping_response__v8 WHERE certExpiryDays IS NOT NULL
+                AND cronTimestamp >= toUnixTimestamp64Milli(now64() - toIntervalDay(1))) AS t
+            GROUP BY monitorId'''
+    },
+    'endpoint__cert_status_workspace__v1': {
+        'node': 'cert_latest_all',
+        'sql': '''SELECT monitorId, argMax(t.certExpiryDays, t.cronTimestamp) AS certExpiryDays,
+            argMax(t.certValid, t.cronTimestamp) AS certValid,
+            argMax(t.certIssuer, t.cronTimestamp) AS certIssuer,
+            max(t.cronTimestamp) AS lastChecked
+            FROM (SELECT * FROM ping_response__v8 WHERE certExpiryDays IS NOT NULL
+                AND cronTimestamp >= toUnixTimestamp64Milli(now64() - toIntervalDay(1))) AS t
+            GROUP BY monitorId'''
+    },
+    'endpoint__cert_history__v1': {
+        'node': 'cert_trend',
+        'sql': '''SELECT toStartOfHour(fromUnixTimestamp64Milli(t.cronTimestamp)) AS time,
+            t.monitorId, avg(t.certExpiryDays) AS avgExpiryDays,
+            min(t.certValid) AS allValid
+            FROM (SELECT * FROM ping_response__v8 WHERE certExpiryDays IS NOT NULL) AS t
+            GROUP BY time, t.monitorId ORDER BY time ASC'''
+    },
+}
+
+created = 0
+for pipe_name, spec in cert_pipes.items():
+    if pipe_name in existing:
+        continue
+    try:
+        data = json.dumps({
+            'name': pipe_name,
+            'nodes': [{'name': spec['node'], 'sql': spec['sql']}]
+        }).encode()
+        req = urllib.request.Request(host + '/v0/pipes', data=data,
+            headers={**hdr, 'Content-Type': 'application/json'})
+        urllib.request.urlopen(req, timeout=10)
+        # Publish as endpoint
+        req2 = urllib.request.Request(
+            host + '/v0/pipes/' + pipe_name + '/nodes/' + spec['node'] + '/endpoint',
+            headers=hdr, method='POST')
+        urllib.request.urlopen(req2, timeout=5)
+        created += 1
+        print(f'Created {pipe_name}')
+    except Exception as e:
+        print(f'Warning: could not create {pipe_name}: {e}')
+
+print(f'Cert pipes: {created} created, {len(cert_pipes) - created} already existed')
+" 2>/dev/null || log "Warning: cert pipe creation failed (non-fatal)"
+
 # Store the deployed schema version as a Tinybird pipe for tracking.
 # This is a constant-returning pipe that acts as version metadata.
 log "Setting schema version to $SCHEMA_VERSION..."
