@@ -219,7 +219,9 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 
 		data.Assertions = assertionAsString
 
+		certDegraded := false
 		if res.CertInfo != nil && !res.CertInfo.Valid && isSuccessfull {
+			certDegraded = true
 			data.RequestStatus = "degraded"
 			data.Message = fmt.Sprintf("Untrusted certificate: %s", res.CertInfo.ErrorMessage)
 
@@ -271,7 +273,7 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 			data.RequestStatus = "degraded"
 		}
 		// it's active
-		if isSuccessfull && req.DegradedAfter == 0 && req.Status != "active" {
+		if isSuccessfull && !certDegraded && req.DegradedAfter == 0 && req.Status != "active" {
 			ud := checker.UpdateData{
 				MonitorId:     req.MonitorID,
 				Status:        "active",
@@ -285,7 +287,7 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 			data.RequestStatus = "success"
 		}
 		// it's active
-		if isSuccessfull && res.Latency < req.DegradedAfter && req.DegradedAfter != 0 && req.Status != "active" {
+		if isSuccessfull && !certDegraded && res.Latency < req.DegradedAfter && req.DegradedAfter != 0 && req.Status != "active" {
 			ud := checker.UpdateData{
 				MonitorId:     req.MonitorID,
 				Status:        "active",

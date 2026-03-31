@@ -355,7 +355,7 @@ checkerRoute.post("/updateStatus", async (c) => {
 
   // Cert expiry notification logic
   if (certExpiryDays !== undefined && certFingerprint) {
-    const thresholds = [14, 1];
+    const thresholds = [1, 14];
 
     for (const threshold of thresholds) {
       if (certExpiryDays <= threshold) {
@@ -372,26 +372,30 @@ checkerRoute.post("/updateStatus", async (c) => {
           .get();
 
         if (!existing) {
-          await db
+          const result = await db
             .insert(schema.certNotificationSent)
             .values({
               monitorId: Number(monitorId),
               thresholdDays: threshold,
               certFingerprint: certFingerprint,
             })
-            .onConflictDoNothing();
+            .onConflictDoNothing()
+            .returning();
 
-          await triggerNotifications({
-            monitorId,
-            notifType: "cert-expiry",
-            cronTimestamp,
-            statusCode,
-            message:
-              threshold === 1
-                ? "SSL certificate expires tomorrow"
-                : `SSL certificate expires in ${certExpiryDays} days`,
-            regions: [region],
-          });
+          if (result.length > 0) {
+            await triggerNotifications({
+              monitorId,
+              notifType: "cert-expiry",
+              cronTimestamp,
+              statusCode,
+              message:
+                threshold === 1
+                  ? "SSL certificate expires tomorrow"
+                  : `SSL certificate expires in ${certExpiryDays} days`,
+              regions: [region],
+            });
+            break;
+          }
         }
       }
     }

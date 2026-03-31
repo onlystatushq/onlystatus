@@ -26,12 +26,18 @@ type PingData struct {
 	Assertions    string `json:"assertions"`
 	Body          string `json:"body,omitempty"`
 	Trigger       string `json:"trigger,omitempty"`
-	RequestStatus string `json:"requestStatus,omitempty"`
-	Latency       int64  `json:"latency"`
-	CronTimestamp int64  `json:"cronTimestamp"`
-	Timestamp     int64  `json:"timestamp"`
-	StatusCode    int    `json:"statusCode,omitempty"`
-	Error         uint8  `json:"error"`
+	RequestStatus   string `json:"requestStatus,omitempty"`
+	Latency         int64  `json:"latency"`
+	CronTimestamp   int64  `json:"cronTimestamp"`
+	Timestamp       int64  `json:"timestamp"`
+	StatusCode      int    `json:"statusCode,omitempty"`
+	Error           uint8  `json:"error"`
+	CertExpiryDays  int32  `json:"certExpiryDays"`
+	CertValid       int8   `json:"certValid"`
+	CertIssuer      string `json:"certIssuer,omitempty"`
+	CertExpiresAt   int64  `json:"certExpiresAt,omitempty"`
+	CertFingerprint string `json:"certFingerprint,omitempty"`
+	CertError       string `json:"certError,omitempty"`
 }
 
 func (h *privateLocationHandler) IngestHTTP(ctx context.Context, req *connect.Request[private_locationv1.IngestHTTPRequest]) (*connect.Response[private_locationv1.IngestHTTPResponse], error) {
@@ -75,7 +81,13 @@ func (h *privateLocationHandler) IngestHTTP(ctx context.Context, req *connect.Re
 		Body:          req.Msg.Body,
 		Trigger:       "cron",
 		RequestStatus: req.Msg.RequestStatus,
-		Assertions:    ic.Monitor.Assertions.String,
+		Assertions:      ic.Monitor.Assertions.String,
+		CertExpiryDays:  req.Msg.GetCertExpiryDays(),
+		CertValid:       int8(req.Msg.GetCertValid()),
+		CertIssuer:      req.Msg.GetCertIssuer(),
+		CertExpiresAt:   req.Msg.GetCertExpiresAt(),
+		CertFingerprint: req.Msg.GetCertFingerprint(),
+		CertError:       req.Msg.GetCertError(),
 	}
 
 	h.sendEventAndUpdateLastSeen(ctx, data, tinybird.DatasourceHTTP, ic.Region.ID)

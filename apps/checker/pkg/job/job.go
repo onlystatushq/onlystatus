@@ -25,8 +25,8 @@ type HttpPrivateRegionData struct {
 	Timestamp       int64  `json:"timestamp"`
 	StatusCode      int    `json:"statusCode,omitempty"`
 	Error           uint8  `json:"error"`
-	CertExpiryDays  int32  `json:"certExpiryDays,omitempty"`
-	CertValid       int32  `json:"certValid,omitempty"`
+	CertExpiryDays  int32  `json:"certExpiryDays"`
+	CertValid       int32  `json:"certValid"`
 	CertIssuer      string `json:"certIssuer,omitempty"`
 	CertExpiresAt   int64  `json:"certExpiresAt,omitempty"`
 	CertFingerprint string `json:"certFingerprint,omitempty"`
