@@ -12,13 +12,16 @@ import (
 )
 
 type UpdateData struct {
-	MonitorId     string `json:"monitorId"`
-	Status        string `json:"status"`
-	Message       string `json:"message,omitempty"`
-	Region        string `json:"region"`
-	CronTimestamp int64  `json:"cronTimestamp"`
-	StatusCode    int    `json:"statusCode,omitempty"`
-	Latency       int64  `json:"latency,omitempty"`
+	MonitorId       string `json:"monitorId"`
+	Status          string `json:"status"`
+	Message         string `json:"message,omitempty"`
+	Region          string `json:"region"`
+	CronTimestamp   int64  `json:"cronTimestamp"`
+	StatusCode      int    `json:"statusCode,omitempty"`
+	Latency         int64  `json:"latency,omitempty"`
+	CertExpiryDays  int    `json:"certExpiryDays,omitempty"`
+	CertValid       bool   `json:"certValid,omitempty"`
+	CertFingerprint string `json:"certFingerprint,omitempty"`
 }
 
 func getWorkflowsURL() string {
