@@ -80,6 +80,45 @@ export const sendDegraded = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  statusCode,
+  message,
+}: NotificationContext) => {
+  const { opsgenie } = OpsGenieSchema.parse(JSON.parse(notification.data));
+  const { name } = monitor;
+
+  const event = OpsGeniePayloadAlert.parse({
+    alias: `${monitor.id}`,
+    message: `${name} certificate expiry warning`,
+    description: message,
+    details: {
+      message,
+      status: statusCode,
+      severity: "cert-expiry",
+    },
+  });
+
+  const url =
+    opsgenie.region === "eu"
+      ? "https://api.eu.opsgenie.com/v2/alerts"
+      : "https://api.opsgenie.com/v2/alerts";
+  const res = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(event),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `GenieKey ${opsgenie.apiKey}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(
+      `Failed to send OpsGenie cert-expiry alert: ${res.status} ${res.statusText}`,
+    );
+  }
+};
+
 export const sendRecovery = async ({
   monitor,
   notification,

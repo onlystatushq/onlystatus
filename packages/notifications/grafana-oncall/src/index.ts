@@ -103,6 +103,40 @@ export const sendRecovery = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  statusCode,
+  message,
+}: NotificationContext) => {
+  const { "grafana-oncall": config } = GrafanaOncallSchema.parse(
+    JSON.parse(notification.data),
+  );
+  const { name } = monitor;
+
+  const event = GrafanaOncallPayload.parse({
+    alert_uid: `openstatus-monitor-${monitor.id}`,
+    title: `${name} certificate expiry warning`,
+    message: message || `Status code: ${statusCode}`,
+    state: "alerting",
+    link_to_upstream_details: `https://www.openstatus.dev/app/${monitor.id}/overview`,
+  });
+
+  const res = await fetch(config.webhookUrl, {
+    method: "POST",
+    body: JSON.stringify(event),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      `Failed to send Grafana OnCall cert-expiry alert: ${res.status} ${res.statusText}`,
+    );
+  }
+};
+
 export const sendTest = async (props: { webhookUrl: string }) => {
   const { webhookUrl } = props;
 

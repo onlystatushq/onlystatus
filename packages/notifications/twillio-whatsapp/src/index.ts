@@ -98,6 +98,38 @@ export const sendDegraded = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+}: NotificationContext) => {
+  const notificationData = whatsappDataSchema.parse(
+    JSON.parse(notification.data),
+  );
+  const contentVariables = JSON.stringify({ url: monitor.url });
+
+  const body = new FormData();
+  body.set("To", `whatsapp:${notificationData.whatsapp}`);
+  body.set("From", "whatsapp:+14807252613");
+  body.set("ContentSid", "HX35589f2e7ac8b8be63f4bd62a60e435f");
+  body.set("ContentVariables", contentVariables);
+
+  const res = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${env.TWILLIO_ACCOUNT_ID}/Messages.json`,
+    {
+      method: "post",
+      body,
+      headers: {
+        Authorization: `Basic ${btoa(
+          `${env.TWILLIO_ACCOUNT_ID}:${env.TWILLIO_AUTH_TOKEN}`,
+        )}`,
+      },
+    },
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to send SMS: ${res.statusText}`);
+  }
+};
+
 export const sendTest = async ({ phoneNumber }: { phoneNumber: string }) => {
   const contentVariables = JSON.stringify({ url: "https://openstat.us" });
   const body = new FormData();

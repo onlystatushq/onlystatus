@@ -114,6 +114,47 @@ export const sendRecovery = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  statusCode,
+  message,
+}: NotificationContext) => {
+  const data = pagerdutyDataSchema.parse(JSON.parse(notification.data));
+
+  const notificationData = PagerDutySchema.parse(JSON.parse(data.pagerduty));
+  const { name } = monitor;
+
+  for (const integrationKey of notificationData.integration_keys) {
+    const { integration_key } = integrationKey;
+
+    const event = triggerEventPayloadSchema.parse({
+      routing_key: integration_key,
+      dedup_key: `${monitor.id}`,
+      event_action: "trigger",
+      payload: {
+        summary: `${name} certificate expiry warning`,
+        source: "Open Status",
+        severity: "warning",
+        timestamp: new Date().toISOString(),
+        custom_details: {
+          statusCode,
+          message,
+        },
+      },
+    });
+
+    const res = await fetch("https://events.pagerduty.com/v2/enqueue", {
+      method: "POST",
+      body: JSON.stringify(event),
+    });
+    if (!res.ok) {
+      console.log(`Failed to send alert notification: ${res.statusText}`);
+      throw new Error("Failed to send alert notification");
+    }
+  }
+};
+
 export const sendTest = async ({
   integrationKey,
 }: {

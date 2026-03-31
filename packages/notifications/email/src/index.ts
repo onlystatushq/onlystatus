@@ -105,3 +105,38 @@ export const sendDegraded = async ({
     timestamp: new Date(cronTimestamp).toISOString(),
   });
 };
+
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  statusCode,
+  message,
+  cronTimestamp,
+  regions,
+  latency,
+}: NotificationContext) => {
+  // Convert regions array to single region for backwards compatibility
+  const region = regions?.[0] as Region | undefined;
+  const emailClient = new EmailClient({
+    smtpHost: env.SMTP_HOST,
+    smtpPort: env.SMTP_PORT,
+    smtpUser: env.SMTP_USER,
+    smtpPass: env.SMTP_PASS,
+  });
+
+  const config = emailDataSchema.safeParse(JSON.parse(notification.data));
+
+  if (!config.success) return;
+
+  await emailClient.sendMonitorAlert({
+    name: monitor.name,
+    type: "degraded",
+    to: config.data.email,
+    url: monitor.url,
+    status: statusCode?.toString(),
+    latency: latency ? `${latency}ms` : "N/A",
+    region: region ?? "N/A",
+    timestamp: new Date(cronTimestamp).toISOString(),
+    message,
+  });
+};

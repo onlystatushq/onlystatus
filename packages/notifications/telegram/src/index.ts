@@ -55,6 +55,23 @@ export const sendDegraded = async ({
   });
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+}: NotificationContext) => {
+  const notificationData = telegramDataSchema.parse(
+    JSON.parse(notification.data),
+  );
+  const { name } = monitor;
+
+  const body = `Your monitor ${name} / ${monitor.url} has a certificate expiry warning`;
+
+  await sendMessage({
+    chatId: notificationData.telegram.chatId,
+    message: body,
+  });
+};
+
 export const sendTest = async ({ chatId }: { chatId: string }) => {
   try {
     await sendMessage({

@@ -141,6 +141,45 @@ export const sendDegraded = async ({
   );
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  statusCode,
+  message,
+  incident,
+  cronTimestamp,
+  regions,
+  latency,
+}: NotificationContext) => {
+  const notificationData = slackDataSchema.parse(JSON.parse(notification.data));
+  const { slack: webhookUrl } = notificationData;
+
+  const context = {
+    monitor,
+    notification,
+    statusCode,
+    message,
+    cronTimestamp,
+    latency,
+    regions,
+  };
+
+  const data = buildCommonMessageData(context, { incident });
+  const blocks = buildDegradedBlocks(data);
+
+  await postToWebhook(
+    {
+      attachments: [
+        {
+          color: COLORS.yellow,
+          blocks,
+        },
+      ],
+    },
+    webhookUrl,
+  );
+};
+
 export const sendTestSlackMessage = async (webhookUrl: string) => {
   await postToWebhook(
     {
