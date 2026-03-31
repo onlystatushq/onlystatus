@@ -227,7 +227,7 @@ export const columns: ColumnDef<Monitor>[] = [
       if (!cert || cert.certExpiryDays == null) {
         return <span className="text-muted-foreground">-</span>;
       }
-      if (!cert.certValid) {
+      if (cert.certValid === 0) {
         return (
           <span className="inline-flex items-center gap-1 text-warning">
             <ShieldAlert className="h-3 w-3" />

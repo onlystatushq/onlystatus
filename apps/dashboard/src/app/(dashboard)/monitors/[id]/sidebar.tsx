@@ -49,7 +49,7 @@ export function Sidebar() {
           items: [
             {
               label: "Status",
-              value: certData.certValid ? (
+              value: certData.certValid === 1 ? (
                 <span className="inline-flex items-center gap-1 text-success">
                   <ShieldCheck className="h-3 w-3" />
                   Valid

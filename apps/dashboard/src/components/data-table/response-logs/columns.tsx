@@ -36,6 +36,7 @@ export function getColumns(
       enableHiding: false,
       cell: ({ row }) => {
         const value = row.getValue("requestStatus");
+        // TODO: certValid will render once the Tinybird list pipe schema includes cert fields
         const certValid = (row.original as ResponseLog & { certValid?: number }).certValid;
         const indicator = (() => {
           if (value === "error") {

@@ -142,7 +142,7 @@ export function Client() {
         </div>
         {certData && certData.certExpiryDays != null && (
           <div className="flex items-center gap-4 rounded-lg border p-4">
-            {certData.certValid ? (
+            {certData.certValid === 1 ? (
               <ShieldCheck className={cn(
                 "h-8 w-8 shrink-0",
                 getCertExpiryClassName(certData.certExpiryDays),
