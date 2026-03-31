@@ -1771,4 +1771,58 @@ export class OSTinybird {
       opts: { next: { revalidate: REVALIDATE } },
     });
   }
+
+  public get certStatus() {
+    return this.tb.buildPipe({
+      pipe: "endpoint__cert_status__v1",
+      parameters: z.object({
+        monitorId: z.string(),
+      }),
+      data: z.object({
+        monitorId: z.string(),
+        certExpiryDays: z.number().nullable(),
+        certValid: z.number().nullable(),
+        certIssuer: z.string().nullable(),
+        certExpiresAt: z.number().nullable(),
+        certFingerprint: z.string().nullable(),
+        certError: z.string().nullable(),
+        lastChecked: z.number(),
+      }),
+      opts: { next: { revalidate: REVALIDATE } },
+    });
+  }
+
+  public get certStatusWorkspace() {
+    return this.tb.buildPipe({
+      pipe: "endpoint__cert_status_workspace__v1",
+      parameters: z.object({
+        workspaceId: z.string(),
+      }),
+      data: z.object({
+        monitorId: z.string(),
+        certExpiryDays: z.number().nullable(),
+        certValid: z.number().nullable(),
+        certIssuer: z.string().nullable(),
+        lastChecked: z.number(),
+      }),
+      opts: { next: { revalidate: REVALIDATE } },
+    });
+  }
+
+  public get certHistory() {
+    return this.tb.buildPipe({
+      pipe: "endpoint__cert_history__v1",
+      parameters: z.object({
+        monitorId: z.string(),
+        fromTimestamp: z.number().optional(),
+      }),
+      data: z.object({
+        time: z.string(),
+        monitorId: z.string(),
+        avgExpiryDays: z.number(),
+        allValid: z.number(),
+      }),
+      opts: { next: { revalidate: REVALIDATE } },
+    });
+  }
 }

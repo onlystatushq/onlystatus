@@ -17,7 +17,13 @@ SCHEMA >
     `trigger` Nullable(String) `json:$.trigger`,
     `id` Nullable(String) `json:$.id`,
     `requestStatus` Nullable(String) `json:$.requestStatus`,
-    `method` String `json:$.method`
+    `method` String `json:$.method`,
+    `certExpiryDays` Nullable(Int32) `json:$.certExpiryDays`,
+    `certValid` Nullable(Int8) `json:$.certValid`,
+    `certIssuer` Nullable(String) `json:$.certIssuer`,
+    `certExpiresAt` Nullable(Int64) `json:$.certExpiresAt`,
+    `certFingerprint` Nullable(String) `json:$.certFingerprint`,
+    `certError` Nullable(String) `json:$.certError`
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYYYYMM(fromUnixTimestamp64Milli(cronTimestamp))"
