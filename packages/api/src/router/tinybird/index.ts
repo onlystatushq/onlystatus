@@ -673,6 +673,12 @@ export const tinybirdRouter = createTRPCRouter({
         });
       }
 
-      return await tb.certStatus(opts.input);
+      const result = await tb.certStatus(opts.input);
+      return {
+        ...result,
+        data: result.data.filter(
+          (d) => d.monitorId === opts.input.monitorId,
+        ),
+      };
     }),
 });
