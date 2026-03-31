@@ -1751,26 +1751,6 @@ export class OSTinybird {
     });
   }
 
-  public get certStatus() {
-    return this.tb.buildPipe({
-      pipe: "endpoint__cert_status__v1",
-      parameters: z.object({
-        monitorId: z.string(),
-      }),
-      data: z.object({
-        monitorId: z.string(),
-        certExpiryDays: z.number().nullable(),
-        certValid: z.number().nullable(),
-        certIssuer: z.string().nullable(),
-        certExpiresAt: z.number().nullable(),
-        certFingerprint: z.string().nullable(),
-        certError: z.string().nullable(),
-        lastChecked: z.number(),
-      }),
-      opts: { next: { revalidate: REVALIDATE } },
-    });
-  }
-
   public get dnsMetricsLatency1dMulti() {
     return this.tb.buildPipe({
       pipe: "endpoint__dns_metrics_latency_1d_multi__v0",
