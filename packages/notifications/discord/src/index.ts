@@ -127,6 +127,37 @@ export const sendDegraded = async ({
   await postToWebhook([embed], webhookUrl);
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  statusCode,
+  message,
+  incident,
+  cronTimestamp,
+  latency,
+  regions,
+}: NotificationContext) => {
+  const notificationData = discordDataSchema.parse(
+    JSON.parse(notification.data),
+  );
+  const { discord: webhookUrl } = notificationData;
+
+  const context = {
+    monitor,
+    notification,
+    statusCode,
+    message,
+    cronTimestamp,
+    latency,
+    regions,
+  };
+
+  const data = buildCommonMessageData(context, { incident });
+  const embed = buildDegradedEmbed(data);
+
+  await postToWebhook([embed], webhookUrl);
+};
+
 export const sendTestDiscordMessage = async (webhookUrl: string) => {
   const testEmbed: DiscordEmbed = {
     title: "Test Notification",

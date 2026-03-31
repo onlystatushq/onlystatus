@@ -91,6 +91,35 @@ export const sendDegraded = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+}: NotificationContext) => {
+  const notificationData = ntfyDataSchema.parse(JSON.parse(notification.data));
+  const { name } = monitor;
+
+  const body = `Your monitor ${name} / ${monitor.url} has a certificate expiry warning`;
+
+  const authorization = notificationData.ntfy
+    ? { Authorization: `Bearer ${notificationData.ntfy.token}` }
+    : undefined;
+
+  const url = notificationData.ntfy.serverUrl
+    ? `${notificationData.ntfy.serverUrl}/${notificationData.ntfy.topic}`
+    : `https://ntfy.sh/${notificationData.ntfy.topic}`;
+
+  const res = await fetch(url, {
+    method: "post",
+    body,
+    headers: {
+      ...authorization,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to send cert-expiry notification: ${res.statusText}`);
+  }
+};
+
 export const sendTest = async ({
   serverUrl,
   topic,

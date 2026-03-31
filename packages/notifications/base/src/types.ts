@@ -38,4 +38,4 @@ export interface FormattedMessageData {
 /**
  * Notification type discriminator
  */
-export type NotificationType = "alert" | "recovery" | "degraded";
+export type NotificationType = "alert" | "recovery" | "degraded" | "cert-expiry";

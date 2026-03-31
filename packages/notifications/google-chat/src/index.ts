@@ -90,6 +90,27 @@ export const sendDegraded = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+}: NotificationContext) => {
+  const notificationData = googleChatDataSchema.parse(
+    JSON.parse(notification.data),
+  );
+  const { "google-chat": webhookUrl } = notificationData; // webhook url
+  const { name } = monitor;
+
+  try {
+    await postToWebhook(
+      `*Certificate Expiry Warning <${monitor.url}|${name}>*\n> Check your <https://www.openstatus.dev/app/|Dashboard>.\n`,
+      webhookUrl,
+    );
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 export const sendTest = async (webhookUrl: string) => {
   if (!webhookUrl) {
     return false;

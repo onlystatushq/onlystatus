@@ -101,6 +101,39 @@ export const sendDegraded = async ({
   }
 };
 
+export const sendCertExpiry = async ({
+  monitor,
+  notification,
+  cronTimestamp,
+  latency,
+  statusCode,
+  message,
+}: NotificationContext) => {
+  const notificationData = WebhookSchema.parse(JSON.parse(notification.data));
+
+  const body = PayloadSchema.parse({
+    monitor: monitor,
+    cronTimestamp,
+    status: "warning",
+    statusCode,
+    latency,
+    errorMessage: message,
+  });
+
+  const res = await fetch(notificationData.webhook.endpoint, {
+    method: "post",
+    body: JSON.stringify(body),
+    headers: notificationData.webhook.headers
+      ? transformHeaders(notificationData.webhook.headers)
+      : {
+          "Content-Type": "application/json",
+        },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to send webhook notification: ${res.statusText}`);
+  }
+};
+
 export const sendTest = async ({
   url,
   headers,
