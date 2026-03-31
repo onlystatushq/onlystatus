@@ -41,6 +41,7 @@ type Response struct {
 	Timestamp int64             `json:"timestamp"`
 	Status    int               `json:"status,omitempty"`
 	Timing    Timing            `json:"timing"`
+	CertInfo  *CertInfo         `json:"certInfo,omitempty"`
 }
 
 // decodeBase64Body decodes a data URL base64 body if needed
@@ -76,6 +77,17 @@ func Http(ctx context.Context, client *http.Client, inputData request.HttpChecke
 		}
 	} else {
 		bodyBytes = []byte(inputData.Body)
+	}
+
+	var certInfo *CertInfo
+	if strings.HasPrefix(strings.ToLower(inputData.URL), "https://") {
+		certInfo = &CertInfo{}
+		client.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify:    true,
+				VerifyPeerCertificate: certInfo.VerifyAndExtract,
+			},
+		}
 	}
 
 	req, err := http.NewRequestWithContext(ctx, inputData.Method, strings.TrimSpace(inputData.URL), bytes.NewReader(bodyBytes))
@@ -165,6 +177,7 @@ func Http(ctx context.Context, client *http.Client, inputData request.HttpChecke
 		Timing:    timing,
 		Latency:   latency,
 		Body:      string(body),
+		CertInfo:  certInfo,
 	}, nil
 
 }

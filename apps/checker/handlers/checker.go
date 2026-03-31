@@ -24,24 +24,30 @@ func (s statusCode) IsSuccessful() bool {
 }
 
 type PingData struct {
-	ID            string `json:"id"`
-	WorkspaceID   string `json:"workspaceId"`
-	MonitorID     string `json:"monitorId"`
-	URL           string `json:"url"`
-	Method        string `json:"method"`
-	Region        string `json:"region"`
-	Message       string `json:"message,omitempty"`
-	Timing        string `json:"timing,omitempty"`
-	Headers       string `json:"headers,omitempty"`
-	Assertions    string `json:"assertions"`
-	Body          string `json:"body,omitempty"`
-	Trigger       string `json:"trigger,omitempty"`
-	RequestStatus string `json:"requestStatus,omitempty"`
-	Latency       int64  `json:"latency"`
-	CronTimestamp int64  `json:"cronTimestamp"`
-	Timestamp     int64  `json:"timestamp"`
-	StatusCode    int    `json:"statusCode,omitempty"`
-	Error         uint8  `json:"error"`
+	ID              string `json:"id"`
+	WorkspaceID     string `json:"workspaceId"`
+	MonitorID       string `json:"monitorId"`
+	URL             string `json:"url"`
+	Method          string `json:"method"`
+	Region          string `json:"region"`
+	Message         string `json:"message,omitempty"`
+	Timing          string `json:"timing,omitempty"`
+	Headers         string `json:"headers,omitempty"`
+	Assertions      string `json:"assertions"`
+	Body            string `json:"body,omitempty"`
+	Trigger         string `json:"trigger,omitempty"`
+	RequestStatus   string `json:"requestStatus,omitempty"`
+	Latency         int64  `json:"latency"`
+	CronTimestamp   int64  `json:"cronTimestamp"`
+	Timestamp       int64  `json:"timestamp"`
+	StatusCode      int    `json:"statusCode,omitempty"`
+	Error           uint8  `json:"error"`
+	CertExpiryDays  int    `json:"certExpiryDays"`
+	CertValid       int8   `json:"certValid"`
+	CertIssuer      string `json:"certIssuer,omitempty"`
+	CertExpiresAt   int64  `json:"certExpiresAt,omitempty"`
+	CertFingerprint string `json:"certFingerprint,omitempty"`
+	CertError       string `json:"certError,omitempty"`
 }
 
 func (h Handler) HTTPCheckerHandler(c *gin.Context) {
@@ -169,6 +175,17 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 			RequestStatus: requestStatus,
 		}
 
+		if res.CertInfo != nil {
+			data.CertExpiryDays = res.CertInfo.ExpiryDays
+			data.CertIssuer = res.CertInfo.Issuer
+			data.CertExpiresAt = res.CertInfo.ExpiresAt
+			data.CertFingerprint = res.CertInfo.Fingerprint
+			data.CertError = res.CertInfo.ErrorMessage
+			if res.CertInfo.Valid {
+				data.CertValid = 1
+			}
+		}
+
 		var isSuccessfull bool = true
 		isSuccessfull, err = EvaluateHTTPAssertions(req.RawAssertions, data, res)
 		if err != nil {
@@ -202,9 +219,31 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 
 		data.Assertions = assertionAsString
 
+		if res.CertInfo != nil && !res.CertInfo.Valid && isSuccessfull {
+			data.RequestStatus = "degraded"
+			data.Message = fmt.Sprintf("Untrusted certificate: %s", res.CertInfo.ErrorMessage)
+
+			if req.Status != "degraded" {
+				checker.UpdateStatus(ctx, checker.UpdateData{
+					MonitorId:       req.MonitorID,
+					Status:          "degraded",
+					Message:         data.Message,
+					Region:          h.Region,
+					CronTimestamp:   req.CronTimestamp,
+					StatusCode:      res.Status,
+					Latency:         res.Latency,
+					CertExpiryDays:  res.CertInfo.ExpiryDays,
+					CertValid:       false,
+					CertFingerprint: res.CertInfo.Fingerprint,
+				})
+			}
+		}
+
+		certUpdate := certUpdateFields(res)
+
 		if !isSuccessfull && req.Status != "error" {
 			// Q: Why here we do not check if the status was previously active?
-			checker.UpdateStatus(ctx, checker.UpdateData{
+			ud := checker.UpdateData{
 				MonitorId:     req.MonitorID,
 				Status:        "error",
 				StatusCode:    res.Status,
@@ -212,43 +251,51 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 				Message:       res.Error,
 				CronTimestamp: req.CronTimestamp,
 				Latency:       res.Latency,
-			})
+			}
+			applyCertFields(&ud, certUpdate)
+			checker.UpdateStatus(ctx, ud)
 			data.RequestStatus = "error"
 		}
 		// it's degraded
 		if isSuccessfull && req.DegradedAfter > 0 && res.Latency > req.DegradedAfter && req.Status != "degraded" {
-			checker.UpdateStatus(ctx, checker.UpdateData{
+			ud := checker.UpdateData{
 				MonitorId:     req.MonitorID,
 				Status:        "degraded",
 				Region:        h.Region,
 				StatusCode:    res.Status,
 				CronTimestamp: req.CronTimestamp,
 				Latency:       res.Latency,
-			})
+			}
+			applyCertFields(&ud, certUpdate)
+			checker.UpdateStatus(ctx, ud)
 			data.RequestStatus = "degraded"
 		}
 		// it's active
 		if isSuccessfull && req.DegradedAfter == 0 && req.Status != "active" {
-			checker.UpdateStatus(ctx, checker.UpdateData{
+			ud := checker.UpdateData{
 				MonitorId:     req.MonitorID,
 				Status:        "active",
 				Region:        h.Region,
 				StatusCode:    res.Status,
 				CronTimestamp: req.CronTimestamp,
 				Latency:       res.Latency,
-			})
+			}
+			applyCertFields(&ud, certUpdate)
+			checker.UpdateStatus(ctx, ud)
 			data.RequestStatus = "success"
 		}
 		// it's active
 		if isSuccessfull && res.Latency < req.DegradedAfter && req.DegradedAfter != 0 && req.Status != "active" {
-			checker.UpdateStatus(ctx, checker.UpdateData{
+			ud := checker.UpdateData{
 				MonitorId:     req.MonitorID,
 				Status:        "active",
 				Region:        h.Region,
 				StatusCode:    res.Status,
 				CronTimestamp: req.CronTimestamp,
 				Latency:       res.Latency,
-			})
+			}
+			applyCertFields(&ud, certUpdate)
+			checker.UpdateStatus(ctx, ud)
 			data.RequestStatus = "success"
 		}
 
@@ -329,6 +376,32 @@ func (h Handler) HTTPCheckerHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, nil)
+}
+
+type certFields struct {
+	expiryDays  int
+	valid       bool
+	fingerprint string
+}
+
+func certUpdateFields(res checker.Response) *certFields {
+	if res.CertInfo == nil {
+		return nil
+	}
+	return &certFields{
+		expiryDays:  res.CertInfo.ExpiryDays,
+		valid:       res.CertInfo.Valid,
+		fingerprint: res.CertInfo.Fingerprint,
+	}
+}
+
+func applyCertFields(ud *checker.UpdateData, cf *certFields) {
+	if cf == nil {
+		return
+	}
+	ud.CertExpiryDays = cf.expiryDays
+	ud.CertValid = cf.valid
+	ud.CertFingerprint = cf.fingerprint
 }
 
 func EvaluateHTTPAssertions(raw []json.RawMessage, data PingData, res checker.Response) (bool, error) {
