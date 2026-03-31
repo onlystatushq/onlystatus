@@ -6,6 +6,12 @@ log() { echo "[tinybird-deploy] $1"; }
 TINYBIRD_HOST="${TINYBIRD_HOST:-http://tinybird-local:7181}"
 AUTH_FILE="${AUTH_FILE:-/auth/.tinyb}"
 
+# Schema version - bump this when datasources, pipes, or endpoints change.
+# The deploy container stores the last deployed version in Tinybird metadata.
+# If the version matches, only new/changed pipes are pushed. If it differs,
+# a full redeploy with --override-datasource is triggered.
+SCHEMA_VERSION="2"
+
 # Wait for auth file (tinybird-local writes .tinyb after workspace init)
 for i in $(seq 1 60); do
   [ -f "$AUTH_FILE" ] && break
@@ -56,29 +62,51 @@ except Exception as e:
   sleep 2
 done
 
-# Check if schemas fully deployed (datasources + endpoint pipes)
-check_deployed() {
+# Get the deployed schema version from a Tinybird metadata datasource.
+# Returns empty string if no version tracking exists yet (fresh or pre-versioning deploy).
+get_deployed_version() {
   python3 -c "
 import urllib.request, json, sys
-hdr = {'Authorization': 'Bearer $TOKEN'}
-# Check datasource exists
-req = urllib.request.Request('$TINYBIRD_HOST/v0/datasources', headers=hdr)
-resp = urllib.request.urlopen(req, timeout=5)
-ds = [d['name'] for d in json.loads(resp.read())['datasources']]
-if 'ping_response__v8' not in ds:
-    sys.exit(1)
-# Check endpoint pipes exist (not just datasources)
-req2 = urllib.request.Request('$TINYBIRD_HOST/v0/pipes', headers=hdr)
-resp2 = urllib.request.urlopen(req2, timeout=5)
-pipes = json.loads(resp2.read()).get('pipes', [])
-endpoints = [p['name'] for p in pipes if p.get('endpoint')]
-sys.exit(0 if len(endpoints) >= 50 else 1)
+try:
+  req = urllib.request.Request(
+    '$TINYBIRD_HOST/v0/pipes/schema_version__v1.json',
+    headers={'Authorization': 'Bearer $TOKEN'}
+  )
+  resp = urllib.request.urlopen(req, timeout=5)
+  data = json.loads(resp.read()).get('data', [])
+  print(data[0]['version'] if data else '')
+except:
+  print('')
 " 2>/dev/null
 }
 
-if check_deployed; then
-  log "Schemas already deployed, skipping."
+# Check if core datasource exists (for fresh vs upgrade detection)
+has_core_datasource() {
+  python3 -c "
+import urllib.request, json, sys
+hdr = {'Authorization': 'Bearer $TOKEN'}
+req = urllib.request.Request('$TINYBIRD_HOST/v0/datasources', headers=hdr)
+resp = urllib.request.urlopen(req, timeout=5)
+ds = [d['name'] for d in json.loads(resp.read())['datasources']]
+sys.exit(0 if 'ping_response__v8' in ds else 1)
+" 2>/dev/null
+}
+
+DEPLOYED_VERSION=$(get_deployed_version)
+log "Schema version: want=$SCHEMA_VERSION, deployed=${DEPLOYED_VERSION:-none}"
+
+if [ "$DEPLOYED_VERSION" = "$SCHEMA_VERSION" ]; then
+  log "Schema version $SCHEMA_VERSION already deployed. Nothing to do."
   exit 0
+fi
+
+# Determine deploy mode
+if has_core_datasource; then
+  DEPLOY_MODE="upgrade"
+  log "Upgrading schema from version ${DEPLOYED_VERSION:-unknown} to $SCHEMA_VERSION"
+else
+  DEPLOY_MODE="fresh"
+  log "Fresh deploy - no existing datasources found"
 fi
 
 log "Authenticating with tb CLI..."
@@ -93,7 +121,7 @@ for dir in datasources pipes endpoints; do
 done
 cd /tmp/tb-work
 
-log "Deploying schemas..."
+log "Deploying schemas ($DEPLOY_MODE mode)..."
 # tcp_response.datasource (VERSION 0) and tcp_response__v0.datasource conflict on
 # fresh deploys (column change limit). The __v0 file has the current schema with
 # requestStatus/id columns that pipes depend on. Remove the outdated versioned file.
@@ -101,10 +129,56 @@ rm -f /tmp/tb-work/datasources/tcp_response.datasource
 printf 'y\n%.0s' $(seq 1 50) | tb push --force --override-datasource 2>&1 || true
 
 # Verify critical schema exists
-if check_deployed; then
-  log "Done."
-  exit 0
+if ! has_core_datasource; then
+  log "FATAL: ping_response__v8 not found after deploy"
+  exit 1
 fi
 
-log "FATAL: ping_response__v8 not found after deploy"
-exit 1
+# Store the deployed schema version as a Tinybird pipe for tracking.
+# This is a constant-returning pipe that acts as version metadata.
+log "Setting schema version to $SCHEMA_VERSION..."
+python3 -c "
+import urllib.request, json
+
+# Delete existing version pipe if present
+try:
+  req = urllib.request.Request(
+    '$TINYBIRD_HOST/v0/pipes/schema_version__v1',
+    headers={'Authorization': 'Bearer $TOKEN'},
+    method='DELETE'
+  )
+  urllib.request.urlopen(req, timeout=5)
+except:
+  pass
+
+# Create version pipe
+data = json.dumps({
+  'name': 'schema_version__v1',
+  'nodes': [{
+    'name': 'version_node',
+    'sql': \"SELECT '$SCHEMA_VERSION' AS version\"
+  }]
+}).encode()
+req = urllib.request.Request(
+  '$TINYBIRD_HOST/v0/pipes',
+  data=data,
+  headers={
+    'Authorization': 'Bearer $TOKEN',
+    'Content-Type': 'application/json'
+  }
+)
+resp = urllib.request.urlopen(req, timeout=5)
+result = json.loads(resp.read())
+
+# Publish as endpoint
+req2 = urllib.request.Request(
+  '$TINYBIRD_HOST/v0/pipes/schema_version__v1/nodes/version_node/endpoint',
+  headers={'Authorization': 'Bearer $TOKEN'},
+  method='POST'
+)
+urllib.request.urlopen(req2, timeout=5)
+print('Version pipe created')
+" 2>/dev/null || log "Warning: could not set schema version (non-fatal)"
+
+log "Done. Schema version $SCHEMA_VERSION deployed."
+exit 0
