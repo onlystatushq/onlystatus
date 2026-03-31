@@ -25,6 +25,9 @@ const payloadSchema = z.object({
   cronTimestamp: z.number(),
   status: monitorStatusSchema,
   latency: z.number().optional(),
+  certExpiryDays: z.number().optional(),
+  certValid: z.boolean().optional(),
+  certFingerprint: z.string().optional(),
 });
 
 const logger = getLogger(["workflow"]);
@@ -107,6 +110,9 @@ checkerRoute.post("/updateStatus", async (c) => {
     cronTimestamp,
     status,
     latency,
+    certExpiryDays,
+    certValid,
+    certFingerprint,
   } = result.data;
 
   logger.info("Updating monitor status", {
@@ -344,6 +350,50 @@ checkerRoute.post("/updateStatus", async (c) => {
       default:
         logger.error("should not happen");
         break;
+    }
+  }
+
+  // Cert expiry notification logic
+  if (certExpiryDays !== undefined && certFingerprint) {
+    const thresholds = [14, 1];
+
+    for (const threshold of thresholds) {
+      if (certExpiryDays <= threshold) {
+        const existing = await db
+          .select()
+          .from(schema.certNotificationSent)
+          .where(
+            and(
+              eq(schema.certNotificationSent.monitorId, Number(monitorId)),
+              eq(schema.certNotificationSent.thresholdDays, threshold),
+              eq(schema.certNotificationSent.certFingerprint, certFingerprint),
+            ),
+          )
+          .get();
+
+        if (!existing) {
+          await db
+            .insert(schema.certNotificationSent)
+            .values({
+              monitorId: Number(monitorId),
+              thresholdDays: threshold,
+              certFingerprint: certFingerprint,
+            })
+            .onConflictDoNothing();
+
+          await triggerNotifications({
+            monitorId,
+            notifType: "cert-expiry",
+            cronTimestamp,
+            statusCode,
+            message:
+              threshold === 1
+                ? "SSL certificate expires tomorrow"
+                : `SSL certificate expires in ${certExpiryDays} days`,
+            regions: [region],
+          });
+        }
+      }
     }
   }
 
