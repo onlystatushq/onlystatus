@@ -2,6 +2,7 @@ package job
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -76,6 +77,17 @@ func (jr jobRunner) HTTPJob(ctx context.Context, monitor *v1.HTTPMonitor) (*Http
 				return http.ErrUseLastResponse
 			}
 			return nil
+		}
+	}
+
+	var certInfo *checker.CertInfo
+	if strings.HasPrefix(strings.ToLower(monitor.Url), "https://") {
+		certInfo = &checker.CertInfo{}
+		requestClient.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify:    true,
+				VerifyPeerCertificate: certInfo.VerifyAndExtract,
+			},
 		}
 	}
 
@@ -205,6 +217,22 @@ func (jr jobRunner) HTTPJob(ctx context.Context, monitor *v1.HTTPMonitor) (*Http
 			RequestStatus: requestStatus,
 			// Assertions:    assertionAsString,
 			Error: 0,
+		}
+
+		if certInfo != nil {
+			data.CertExpiryDays = int32(certInfo.ExpiryDays)
+			data.CertIssuer = certInfo.Issuer
+			data.CertExpiresAt = certInfo.ExpiresAt
+			data.CertFingerprint = certInfo.Fingerprint
+			data.CertError = certInfo.ErrorMessage
+			if certInfo.Valid {
+				data.CertValid = 1
+			}
+
+			if !certInfo.Valid && isSuccessful {
+				data.RequestStatus = "degraded"
+				data.Message = fmt.Sprintf("Untrusted certificate: %s", certInfo.ErrorMessage)
+			}
 		}
 
 		if isSuccessful {

@@ -13,18 +13,24 @@ func (s statusCode) IsSuccessful() bool {
 }
 
 type HttpPrivateRegionData struct {
-	ID            string `json:"id"`
-	URL           string `json:"url"`
-	Message       string `json:"message,omitempty"`
-	Timing        string `json:"timing,omitempty"`
-	Headers       string `json:"headers,omitempty"`
-	Body          string `json:"body,omitempty"`
-	RequestStatus string `json:"requestStatus,omitempty"`
-	Latency       int64  `json:"latency"`
-	CronTimestamp int64  `json:"cronTimestamp"`
-	Timestamp     int64  `json:"timestamp"`
-	StatusCode    int    `json:"statusCode,omitempty"`
-	Error         uint8  `json:"error"`
+	ID              string `json:"id"`
+	URL             string `json:"url"`
+	Message         string `json:"message,omitempty"`
+	Timing          string `json:"timing,omitempty"`
+	Headers         string `json:"headers,omitempty"`
+	Body            string `json:"body,omitempty"`
+	RequestStatus   string `json:"requestStatus,omitempty"`
+	Latency         int64  `json:"latency"`
+	CronTimestamp   int64  `json:"cronTimestamp"`
+	Timestamp       int64  `json:"timestamp"`
+	StatusCode      int    `json:"statusCode,omitempty"`
+	Error           uint8  `json:"error"`
+	CertExpiryDays  int32  `json:"certExpiryDays,omitempty"`
+	CertValid       int32  `json:"certValid,omitempty"`
+	CertIssuer      string `json:"certIssuer,omitempty"`
+	CertExpiresAt   int64  `json:"certExpiresAt,omitempty"`
+	CertFingerprint string `json:"certFingerprint,omitempty"`
+	CertError       string `json:"certError,omitempty"`
 }
 
 type JobRunner interface {
