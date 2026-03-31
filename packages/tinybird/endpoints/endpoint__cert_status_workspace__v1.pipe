@@ -1,0 +1,18 @@
+NODE cert_latest_all
+SQL >
+    SELECT
+        monitorId,
+        argMax(t.certExpiryDays, t.cronTimestamp) AS certExpiryDays,
+        argMax(t.certValid, t.cronTimestamp) AS certValid,
+        argMax(t.certIssuer, t.cronTimestamp) AS certIssuer,
+        max(t.cronTimestamp) AS lastChecked
+    FROM (
+        SELECT * FROM ping_response__v8
+        WHERE certExpiryDays IS NOT NULL
+        AND cronTimestamp >= toUnixTimestamp64Milli(now64() - INTERVAL 1 DAY)
+    ) AS t
+    WHERE
+        t.workspaceId = {{ String(workspaceId, '1', required=True) }}
+    GROUP BY monitorId
+
+TYPE endpoint

@@ -1,0 +1,18 @@
+NODE cert_trend
+SQL >
+    SELECT
+        toStartOfHour(fromUnixTimestamp64Milli(t.cronTimestamp)) AS time,
+        t.monitorId,
+        avg(t.certExpiryDays) AS avgExpiryDays,
+        min(t.certValid) AS allValid
+    FROM (
+        SELECT * FROM ping_response__v8
+        WHERE certExpiryDays IS NOT NULL
+    ) AS t
+    WHERE
+        t.monitorId = {{ String(monitorId, '1', required=True) }}
+        AND t.cronTimestamp >= {{ Int64(fromTimestamp, 0) }}
+    GROUP BY time, t.monitorId
+    ORDER BY time ASC
+
+TYPE endpoint
