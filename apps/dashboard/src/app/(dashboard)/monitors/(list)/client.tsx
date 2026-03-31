@@ -22,11 +22,11 @@ import { DataTable } from "@/components/ui/data-table/data-table";
 import { DataTablePaginationSimple } from "@/components/ui/data-table/data-table-pagination";
 import { getMonitorListMetrics } from "@/data/metrics.client";
 import { useTRPC } from "@/lib/trpc/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import { ArrowDown, CheckCircle, ListFilter } from "lucide-react";
 import { useQueryStates } from "nuqs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { searchParamsParsers } from "./search-params";
 
 const icons = {
@@ -76,6 +76,27 @@ export function Client() {
     }),
     enabled: tcpMonitors.length > 0,
   });
+
+  const certQueries = useQueries({
+    queries: httpMonitors.map((monitorId) => ({
+      ...trpc.tinybird.certStatus.queryOptions({ monitorId }),
+      enabled: httpMonitors.length > 0,
+    })),
+  });
+
+  const certStatusMap = useMemo(() => {
+    const map = new Map<string, { certExpiryDays: number | null; certValid: number | null }>();
+    for (const query of certQueries) {
+      const row = query.data?.data?.[0];
+      if (row) {
+        map.set(row.monitorId, {
+          certExpiryDays: row.certExpiryDays,
+          certValid: row.certValid,
+        });
+      }
+    }
+    return map;
+  }, [certQueries]);
 
   // TODO: ideally we read from the searchParamsCache and there is no layout shift
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -176,6 +197,10 @@ export function Client() {
                   : globalTcpMetrics?.data?.find(
                       (m) => m.monitorId === monitor.id.toString(),
                     ) ?? false,
+            certStatus:
+              monitor.jobType === "http"
+                ? certStatusMap.get(monitor.id.toString()) ?? null
+                : null,
           }))}
           actionBar={MonitorDataTableActionBar}
           toolbarComponent={(props) => (
