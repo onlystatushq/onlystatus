@@ -26,7 +26,7 @@ export const triggerNotifications = async ({
   monitorId: string;
   statusCode?: number;
   message?: string;
-  notifType: "alert" | "recovery" | "degraded";
+  notifType: "alert" | "recovery" | "degraded" | "cert-expiry";
   cronTimestamp: number;
   incidentId?: number;
   regions?: string[];
@@ -177,6 +177,36 @@ export const triggerNotifications = async ({
         );
         await Effect.runPromise(degradedResult).catch((err) =>
           logger.error("Failed to send degraded notification", {
+            monitor_id: monitorId,
+            provider: notif.notification.provider,
+            error_message: err instanceof Error ? err.message : String(err),
+          }),
+        );
+        break;
+      case "cert-expiry":
+        const certExpiryResult = Effect.tryPromise({
+          try: () =>
+            providerToFunction[notif.notification.provider].sendCertExpiry({
+              monitor,
+              notification: selectNotificationSchema.parse(notif.notification),
+              statusCode,
+              message,
+              cronTimestamp,
+              regions,
+              latency,
+            }),
+          catch: (_unknown) =>
+            new Error(
+              `Failed sending cert-expiry notification via ${notif.notification.provider} for monitor ${monitorId}`,
+            ),
+        }).pipe(
+          Effect.retry({
+            times: 3,
+            schedule: Schedule.exponential("1000 millis"),
+          }),
+        );
+        await Effect.runPromise(certExpiryResult).catch((err) =>
+          logger.error("Failed to send cert-expiry notification", {
             monitor_id: monitorId,
             provider: notif.notification.provider,
             error_message: err instanceof Error ? err.message : String(err),
